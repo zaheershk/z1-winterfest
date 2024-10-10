@@ -314,7 +314,7 @@
                      <div class="section-header">
                         <h2>Final Submission</h2>
                      </div>
-                     <button class="btn btn-primary" type="button" onclick="validateAndSubmitForm()">Submit</button>
+                     <button class="btn btn-primary" type="submit" onclick="validateAndSubmitForm(event)">Submit</button>
                   </section>
                </div>
             </div>
@@ -332,14 +332,17 @@
       </div>
       <!-- JavaScript for dynamic management -->
       <script>
+         
          function validateAndSubmitForm() {
+             event.preventDefault(); // Add this to prevent submission.
+
              const competitions = document.querySelectorAll('input[name="competitions"]:checked');
              if (competitions.length === 0) {
                  alert('Please select at least one competition');
-                 return false;
+             } else {
+                 const form = document.getElementById('registrationForm');
+                 form.submit(); // Now submit when everything's fine.
              }
-             const form = document.getElementById('registrationForm');
-             form.submit(); 
 
             // Collect data and submit; implement real backend integration
             console.log("Submit functionality needs complete backend integration.");
