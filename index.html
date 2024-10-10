@@ -449,9 +449,12 @@
             
                 // Mandatory checks
                 [email, name, phoneNumber, tower, flat, age, paymentConfirmation].forEach(input => {
-                    if (!input.value) {
+                    // Check if the element exists and has an empty value
+                    if (input && !input.value) {
                         input.classList.add(invalidInputClass);
                         formValid = false;
+                    } else if (!input) { // Log an error or handle the case if the element is not found
+                        console.error("Error: Element is not found in the document.");
                     }
                 });
             
