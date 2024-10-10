@@ -519,7 +519,6 @@
                 var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
 
                 /*
-                let competitionInfo = [];
                 document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
                     const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
                     const escapedId = escapeCSSId(`team-${checkboxId}`);
@@ -530,9 +529,10 @@
                         // Make sure the input exists and has a value
                         teamInfo = teamInfoInput.value;
                     }
-                    */
+                */
 
                 let teamInfo = null;
+                let competitionInfo = [];
                 selectedCompetitions.forEach((comp) => {
                     const compId = comp.id;
                     if (document.getElementById(`team-${compId}`)) {
@@ -542,13 +542,13 @@
                             teamInfo = teamInfoInput.value;
                         }
                     }
-                });
 
-                const category = comp.closest(".category-block").querySelector(".category-header").textContent;
-                competitionInfo.push({
-                    category: category,
-                    name: comp.labels[0].innerText,
-                    teamInfo: teamInfo,
+                    const category = comp.closest(".category-block").querySelector(".category-header").textContent;
+                    competitionInfo.push({
+                        category: category,
+                        name: comp.labels[0].innerText,
+                        teamInfo: teamInfo,
+                    });
                 });
 
                 const foodMenu = document.getElementById("foodMenu").value;
