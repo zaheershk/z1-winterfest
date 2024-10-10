@@ -329,6 +329,15 @@
       </div>
       <!-- JavaScript for dynamic management -->
       <script>
+         document.getElementById('paymentConfirmation').addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function(loadEvent) {
+                      const paymentScreenshotBytes = loadEvent.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                  });
+         
          function validateAndSubmitForm(event) {
              event.preventDefault(); // Add this to prevent submission.
          
@@ -345,19 +354,41 @@
                  var gender = document.querySelector('input[name="gender"]:checked');
                  var age = document.getElementById('age').value;
                  var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-                 var competitions = "xyz";
-                 var foodStalls = "xyz";
-                 var acknowledge = (document.getElementById('acknowledge')).checked ? 'Yes' : 'No';
-                 var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-                 var paymentScreenshotLink = "xyz";
-               
+
                  if (!email || !name || !phoneNumber || !tower || !flat || !gender || !age || !ageGroup || !acknowledge || !paymentOption) {  // Basic validation
                    alert("All fields are required!");
                    return;
                  }
                
-                 // Step 2: Manipulate data if necessary
-                 paymentScreenshotLink = "zzz.link";
+                 // Step 2: Set the data
+                let competitionInfo = [];
+                  document.querySelectorAll('input[name="competitions"]:checked').forEach(comp => {
+                    const teamInfo = comp.parentElement.querySelector('input[type="text"]') ? comp.parentElement.querySelector('input[type="text"]').value : null;
+                    const category = comp.closest('.category-block').querySelector('.category-header').textContent;
+                    competitionData.push({
+                      category: category,
+                      name: comp.labels[0].innerText,
+                      teamInfo: teamInfo
+                    });
+                  });
+                 var competitions = competitionInfo;
+                
+                  const foodMenu = document.getElementById('foodMenu').value;
+                  const selectedDates = [];
+                  document.querySelectorAll('.form-check-input[type="checkbox"]').forEach(checkbox => {
+                    if (checkbox.checked) {
+                      selectedDates.push(checkbox.value);
+                    }
+                  });
+                  const foodStallInfo = {
+                    menu: foodMenu,
+                    dates: selectedDates
+                  };
+                  var foodStalls = foodStallInfo;
+                
+                 var acknowledge = (document.getElementById('acknowledge')).checked ? 'Yes' : 'No';
+                 var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
+                 var paymentScreenshotInfo = paymentScreenshotBytes;
                  
                  // Step 3: Prepare data to send
                  var registrationData = {
@@ -373,11 +404,11 @@
                       foodStalls: foodStalls,
                       acknowledge: acknowledge,
                       paymentOption: paymentOption.value,
-                      paymentScreenshotLink: paymentScreenshotLink
+                      paymentScreenshotInfo: paymentScreenshotInfo
                   };
                
-                  // Step 4: Send data using fetch with JSON payload
-                  fetch('https://script.google.com/macros/s/AKfycby58cWvFzhVBk0XhZNu0bl3IN84zpLQW3Xyxl6IWIty6gaKSkzcHZqfkvlePms3M5OebQ/exec', {
+                  // Step 4: Send data using fetch with payload
+                  fetch('https://script.google.com/macros/s/AKfycbyZeC1HmFLg5WPMq2FiqqH3y1cz3cB7yKovtN-t40x2-xYe4UWu9XiT9JGDUH-DhSP5jA/exec', {
                       redirect: "follow",
                       mode: 'no-cors',
                       method: 'POST',
