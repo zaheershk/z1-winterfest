@@ -201,40 +201,40 @@
                             <p>Select if you want to book a <strong>Food Stall at Rs. 700 per day per stall</strong> on competition days.</p>
                             <!-- Static Checkbox list for dates -->
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="10nov" value="Sunday, 10 Nov" />
-                                <label class="form-check-label" for="10nov">Sunday, 10 Nov</label>
+                                <input class="form-check-input" type="checkbox" id="date-10nov" value="Sunday, 10 Nov" />
+                                <label class="form-check-label" for="date-10nov">Sunday, 10 Nov</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="16nov" value="Saturday, 16 Nov" />
-                                <label class="form-check-label" for="16nov">Saturday, 16 Nov</label>
+                                <input class="form-check-input" type="checkbox" id="date-16nov" value="Saturday, 16 Nov" />
+                                <label class="form-check-label" for="date-16nov">Saturday, 16 Nov</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="17nov" value="Sunday, 17 Nov" />
-                                <label class="form-check-label" for="17nov">Sunday, 17 Nov</label>
+                                <input class="form-check-input" type="checkbox" id="date-17nov" value="Sunday, 17 Nov" />
+                                <label class="form-check-label" for="date-17nov">Sunday, 17 Nov</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="23nov" value="Saturday, 23 Nov" />
-                                <label class="form-check-label" for="23nov">Saturday, 23 Nov</label>
+                                <input class="form-check-input" type="checkbox" id="date-23nov" value="Saturday, 23 Nov" />
+                                <label class="form-check-label" for="date-23nov">Saturday, 23 Nov</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="24nov" value="Sunday, 24 Nov" />
-                                <label class="form-check-label" for="24nov">Sunday, 24 Nov</label>
+                                <input class="form-check-input" type="checkbox" id="date-24nov" value="Sunday, 24 Nov" />
+                                <label class="form-check-label" for="date-24nov">Sunday, 24 Nov</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="30nov" value="Saturday, 30 Nov" />
-                                <label class="form-check-label" for="30nov">Saturday, 30 Nov</label>
+                                <input class="form-check-input" type="checkbox" id="date-30nov" value="Saturday, 30 Nov" />
+                                <label class="form-check-label" for="date-30nov">Saturday, 30 Nov</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="1dec" value="Sunday, 1 Dec" />
-                                <label class="form-check-label" for="1dec">Sunday, 1 Dec</label>
+                                <input class="form-check-input" type="checkbox" id="date-1dec" value="Sunday, 1 Dec" />
+                                <label class="form-check-label" for="date-1dec">Sunday, 1 Dec</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="7dec" value="Saturday, 7 Dec" />
-                                <label class="form-check-label" for="7dec">Saturday, 7 Dec</label>
+                                <input class="form-check-input" type="checkbox" id="date-7dec" value="Saturday, 7 Dec" />
+                                <label class="form-check-label" for="date-7dec">Saturday, 7 Dec</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="8dec" value="Sunday, 8 Dec" />
-                                <label class="form-check-label" for="8dec">Sunday, 8 Dec</label>
+                                <input class="form-check-input" type="checkbox" id="date-8dec" value="Sunday, 8 Dec" />
+                                <label class="form-check-label" for="date-8dec">Sunday, 8 Dec</label>
                             </div>
                             <div>
                                 &nbsp
@@ -368,7 +368,7 @@
                 return id.replace(/([^\w-])/g, '\\$1');  // This will escape all characters that are not alphanumeric, underscore, or dash.
             }
 
-            const foodStallCheckboxSelector = '#10nov, #16nov, #17nov, #23nov, #24nov, #30nov, #1dec, #7dec, #8dec';
+            const foodStallCheckboxSelector = '#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec';
 
             document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
                 checkbox.addEventListener("change", function() {
