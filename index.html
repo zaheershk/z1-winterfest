@@ -151,7 +151,7 @@
                         <div class="mb-3">
                            <label style="font-weight: bold;">Select correct Age Group</label>
                            <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="3to5yrs" value="3to5yrs" onchange="updateCompetitionsDisplay(this.value)" required>
+                              <input class="form-check-input" type="radio" name="ageGroup" id="3to5yrs" value="3to5yrs" onchange="updateCompetitionsDisplay(this.value)" checked required>
                               <label class="form-check-label" for="3to5yrs">3 to 5 yrs</label>
                            </div>
                            <div class="form-check">
@@ -275,7 +275,7 @@
                         <li>If you are submitting another form for another participant from your flat to participate in competitions, and have <strong>already made a payment of Rs.600 for your flat</strong>, select Option 2, skip the payment, and attach original payment screenshot.</li>
                      </ul>
                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="Option 1 : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now." checked required>
+                        <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="Option 1 : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now.">
                         <label class="form-check-label" for="option1"><strong>Option 1</strong> : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now.</label>
                      </div>
                      <div class="form-check">
@@ -336,9 +336,6 @@
              if (selectedCompetitions.length === 0) {
                  alert('Please select at least one competition');
              } else {
-                 //const form = document.getElementById('registrationForm');
-                 //form.submit(); // Now submit when everything's fine.
-         
                  // Step 1: Validate the data
                  var email = document.getElementById('email').value;
                  var name = document.getElementById('name').value;
@@ -350,7 +347,7 @@
                  var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
                  var competitions = "xyz";
                  var foodStalls = "xyz";
-                 var acknowledge = document.getElementById('acknowledge').value;
+                 var acknowledge = (document.getElementById('acknowledge')).checked ? 'Yes' : 'No';
                  var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
                  var paymentScreenshotLink = "xyz";
                
@@ -363,35 +360,39 @@
                  paymentScreenshotLink = "zzz.link";
                  
                  // Step 3: Prepare data to send
-                 var formData = new FormData();
-                 formData.append('email', email);
-                 formData.append('name', name);
-                 formData.append('phoneNumber', phoneNumber);
-                 formData.append('tower', tower);
-                 formData.append('flat', flat);
-                 formData.append('gender', gender.value);
-                 formData.append('age', age);
-                 formData.append('ageGroup', ageGroup.value);
-                 formData.append('competitions', competitions);
-                 formData.append('foodStalls', foodStalls);
-                 formData.append('acknowledge', acknowledge);
-                 formData.append('paymentOption', paymentOption.value);
-                 formData.append('paymentScreenshotLink', paymentScreenshotLink);
+                 var registrationData = {
+                      email: email,
+                      name: name,
+                      phoneNumber: phoneNumber,
+                      tower: tower,
+                      flat: flat,
+                      gender: gender.value,
+                      age: age,
+                      ageGroup: ageGroup.value,
+                      competitions: competitions,
+                      foodStalls: foodStalls,
+                      acknowledge: acknowledge,
+                      paymentOption: paymentOption.value,
+                      paymentScreenshotLink: paymentScreenshotLink
+                  };
                
-                 // Step 4: Send data using fetch to Google Apps Script Web App URL
-                 fetch('https://script.google.com/macros/s/AKfycbzMXsxb_C24ACSw8yNQQui5CXbXf5akwIkyWB5vsGutNAGlVolRcLsSteplbHOLEDJEMw/exec', {
-                   method: 'POST',
-                   body: formData
-                 })
-                 .then(response => response.text())
-                 .then(data => {
-                   console.log(data);
-                   alert('Form submitted successfully!');
-                 })
-                 .catch(error => {
-                   console.error('Error:', error);
-                   alert('An error occurred while submitting the form.');
-                 });
+                  // Step 4: Send data using fetch with JSON payload
+                  fetch('https://script.google.com/macros/s/AKfycbzMXsxb_C24ACSw8yNQQui5CXbXf5akwIkyWB5vsGutNAGlVolRcLsSteplbHOLEDJEMw/exec', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify(registrationData)
+                  })
+                  .then(response => response.text())
+                  .then(data => {
+                      console.log(data);
+                      alert('Form submitted successfully!');
+                  })
+                  .catch(error => {
+                      console.error('Error:', error);
+                      alert('An error occurred while submitting the form.');
+                  });
              }
          };
          
