@@ -90,17 +90,17 @@
                         <!-- Email -->
                         <div class="mb-3">
                            <label for="email" class="form-label" style="font-weight: bold;">Email</label>
-                           <input type="email" class="form-control" id="email" required>
+                           <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
                         </div>
                         <!-- Name -->
                         <div class="mb-3">
                            <label for="name" class="form-label" style="font-weight: bold;">Name</label>
-                           <input type="text" class="form-control" id="name" required>
+                           <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
                         </div>
                         <!-- Phone Number -->
                         <div class="mb-3">
                            <label for="phone" class="form-label" style="font-weight: bold;">Phone Number</label>
-                           <input type="tel" class="form-control" id="phone" required>
+                           <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number" required pattern="^\+?(?:\d{1,3}[\s-]?)?(?:(\d[\s-]?){10})$" title="Enter valid phone number">
                         </div>
                         <!-- Tower -->
                         <div class="mb-3">
@@ -127,7 +127,7 @@
                         <!-- Flat Number -->
                         <div class="mb-3">
                            <label for="flat" class="form-label" style="font-weight: bold;">Flat Number</label>
-                           <input type="number" class="form-control" id="flat" required>
+                           <input type="number" class="form-control" id="flat" placeholder="Enter your flat number" required>
                         </div>
                         <!-- Gender -->
                         <div class="mb-3">
@@ -148,7 +148,7 @@
                         <!-- Age -->
                         <div class="mb-3">
                            <label for="age" class="form-label" style="font-weight: bold;">Age</label>
-                           <input type="number" class="form-control" id="age" required>
+                           <input type="number" class="form-control" id="age" placeholder="Enter your age in number" required>
                         </div>
                         <!-- Age Group -->
                         <div class="mb-3">
@@ -305,7 +305,7 @@
                      </div>
                      <div class="mb-3">
                         <label for="paymentConfirmation" class="form-label">Upload Payment Screenshot</label>
-                        <input type="file" class="form-control" id="paymentConfirmation" accept="image/*">
+                        <input type="file" class="form-control" id="paymentConfirmation" accept="image/*" required>
                      </div>
                   </section>
                   <!-- Rules and Submission Section -->
@@ -314,7 +314,7 @@
                      <div class="section-header">
                         <h2>Final Submission</h2>
                      </div>
-                     <button class="btn btn-primary" onclick="submitForm()">Submit</button>
+                     <button class="btn btn-primary" type="button" onclick="validateAndSubmitForm()">Submit</button>
                   </section>
                </div>
             </div>
@@ -332,6 +332,19 @@
       </div>
       <!-- JavaScript for dynamic management -->
       <script>
+         function validateAndSubmitForm() {
+             const competitions = document.querySelectorAll('input[name="competitions"]:checked');
+             if (competitions.length === 0) {
+                 alert('Please select at least one competition');
+                 return false;
+             }
+             const form = document.getElementById('registrationForm');
+             form.submit(); 
+
+            // Collect data and submit; implement real backend integration
+            console.log("Submit functionality needs complete backend integration.");
+         };
+         
          document.addEventListener('DOMContentLoaded', function () {
              updateCompetitionsDisplay('3to5yrs'); // Default age group on load
          });
@@ -446,11 +459,6 @@
                      categoryElem.style.display = 'block';
                  }
              });
-         }
-         
-         function submitForm() {
-             // Collect data and submit; implement real backend integration
-             console.log("Submit functionality needs complete backend integration.");
          }
       </script>
       <!-- Bootstrap Bundle with Popper -->
