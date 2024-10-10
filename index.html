@@ -353,8 +353,6 @@
                             <h2>Registration Confirmation</h2>
                             <p>Thank you! Your registration has been submitted.</p>
                             <div class="dividerthin"></div>
-                            <p>Registration Id: <span id="registrationId">12345</span></p>
-                            &nbsp
                             <button class="btn btn-primary" onclick="resetForm()">Submit a New Registration</button>
                         </div>
                     </div>
@@ -596,7 +594,7 @@
                 // Step 4: Send data using fetch with payload
                 fetch("https://script.google.com/macros/s/AKfycbzYUQTMAHwAFrlSpEhfRLhi5VWeLjW394GwdlscaQuiNgUgI93LImiExp4iR-UVp0ATGA/exec", {
                     redirect: "follow",
-                    mode: "cors",
+                    mode: "no-cors",
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -608,7 +606,6 @@
                         console.log(data);
                         document.getElementById('newRegistration').style.display = 'none';  // Hide the form section
                         document.getElementById('registrationConfirmation').style.display = 'block'; // Show the confirmation section
-                        document.getElementById('registrationId').textContent = 'Some ID from response'; // Set the registration id from the response
                     })
                     .catch((error) => {
                         console.error("Error:", error);
