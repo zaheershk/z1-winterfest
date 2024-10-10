@@ -332,8 +332,8 @@
          function validateAndSubmitForm() {
              event.preventDefault(); // Add this to prevent submission.
          
-             const competitions = document.querySelectorAll('input[name="competitions"]:checked');
-             if (competitions.length === 0) {
+             const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+             if (selectedCompetitions.length === 0) {
                  alert('Please select at least one competition');
              } else {
                  //const form = document.getElementById('registrationForm');
@@ -342,19 +342,19 @@
                  // Step 1: Validate the data
                  var email = document.getElementById('email').value;
                  var name = document.getElementById('name').value;
-                 var phone = document.getElementById('phone').value;
+                 var phoneNumber = document.getElementById('phoneNumber').value;
                  var tower = document.getElementById('tower').value;
                  var flat = document.getElementById('flat').value;
                  var gender = document.getElementById('gender').value;
                  var age = document.getElementById('age').value;
                  var ageGroup = document.getElementById('ageGroup').value;
-                 var optedCompetitions = "xyz";
+                 var competitions = "xyz";
                  var foodStalls = "xyz";
                  var acknowledge = document.getElementById('acknowledge').value;
                  var paymentOption = document.getElementById('paymentOption').value;
                  var paymentScreenshotLink = "xyz";
                
-                 if (!email || !name || !phone || !tower || !flat || !gender || !age || !ageGroup || !acknowledge || !paymentOption) {  // Basic validation
+                 if (!email || !name || !phoneNumber || !tower || !flat || !gender || !age || !ageGroup || !acknowledge || !paymentOption) {  // Basic validation
                    alert("All fields are required!");
                    return;
                  }
@@ -366,13 +366,13 @@
                  var formData = new FormData();
                  formData.append('email', email);
                  formData.append('name', name);
-                 formData.append('phone', phone);
+                 formData.append('phoneNumber', phoneNumber);
                  formData.append('tower', tower);
                  formData.append('flat', flat);
                  formData.append('gender', gender);
                  formData.append('age', age);
                  formData.append('ageGroup', ageGroup);
-                 formData.append('competitions', optedCompetitions);
+                 formData.append('competitions', competitions);
                  formData.append('foodStalls', foodStalls);
                  formData.append('acknowledge', acknowledge);
                  formData.append('paymentOption', paymentOption);
