@@ -452,7 +452,7 @@
                 const v_paymentConfirmation = document.getElementById("paymentConfirmation").value;
 
                 // Mandatory checks
-                [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age, v_paymentConfirmation].forEach((input) => {
+                [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age].forEach((input) => {
                     // Check if the element exists and has an empty value
                     if (input && !input.value) {
                         input.classList.add(invalidInputClass);
