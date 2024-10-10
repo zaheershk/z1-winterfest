@@ -296,6 +296,7 @@
                             <strong>Option 1 :</strong>
                             <p>If this is the <strong>first</strong> registration from your flat for <strong>event participation</strong> or <strong>hosting a food stall</strong>, select this option, 
                                 make the payment and attach payment screenshot.</p>
+                            <p id="totalCharge" style="color: red;">Total Amount to be paid: INR 0</p>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="I will pay for participation and/or food stall now." />
                                 <label class="form-check-label" for="option1">I will pay for participation and/or food stall now.</label>
@@ -365,6 +366,41 @@
 
             function escapeCSSId(id) {
                 return id.replace(/([^\w-])/g, '\\$1');  // This will escape all characters that are not alphanumeric, underscore, or dash.
+            }
+
+            document.querySelectorAll('section.mb-4 .form-check-input[type="checkbox"]').forEach((checkbox) => {
+                checkbox.addEventListener("change", function() {
+                    updateTotalAmountDisplay();
+                });
+            });
+            
+            // Add or adapt similar event listeners if your payment methods and specifics are differently defined.
+            document.getElementById('option1').addEventListener('change', function() {
+                updateTotalAmountDisplay();
+            });
+            
+            function updateTotalAmountDisplay() {
+                const option1Selected = document.getElementById('option1').checked;
+                const totalContainer = document.getElementById('totalCharge');
+            
+                if (option1Selected) {
+                    const total = calculateFoodStallCount()*700 + 600;
+                    totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
+                    totalContainer.style.display = 'block'; 
+                } else {
+                    totalContainer.style.display = 'none'; 
+                }
+            }
+            
+            function calculateFoodStallCount() {
+                const checkboxes = document.querySelectorAll('section.mb-4 .form-check-input[type="checkbox"]');
+                let count = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) {
+                        count++;
+                    }
+                });
+                return count;
             }
 
             document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
@@ -443,6 +479,7 @@
                     document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
                         if (checkbox.checked) {
                             selectedDates.push(checkbox.value);
+                            // Removing unwanted 'on' values by ensuring only valued checkboxes are processed.
                         }
                     });
                     const foodStallInfo = {
