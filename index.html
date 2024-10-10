@@ -298,7 +298,7 @@
                                 make the payment and attach payment screenshot.</p>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="I will pay for my flat now." />
-                                <label class="form-check-label" for="option1">I will pay for my flat now.</label>
+                                <label class="form-check-label" for="option1">I will pay for my flat now (for participation/food stall).</label>
                             </div>
                             <div class="dividerthin"></div>
                             <strong>Option 2 :</strong>
@@ -308,7 +308,7 @@
                             </p>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentOption" id="option2" value="I have already made a payment for my flat." />
-                                <label class="form-check-label" for="option2">I have already made a payment for my flat.</label>
+                                <label class="form-check-label" for="option2">I have already made a payment for my flat (for participation/food stall).</label>
                             </div>
                             <div class="dividerthin"></div>
                             <div class="mb-3">
@@ -417,7 +417,10 @@
                     // Step 2: Set the data
                     let competitionInfo = [];
                     document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
-                        const teamInfo = comp.parentElement.querySelector('input[type="text"]') ? comp.parentElement.querySelector('input[type="text"]').value : null;
+                        const categoryBlock = comp.closest('.category-block');
+                        const teamInfoInput = categoryBlock.querySelector(`#team-${comp.id}`);
+                        let teamInfo = teamInfoInput ? teamInfoInput.value : null;
+
                         const category = comp.closest(".category-block").querySelector(".category-header").textContent;
                         competitionInfo.push({
                             category: category,
