@@ -363,6 +363,7 @@
         <!-- JavaScript for dynamic management -->
         <script>
             var paymentScreenshotBytes = null;
+            var paymentScreenshotMimeType = null;
 
             function escapeCSSId(id) {
                 return id.replace(/([^\w-])/g, '\\$1');  // This will escape all characters that are not alphanumeric, underscore, or dash.
@@ -412,13 +413,14 @@
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function (loadEvent) {
-                        // Update the global variable
                         paymentScreenshotBytes = loadEvent.target.result;
+                        paymentScreenshotMimeType = file.type;
                     };
                     reader.readAsDataURL(file);
                 } else {
                     // Reset to null if the file input is cleared
                     paymentScreenshotBytes = null;
+                    paymentScreenshotMimeType = null;
                 }
             });
 
@@ -494,7 +496,6 @@
 
                     var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
                     var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-                    var paymentScreenshotInfo = paymentScreenshotBytes;
 
                     // Step 3: Prepare data to send
                     var registrationData = {
@@ -510,11 +511,12 @@
                         foodStalls: foodStalls,
                         acknowledge: acknowledge,
                         paymentOption: paymentOption.value,
-                        paymentScreenshotInfo: paymentScreenshotInfo,
+                        paymentScreenshotBytes: paymentScreenshotBytes,
+                        paymentScreenshotMimeType: paymentScreenshotMimeType
                     };
 
                     // Step 4: Send data using fetch with payload
-                    fetch("https://script.google.com/macros/s/AKfycbw5uG_sk6fvuCgaAAlt73A0sn_8ZZZbOqFxS8rM5fIAU6Qov2gTjC2ZFh7Mt_XRhurfjg/exec", {
+                    fetch("https://script.google.com/macros/s/AKfycbzJUqcNloR5rBXTWNIfe60RPwYHjwE7-i6Fa22u5ikvi6g3VW7kSaYfatYJwa3MyUBbQQ/exec", {
                         redirect: "follow",
                         mode: "no-cors",
                         method: "POST",
