@@ -379,17 +379,20 @@
             document.getElementById('option1').addEventListener('change', function() {
                 updateTotalAmountDisplay();
             });
+
+            document.getElementById('option2').addEventListener('change', function() {
+                updateTotalAmountDisplay();
+            });
             
             function updateTotalAmountDisplay() {
                 const option1Selected = document.getElementById('option1').checked;
                 const totalContainer = document.getElementById('totalCharge');
-            
+
+                totalContainer.style.display = 'none'; 
                 if (option1Selected) {
                     const total = calculateFoodStallCount()*700 + 600;
                     totalContainer.textContent = `Total for Food Stalls: INR ${total}`;
                     totalContainer.style.display = 'block'; 
-                } else {
-                    totalContainer.style.display = 'none'; 
                 }
             }
             
