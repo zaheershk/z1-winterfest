@@ -452,8 +452,21 @@
                 event.preventDefault(); // Add this to prevent submission.
 
                 const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+                // Check for mandatory team member inputs
+                let teamInputValid = true;
+                selectedCompetitions.forEach(comp => {
+                    const compId = comp.id;
+                    if (document.getElementById(`team-${compId}`) && document.getElementById(`team-${compId}`).value === '') {
+                        teamInputValid = false;
+                        alert("Please enter team member details for all selected team events.");
+                        return;
+                    }
+                });
+              
                 if (selectedCompetitions.length === 0) {
-                    alert("Please select at least one competition");
+                    alert("Please select at least one competition.");
+                } else if (!teamInputValid) {
+                    // If team input validation failed, do nothing as the alert is already shown
                 } else {
                     // Step 1: Validate the data
                     var email = document.getElementById("email").value;
@@ -632,16 +645,25 @@
                          `;
 
                             if (comp.teamBased) {
+                                // Label for age groups
+                                const ageGroupLabel = document.createElement("label");
+                                ageGroupLabel.className = "form-label mt-2";
+                                ageGroupLabel.textContent = `Age Groups: ${comp.ageGroups.join(", ")}`;
+                                compElement.appendChild(ageGroupLabel);
+                            
                                 const inputTeamMembers = document.createElement("input");
                                 inputTeamMembers.id = `team-${checkboxId}`;
                                 inputTeamMembers.className = "form-control mt-2";
-                                inputTeamMembers.placeholder = "Enter team member names";
+                                inputTeamMembers.placeholder = "Enter team member names & flat numbers";
+                                inputTeamMembers.required = true; // Make input field required
                                 inputTeamMembers.style.display = "none";
-
-                                // Show this input when the checkbox is changed
+                                // Toggle visibility of age group label and input based on the checkbox
                                 compElement.querySelector('input[type="checkbox"]').onchange = function () {
-                                    inputTeamMembers.style.display = this.checked ? "block" : "none";
+                                    const displayStyle = this.checked ? "block" : "none";
+                                    inputTeamMembers.style.display = displayStyle;
+                                    ageGroupLabel.style.display = displayStyle;
                                 };
+                            
                                 compElement.appendChild(inputTeamMembers);
                             }
                             categoryElem.appendChild(compElement);
