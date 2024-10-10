@@ -367,7 +367,7 @@
                   document.querySelectorAll('input[name="competitions"]:checked').forEach(comp => {
                     const teamInfo = comp.parentElement.querySelector('input[type="text"]') ? comp.parentElement.querySelector('input[type="text"]').value : null;
                     const category = comp.closest('.category-block').querySelector('.category-header').textContent;
-                    competitionData.push({
+                    competitionInfo.push({
                       category: category,
                       name: comp.labels[0].innerText,
                       teamInfo: teamInfo
