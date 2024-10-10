@@ -427,6 +427,7 @@
             function validateAndSubmitForm(event) {
                 event.preventDefault(); // Prevent form from submitting traditionally
 
+                // Step 1: Validate the data
                 let formValid = true;
                 const invalidInputClass = "is-invalid"; // Bootstrap 5 class for invalid input
             
@@ -434,73 +435,61 @@
                 document.querySelectorAll(`.${invalidInputClass}`).forEach(el => el.classList.remove(invalidInputClass));
             
                 // Collect inputs and checks
-                const email = document.getElementById("email");
-                const name = document.getElementById("name");
-                const phoneNumber = document.getElementById("phoneNumber");
-                const tower = document.getElementById("tower");
-                const flat = document.getElementById("flat");
-                const gender = document.querySelector('input[name="gender"]:checked');
-                const age = document.getElementById("age");
-                const ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-                const competitions = document.querySelectorAll('input[name="competitions"]:checked');
-                const acknowledge = document.getElementById("acknowledge").checked;
-                const paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-                const paymentConfirmation = document.getElementById("paymentConfirmation").value;
+                const v_email = document.getElementById("email");
+                const v_name = document.getElementById("name");
+                const v_phoneNumber = document.getElementById("phoneNumber");
+                const v_tower = document.getElementById("tower");
+                const v_flat = document.getElementById("flat");
+                const v_gender = document.querySelector('input[name="gender"]:checked');
+                const v_age = document.getElementById("age");
+                const v_ageGroup = document.querySelector('input[name="ageGroup"]:checked');
+                //const v_competitions = document.querySelectorAll('input[name="competitions"]:checked');
+                const v_acknowledge = document.getElementById("acknowledge").checked;
+                const v_paymentOption = document.querySelector('input[name="paymentOption"]:checked');
+                const v_paymentConfirmation = document.getElementById("paymentConfirmation").value;
             
                 // Mandatory checks
-                [email, name, phoneNumber, tower, flat, age, paymentConfirmation].forEach(input => {
+                [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age, v_paymentConfirmation].forEach(input => {
                     // Check if the element exists and has an empty value
                     if (input && !input.value) {
                         input.classList.add(invalidInputClass);
                         formValid = false;
-                    } else if (!input) { // Log an error or handle the case if the element is not found
-                        console.error("Error: Element is not found in the document.");
+                    } else if (!input) { 
+                        console.warning(`Element ${input} is not found in the document.`);
                     }
                 });
             
-                if (!gender) {
+                if (!v_gender) {
                     document.querySelectorAll('input[name="gender"]').forEach(input => input.classList.add(invalidInputClass));
                     formValid = false;
                 }
             
-                if (!ageGroup) {
+                if (!v_ageGroup) {
                     document.querySelectorAll('input[name="ageGroup"]').forEach(input => input.classList.add(invalidInputClass));
                     formValid = false;
                 }
             
-                if (!acknowledge) {
+                if (!v_acknowledge) {
                     document.getElementById("acknowledge").classList.add(invalidInputClass);
                     formValid = false;
                 }
             
-                if (!paymentOption) {
+                if (!v_paymentOption) {
                     document.querySelectorAll('input[name="paymentOption"]').forEach(input => input.classList.add(invalidInputClass));
                     formValid = false;
                 }
-            
-                if (competitions.length === 0) {
-                    // Highlight all competition checkboxes
-                    document.querySelectorAll('input[name="competitions"]').forEach(input => input.classList.add(invalidInputClass));
-                    formValid = false;
-                }
-            
-                // Additional check for team based competitions
-                competitions.forEach(comp => {
-                    if (comp.dataset.teamBased === 'true') {
-                        const teamInfo = document.getElementById(`team-${comp.id}`);
-                        if (!teamInfo.value) {
-                            teamInfo.classList.add(invalidInputClass);
-                            formValid = false;
-                        }
-                    }
-                });
+
+                //if (v_competitions.length === 0) {
+                //    // Highlight all competition checkboxes
+                //    document.querySelectorAll('input[name="competitions"]').forEach(input => input.classList.add(invalidInputClass));
+                //    formValid = false;
+                //}
                 
                 if (!formValid) {
-                    alert("Please fill in all required fields.");
+                    alert("Please review & fill in all required fields.");
                     return false;
                 }
 
-                /*
                 const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
                 // Check for mandatory team member inputs
                 let teamInputValid = true;
@@ -513,17 +502,14 @@
                     }
                 });
                 
-              
-                if (selectedCompetitions.length === 0) {
-                    alert("Please select at least one competition.");
-                } else if (!teamInputValid) {
-                    // If team input validation failed, do nothing as the alert is already shown
-                } else {
-                    
-                }
+                //if (selectedCompetitions.length === 0) {
+                //    alert("Please select at least one competition.");
+                //} else if (!teamInputValid) {
+                //    // If team input validation failed, do nothing as the alert is already shown
+                //} else {
+                //    
+                //}
                 
-
-                // Step 1: Validate the data
                     var email = document.getElementById("email").value;
                     var name = document.getElementById("name").value;
                     var phoneNumber = document.getElementById("phoneNumber").value;
@@ -532,12 +518,6 @@
                     var gender = document.querySelector('input[name="gender"]:checked');
                     var age = document.getElementById("age").value;
                     var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-
-                    //if (!email || !name || !phoneNumber || !tower || !flat || !gender || !age || !ageGroup || !acknowledge || !paymentOption) {  // Basic validation
-                    //  alert("All fields are required!");
-                    //  return;
-                    //}
-                */
 
                     // Step 2: Set the data
                     let competitionInfo = [];
@@ -571,7 +551,8 @@
                         dates: selectedDates,
                     };
 
-                    var acknowledgeInfo = document.getElementById("acknowledge").checked ? "Yes" : "No";
+                    var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
+                    var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
 
                     // Step 3: Prepare data to send
                     var registrationData = {
@@ -585,7 +566,7 @@
                         ageGroup: ageGroup.value,
                         competitions: competitionInfo,
                         foodStalls: foodStallInfo,
-                        acknowledge: acknowledgeInfo,
+                        acknowledge: acknowledge,
                         paymentOption: paymentOption.value,
                         paymentScreenshotBytes: paymentScreenshotBytes,
                         paymentScreenshotMimeType: paymentScreenshotMimeType
