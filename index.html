@@ -25,6 +25,8 @@
             .close:hover, .close:focus { color: #000; text-decoration: none; cursor: pointer; opacity: 1; }
             .btn { padding: 8px 16px; background-color: #007BFF; color: white; border: none; cursor: pointer; border-radius: 4px; }
             .btn:hover { background-color: #0056b3; }
+            .loader { border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 120px; height: 120px; animation: spin 2s linear infinite; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 99; }
+            @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         </style>
     </head>
     <body>
@@ -369,6 +371,7 @@
                 </div>
             </div>
         </div>
+        <div id="loadingSpinner" class="loader" hidden></div>
         <div id="myModal" class="modal">
           <div class="modal-content">
             <span class="close">&times;</span>
@@ -518,6 +521,7 @@
 
                 submitBtn.addEventListener('click', function(event) {
                     event.preventDefault(); // Prevent form from submitting traditionally
+                    document.getElementById('loadingSpinner').hidden = false; // Show spinner
     
                     // Step 1: Validate the data
                     let formValid = true;
@@ -688,11 +692,12 @@
                         .then((data) => {
                             console.log(data);
                             modal.style.display = "block";
-                            //alert("Form submitted successfully!");
+                            document.getElementById('loadingSpinner').hidden = true; // Hide spinner
                         })
                         .catch((error) => {
                             console.error("Error:", error);
                             alert("An error occurred while submitting the form.");
+                            document.getElementById('loadingSpinner').hidden = true; // Ensure spinner hides on error
                         });
                 });
             
