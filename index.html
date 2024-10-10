@@ -551,56 +551,62 @@
             ];
 
             function updateCompetitionsDisplay(selectedAgeGroup) {
-                const competitionsElement = document.getElementById('competitionsContainer');
-                competitionsElement.innerHTML = ''; // Clear existing elements
+                const container = document.getElementById("competitionsContainer");
+                container.innerHTML = ""; // Clear current contents
             
-                // Iterate through competitions based on the selected age group
-                competitions.forEach(comp => {
-                    if (comp.ageGroups.includes(selectedAgeGroup)) {
-                        const compElement = document.createElement('div');
-                        compElement.className = 'competition-entry';
+                competitionsData.forEach((category) => {
+                    const categoryElem = document.createElement("div");
+                    categoryElem.classList.add("category-block");
+                    const header = document.createElement("div");
+                    header.className = "category-header";
+                    header.textContent = category.category;
+                    categoryElem.appendChild(header);
             
-                        const checkboxId = `comp-${comp.id}`;
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.id = checkboxId;
-                        checkbox.name = 'competitions';
-                        checkbox.value = comp.id;
+                    let hasVisibleCompetitions = false;
             
-                        const label = document.createElement('label');
-                        label.htmlFor = checkboxId;
-                        label.textContent = comp.name + (comp.teamBased ? ' (Team Event)' : '');
+                    category.competitions.forEach((comp) => {
+                        if (comp.ageGroups.includes(selectedAgeGroup)) {
+                            hasVisibleCompetitions = true;
+                            const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
+                            const compElement = document.createElement("div");
+                            compElement.className = "form-check";
+                            compElement.innerHTML = `
+                                <input class="form-check-input" type="checkbox" id="${checkboxId}" name="competitions">
+                                <label class="form-check-label" for="${checkboxId}">${comp.name}</label>
+                            `;
             
-                        compElement.appendChild(checkbox);
-                        compElement.appendChild(label);
+                            if (comp.teamBased) {
+                                const inputTeamMembers = document.createElement("input");
+                                inputTeamMembers.id = `team-${checkboxId}`;
+                                inputTeamMembers.className = "form-control mt-2";
+                                inputTeamMembers.placeholder = "Enter team member names & flat numbers";
+                                inputTeamMembers.required = true; // Make input field required
+                                inputTeamMembers.style.display = "none"; // Initially hide the input field
+                                
+                                // Label for age groups
+                                const ageGroupLabel = document.createElement("label");
+                                ageGroupLabel.className = "form-label mt-2";
+                                ageGroupLabel.textContent = `Age Groups: ${comp.displayAgeGroups}`;
+                                ageGroupLabel.style.display = "none"; // Initially hide the label
             
-                        const ageGroupLabel = document.createElement("label");
-                        ageGroupLabel.className = "form-label mt-2";
-                        ageGroupLabel.textContent = `Age Groups: ${comp.displayAgeGroups}`;
-                        ageGroupLabel.style.display = "none"; // Initially hide the age group label
-                        compElement.appendChild(ageGroupLabel);
-            
-                        if (comp.teamBased) {
-                            const inputTeamMembers = document.createElement("input");
-                            inputTeamMembers.id = `team-${checkboxId}`;
-                            inputTeamMembers.className = "form-control mt-2";
-                            inputTeamMembers.placeholder = "Enter team member names & Flat numbers";
-                            inputTeamMembers.required = true;
-                            inputTeamMembers.style.display = "none"; // Initially hide the input
-                            checkbox.addEventListener('change', () => {
-                                if (checkbox.checked) {
-                                    inputTeamMembers.style.display = "block";
-                                    ageGroupLabel.style.display = "block"; // Show label when checkbox is checked
-                                } else {
-                                    inputTeamMembers.style.display = "none";
-                                    ageGroupLabel.style.display = "none"; // Hide label when checkbox is unchecked
-                                }
-                            });
-            
-                            compElement.appendChild(inputTeamMembers);
+                                // Insert age group label before the team members input field
+                                compElement.appendChild(ageGroupLabel);
+                                compElement.appendChild(inputTeamMembers);
+                                
+                                // Toggle visibility of age group label and input based on the checkbox
+                                compElement.querySelector('input[type="checkbox"]').onchange = function () {
+                                    const displayStyle = this.checked ? "block" : "none";
+                                    inputTeamMembers.style.display = displayStyle;
+                                    ageGroupLabel.style.display = displayStyle;
+                                };
+                            }
+                            categoryElem.appendChild(compElement);
                         }
+                    });
             
-                        competitionsElement.appendChild(compElement);
+                    if (hasVisibleCompetitions) {
+                        container.appendChild(categoryElem);
+                        categoryElem.style.display = "block";
                     }
                 });
             }
