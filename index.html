@@ -347,7 +347,7 @@
                             <div class="section-header">
                                 <h2>Final Submission</h2>
                             </div>
-                            <button class="btn btn-primary" type="submit" onclick="validateAndSubmitForm(event)">Submit</button>
+                            <button class="btn btn-primary" type="submit">Submit</button>
                         </section>
                     </div>
                 </div>
@@ -436,8 +436,9 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const modal = document.getElementById("myModal");
                 const span = document.getElementsByClassName("close")[0];
+                const submitBtn = document.getElementById("submitBtn"); 
 
-                function validateAndSubmitForm(event) {
+                submitBtn.addEventListener('click', function(event) {
                     event.preventDefault(); // Prevent form from submitting traditionally
     
                     // Step 1: Validate the data
