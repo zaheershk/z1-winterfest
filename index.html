@@ -422,11 +422,14 @@
                     let competitionInfo = [];
                     document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
                         const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
-                        const teamInfoInputId = `team-${checkboxId}`;
-                        const escapedId = escapeCSSId(teamInfoInputId);
-                        const teamInfoInput = comp.closest('.category-block').querySelector(`#${escapedId}`);
-                        let teamInfo = teamInfoInput ? teamInfoInput.value : null;
-
+                        const escapedId = escapeCSSId(`team-${checkboxId}`);
+                        const teamInfoInput = document.getElementById(escapedId);
+                    
+                        let teamInfo = null;
+                        if (teamInfoInput && teamInfoInput.value) { // Make sure the input exists and has a value
+                            teamInfo = teamInfoInput.value;
+                        }
+                    
                         const category = comp.closest(".category-block").querySelector(".category-header").textContent;
                         competitionInfo.push({
                             category: category,
@@ -471,7 +474,7 @@
                     };
 
                     // Step 4: Send data using fetch with payload
-                    fetch("https://script.google.com/macros/s/AKfycbyZeC1HmFLg5WPMq2FiqqH3y1cz3cB7yKovtN-t40x2-xYe4UWu9XiT9JGDUH-DhSP5jA/exec", {
+                    fetch("https://script.google.com/macros/s/AKfycbzHgI4bQx2gxPaC_HtMQHzjIxEyh4EJm30dAJRkEgQZiM27-018kM5YGq24jPpfG4RD4A/exec", {
                         redirect: "follow",
                         mode: "no-cors",
                         method: "POST",
