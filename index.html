@@ -1,594 +1,654 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Z1 Winterfest 2024</title>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-      <style>
-         /* Styling the entire nav-tabs container */
-         .nav-tabs { border-bottom: 3px solid #4CAF50; /* Solid border under the tabs */ }
-         /* Defining the default look of each tab */
-         .nav-link { color: #666; padding: 10px 20px; background-color: #f9f9f9; border: 0 solid transparent; border-radius: 5px 5px 0 0; transition: color 0.2s, background-color 0.2s; /* Smooth transition for hover effects */ }
-         /* Darker background and color text when hovering over tab */
-         .nav-link:hover { background-color: #e2e2e2; color: #333; border-color: #ddd; /* Slightly darker border on hover */ }
-         /* Styling for when a tab is active */
-         .nav-tabs .nav-link.active, .nav-tabs .nav-link.active:hover { color: #fff; background-color: #4CAF50; border: 0; border-bottom-color: transparent; /* No border at the bottom */ }
-         /* Responsive adjustments for tablets */
-         @media (max-width: 768px) { 
-         .nav-link { padding: 8px 16px; font-size: 14px; /* Slightly reduce padding and font size */ }
-         }
-         /* Responsive adjustments for small devices (phones) */
-         @media (max-width: 575.98px) {
-         .nav-tabs { overflow-x: auto; flex-wrap: nowrap; /* Enable horizontal scrolling and prevent tabs from wrapping */ }
-         .nav-link { padding: 6px 12px; font-size: 12px; /* Further reduce padding and font size */ }
-         }
-         .section-header { background-color: #e6d4e7; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-         .divider { height: 2px; background-color: #dee2e6; margin: 40px 0; }
-         .category-block { display: none; margin-bottom: 20px; }
-         .category-header { font-size: 20px; font-weight: bold; color: #333; }
-         .bullet-points { list-style: none; padding-left: 20px; }
-         .bullet-points li:before { content: "\2022"; color: black; font-weight: bold; display: inline-block; width: 1em; margin-left: -1em; }
-      </style>
-   </head>
-   <body>
-      <div class="container py-5">
-         <!-- Tab Navigation -->
-         <ul class="nav nav-tabs">
-            <li class="nav-item">
-               <a class="nav-link active" data-bs-toggle="tab" href="#newRegistration">Submit New Registration</a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link" data-bs-toggle="tab" href="#dashboard">My Dashboard</a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
-            </li>
-         </ul>
-         <!-- Tab Content -->
-         <div class="tab-content">
-            <div id="newRegistration" class="tab-pane fade show active">
-               <div class="container py-5">
-                  <!-- Welcome Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h1>Z1 Winterfest 2024</h1>
-                     </div>
-                     <img src="banner.png" alt="Banner Image" class="img-fluid">
-                     &nbsp
-                     <p style="color:#a63a50;"><strong>Instructions:</strong></p>
-                     <ul class="bullet-points">
-                        <li>Participation fee is <strong>Rs.600/- per flat.</strong></li>
-                        <li>Fill a <strong>separate form for each participant</strong> from your flat.</li>
-                        <li>Irrespective of the number of forms submitted from <strong>your flat</strong>, you only need to <strong>pay Rs.600/- once.</strong></li>
-                        <li>If you wish to <strong>host a Food stall</strong>, the fee is <strong>Rs. 700/- per day per stall</strong> (on first come first serve basis).</li>
-                        <li>Please submit form by <strong>Sunday, 27 Oct 2024.</strong></li>
-                     </ul>
-                  </section>
-                  <div class="divider"></div>
-                  <!-- Event Schedule Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Event Schedule</h2>
-                     </div>
-                     <img src="schedule.png" alt="Event Schedule" class="img-fluid">
-                  </section>
-                  <div class="divider"></div>
-                  <!-- Participant Information Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Participant Information</h2>
-                        <p style="color:#a63a50;"><strong>NOTE:</strong> Fill a separate form for each participant from your flat</p>
-                     </div>
-                     <form id="registrationForm">
-                        <!-- Email -->
-                        <div class="mb-3">
-                           <label for="email" class="form-label" style="font-weight: bold;">Email</label>
-                           <input type="email" class="form-control" id="email" placeholder="Enter email" required>
-                        </div>
-                        <!-- Name -->
-                        <div class="mb-3">
-                           <label for="name" class="form-label" style="font-weight: bold;">Name</label>
-                           <input type="text" class="form-control" id="name" placeholder="Enter full name" required>
-                        </div>
-                        <!-- Phone Number -->
-                        <div class="mb-3">
-                           <label for="phone" class="form-label" style="font-weight: bold;">Phone Number</label>
-                           <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
-                              pattern="^\+?(\d{1,4}[\s-]?)?(\(?\d{1,3}\)?[\s-]?)?[\d\s-]{4,10}$"
-                              title="Enter a valid phone number. Include country and area code if necessary."
-                              placeholder="Enter phone number" required>
-                        </div>
-                        <!-- Tower -->
-                        <div class="mb-3">
-                           <label for="tower" class="form-label" style="font-weight: bold;">Tower</label>
-                           <select class="form-select" id="tower" required>
-                              <option value="">Select Tower</option>
-                              <option value="Tower A">Tower A</option>
-                              <option value="Tower B">Tower B</option>
-                              <option value="Tower C">Tower C</option>
-                              <option value="Tower D">Tower D</option>
-                              <option value="Tower E">Tower E</option>
-                              <option value="Tower F">Tower F</option>
-                              <option value="Tower G">Tower G</option>
-                              <option value="Tower 1">Tower 1</option>
-                              <option value="Tower 2">Tower 2</option>
-                              <option value="Tower 3">Tower 3</option>
-                              <option value="Tower 4">Tower 4</option>
-                              <option value="Tower 5">Tower 5</option>
-                              <option value="Tower 6">Tower 6</option>
-                              <option value="Tower 7">Tower 7</option>
-                              <option value="Tower 8">Tower 8</option>
-                           </select>
-                        </div>
-                        <!-- Flat Number -->
-                        <div class="mb-3">
-                           <label for="flat" class="form-label" style="font-weight: bold;">Flat Number</label>
-                           <input type="number" class="form-control" id="flat" placeholder="Enter flat number" required>
-                        </div>
-                        <!-- Gender -->
-                        <div class="mb-3">
-                           <label style="font-weight: bold;">Gender</label>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="gender" id="male" value="Male" required>
-                              <label class="form-check-label" for="male">Male</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="gender" id="female" value="Female">
-                              <label class="form-check-label" for="female">Female</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="gender" id="other" value="Other">
-                              <label class="form-check-label" for="other">Other</label>
-                           </div>
-                        </div>
-                        <!-- Age -->
-                        <div class="mb-3">
-                           <label for="age" class="form-label" style="font-weight: bold;">Age</label>
-                           <input type="number" class="form-control" id="age" placeholder="Enter age" required>
-                        </div>
-                        <!-- Age Group -->
-                        <div class="mb-3">
-                           <label style="font-weight: bold;">Select correct Age Group</label>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="3to5yrs" value="3to5yrs" onchange="updateCompetitionsDisplay(this.value)" checked required>
-                              <label class="form-check-label" for="3to5yrs">3 to 5 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="6to10yrs" value="6to10yrs" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="6to10yrs">6 to 10 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="11to16yrs" value="11to16yrs" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="11to16yrs">11 to 16 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="17to29yrs" value="17to29yrs" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="17to29yrs">17 to 29 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="30to35yrs" value="30to35yrs" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="30to35yrs">30 to 35 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="36to49yrs" value="36to49yrs" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="36to49yrs">36 to 49 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="50to55yrs" value="50to55yrs" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="50to55yrs">50 to 55 yrs</label>
-                           </div>
-                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="ageGroup" id="56Yrsabove" value="56Yrsabove" onchange="updateCompetitionsDisplay(this.value)" required>
-                              <label class="form-check-label" for="56Yrsabove">56 Yrs & above</label>
-                           </div>
-                        </div>
-                     </form>
-                  </section>
-                  <div class="divider"></div>
-                  <!-- Competitions Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Competitions</h2>
-                     </div>
-                     <div id="competitionsContainer" class="mt-3">
-                        <!-- Competitions will be populated here dynamically -->
-                     </div>
-                  </section>
-                  <div class="divider"></div>
-                  <!-- Food Stall Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Book Food Stalls</h2>
-                        <p style="color:#a63a50;"><strong>NOTE:</strong> Booking is on first come first serve basis</p>
-                     </div>
-                     <p>Select if you want to book a <strong>Food Stall at Rs. 700 per day per stall</strong> on competition days.</p>
-                     <!-- Static Checkbox list for dates -->
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="10nov" value="Sunday, 10 Nov">
-                        <label class="form-check-label" for="10nov">Sunday, 10 Nov</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="16nov" value="Saturday, 16 Nov">
-                        <label class="form-check-label" for="16nov">Saturday, 16 Nov</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="17nov" value="Sunday, 17 Nov">
-                        <label class="form-check-label" for="17nov">Sunday, 17 Nov</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="23nov" value="Saturday, 23 Nov">
-                        <label class="form-check-label" for="23nov">Saturday, 23 Nov</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="24nov" value="Sunday, 24 Nov">
-                        <label class="form-check-label" for="24nov">Sunday, 24 Nov</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="30nov" value="Saturday, 30 Nov">
-                        <label class="form-check-label" for="30nov">Saturday, 30 Nov</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="1dec" value="Sunday, 1 Dec">
-                        <label class="form-check-label" for="1dec">Sunday, 1 Dec</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="7dec" value="Saturday, 7 Dec">
-                        <label class="form-check-label" for="7dec">Saturday, 7 Dec</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="8dec" value="Sunday, 8 Dec">
-                        <label class="form-check-label" for="8dec">Sunday, 8 Dec</label>
-                     </div>
-                     <div>
-                        &nbsp
-                     </div>
-                     <!-- Food Menu -->
-                     <label for="foodMenu" class="form-label">If you are booking a food stall, please mention your <strong>Food menu</strong>. We will not accept booking without this information.</label>
-                     <textarea class="form-control" id="foodMenu" rows="3" required></textarea>
-                  </section>
-                  <!-- Acknowledgement Section -->
-                  <div class="divider"></div>
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Acknowledge Rules</h2>
-                     </div>
-                     <div>
-                        <strong>Eligibility</strong>
-                        <ul class="bullet-points">
-                           <li>Participants must be residents or owners in Z1.</li>
-                           <li>Participants can only play in their own age category as specified for that event.</li>
-                           <li>Age validation - If required, organizers will request for age proof of participants and then assign them to the appropriate age category.</li>
-                        </ul>
-                        &nbsp
-                        <strong>General Rules</strong>
-                        <ul class="bullet-points">
-                           <li>All participation forms must be received by Sunday, 27 October 2024.</li>
-                           <li>Participants must arrive on time as per schedule.</li>
-                           <li>Participants from the senior most age category can choose to drop down to the next age category.</li>
-                           <li>If an event doesn't have a minimum of 4 individual/ team participation, it will be canceled.</li>
-                           <li>No changes to teams will be allowed after 27 Oct, 2024.</li>
-                           <li>All events require a lot of planning and fixtures will be decided in advance. Therefore, organizers will not be able to accommodate entries after the participation due date.</li>
-                           <li>We have created the competition schedule keeping multiple variables in mind and therefore, it will not be possible to reschedule any of the events.</li>
-                           <li>Each contest will have a Winner and a Runners-up.</li>
-                           <li>The decision of Referee/ Umpire/ Linesman/ Judge will be final.</li>
-                        </ul>
-                        &nbsp
-                        <strong>Racket games</strong>
-                        <ul class="bullet-points">
-                           <li>Seeded players are not allowed to compete. </li>
-                           <li>For Doubles and Mixed Doubles Racket games, it is mandatory to mention team member names and flat numbers.</li>
-                           <li>To accommodate all participants, racket games might be held on weekdays. The schedule will be published at least one week in advance.</li>
-                        </ul>
-                        &nbsp
-                     </div>
-                     <strong>Other competition specific rules</strong>
-                     <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="acknowledge" required>
-                        <label class="form-check-label" for="acknowledge">
-                        I have read and agree to the <a href="https://docs.google.com/document/d/1BE8XK-kl9kdpqbTX6sVo0VQXfe7bPPDbwTRa9D2aHww" target="_blank">Z1 Winterfest 2024 rules</a>.
-                        </label>
-                     </div>
-                  </section>
-                  <div class="divider"></div>
-                  <!-- Payment Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Payment</h2>
-                     </div>
-                     <p>Please check the appropriate box! &nbsp</p>
-                     <ul class="bullet-points">
-                        <li>If this is the <strong>first registration from your flat</strong>
-                           OR if you are registering <strong>again to host a Food stall</strong>, select Option 1, make the payment, and attach payment screenshot.
-                        </li>
-                        &nbsp
-                        <li>If you are submitting another form for another participant from your flat to participate in competitions, and have <strong>already made a payment of Rs.600 for your flat</strong>, select Option 2, skip the payment, and attach original payment screenshot.</li>
-                     </ul>
-                     <div class="divider"></div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="Option 1 : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now.">
-                        <label class="form-check-label" for="option1"><strong>Option 1</strong> : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now.</label>
-                     </div>
-                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="paymentOption" id="option2" value="Option 2 : I confirm that I have already made a payment of Rs. 600 and will attach the the screenshot.">
-                        <label class="form-check-label" for="option2"><strong>Option 2</strong> : I confirm that I have already made a payment of Rs. 600 and will attach the the screenshot.</label>
-                     </div>
-                     &nbsp
-                     <div class="mb-3">
-                        <p style="color:#a63a50;"><strong>(Preferred method) Pay via Anacity:</strong></p>
-                        <ul class="bullet-points">
-                           <li>Go to the app => "Z1 Apartments Facilities" account on the top left</li>
-                           <li>Select Dues => Pay advance => Paying to "Winterfest 2024"</li>
-                           <li>Choose amount Rs. 600/ 700/ both and proceed with payment</li>
-                        </ul>
-                        <p style="color:#a63a50;">
-                           <strong>(Alternate method) Pay via UPI:</strong>
-                        </p>
-                        <p>Use below QR code or below UPI ID
-                           <strong>vyapar.171174085726@hdfcbank</strong>
-                        </p>
-                        <img src="qrcode.png" alt="QRcode" class="img-fluid">
-                     </div>
-                  </section>
-                  <!-- Payment confirmation Section -->
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Confirmation</h2>
-                     </div>
-                     <div class="mb-3">
-                        <label for="paymentConfirmation" class="form-label">Upload Payment Screenshot</label>
-                        <input type="file" class="form-control" id="paymentConfirmation" accept="image/*" required>
-                     </div>
-                  </section>
-                  <!-- Rules and Submission Section -->
-                  <div class="divider"></div>
-                  <section class="mb-4">
-                     <div class="section-header">
-                        <h2>Final Submission</h2>
-                     </div>
-                     <button class="btn btn-primary" type="submit" onclick="validateAndSubmitForm(event)">Submit</button>
-                  </section>
-               </div>
-            </div>
-            <div id="dashboard" class="tab-pane fade">
-               <!-- Dashboard related information and widgets go here -->
-               <h4>Dashboard</h4>
-               <p>Content for Dashboard...</p>
-            </div>
-            <div id="reports" class="tab-pane fade">
-               <!-- Reports and analytics graphs or data tables go here -->
-               <h4>Reports</h4>
-               <p>Content for Reports...</p>
-            </div>
-         </div>
-      </div>
-      <!-- JavaScript for dynamic management -->
-      <script>
-         var paymentScreenshotBytes = null;
-
-         document.getElementById('paymentConfirmation').addEventListener('change', function(event) {
-             const file = event.target.files[0];
-             if (file) {
-                 const reader = new FileReader();
-                 reader.onload = function(loadEvent) {
-                     // Update the global variable
-                     paymentScreenshotBytes = loadEvent.target.result;
-                 };
-                 reader.readAsDataURL(file);
-             } else {
-                 // Reset to null if the file input is cleared
-                 paymentScreenshotBytes = null;
-             }
-         });
-         
-         function validateAndSubmitForm(event) {
-             event.preventDefault(); // Add this to prevent submission.
-         
-             const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
-             if (selectedCompetitions.length === 0) {
-                 alert('Please select at least one competition');
-             } else {
-                 // Step 1: Validate the data
-                 var email = document.getElementById('email').value;
-                 var name = document.getElementById('name').value;
-                 var phoneNumber = document.getElementById('phoneNumber').value;
-                 var tower = document.getElementById('tower').value;
-                 var flat = document.getElementById('flat').value;
-                 var gender = document.querySelector('input[name="gender"]:checked');
-                 var age = document.getElementById('age').value;
-                 var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-
-                 //if (!email || !name || !phoneNumber || !tower || !flat || !gender || !age || !ageGroup || !acknowledge || !paymentOption) {  // Basic validation
-                 //  alert("All fields are required!");
-                 //  return;
-                 //}
-               
-                 // Step 2: Set the data
-                let competitionInfo = [];
-                  document.querySelectorAll('input[name="competitions"]:checked').forEach(comp => {
-                    const teamInfo = comp.parentElement.querySelector('input[type="text"]') ? comp.parentElement.querySelector('input[type="text"]').value : null;
-                    const category = comp.closest('.category-block').querySelector('.category-header').textContent;
-                    competitionInfo.push({
-                      category: category,
-                      name: comp.labels[0].innerText,
-                      teamInfo: teamInfo
-                    });
-                  });
-                 var competitions = competitionInfo;
-                
-                  const foodMenu = document.getElementById('foodMenu').value;
-                  const selectedDates = [];
-                  document.querySelectorAll('.form-check-input[type="checkbox"]').forEach(checkbox => {
-                    if (checkbox.checked) {
-                      selectedDates.push(checkbox.value);
-                    }
-                  });
-                  const foodStallInfo = {
-                    menu: foodMenu,
-                    dates: selectedDates
-                  };
-                  var foodStalls = foodStallInfo;
-                
-                 var acknowledge = (document.getElementById('acknowledge')).checked ? 'Yes' : 'No';
-                 var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-                 var paymentScreenshotInfo = paymentScreenshotBytes;
-                 
-                 // Step 3: Prepare data to send
-                 var registrationData = {
-                      email: email,
-                      name: name,
-                      phoneNumber: phoneNumber,
-                      tower: tower,
-                      flat: flat,
-                      gender: gender.value,
-                      age: age,
-                      ageGroup: ageGroup.value,
-                      competitions: competitions,
-                      foodStalls: foodStalls,
-                      acknowledge: acknowledge,
-                      paymentOption: paymentOption.value,
-                      paymentScreenshotInfo: paymentScreenshotInfo
-                  };
-               
-                  // Step 4: Send data using fetch with payload
-                  fetch('https://script.google.com/macros/s/AKfycbyZeC1HmFLg5WPMq2FiqqH3y1cz3cB7yKovtN-t40x2-xYe4UWu9XiT9JGDUH-DhSP5jA/exec', {
-                      redirect: "follow",
-                      mode: 'no-cors',
-                      method: 'POST',
-                      headers: {
-                          'Content-Type': 'text/plain;charset=utf-8'
-                      },
-                      body: JSON.stringify(registrationData)
-                  })
-                  .then(response => response.text())
-                  .then(data => {
-                      console.log(data);
-                      alert('Form submitted successfully!');
-                  })
-                  .catch(error => {
-                      console.error('Error:', error);
-                      alert('An error occurred while submitting the form.');
-                  });
-             }
-         };
-         
-         document.addEventListener('DOMContentLoaded', function () {
-             updateCompetitionsDisplay('3to5yrs'); // Default age group on load
-         });
-         
-         const competitionsData = [
-            {
-            category: 'Cultural',
-            competitions: [
-            { name: 'Dance-Bollywood', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Dance-Classical', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'DJ Night', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false }, 
-            { name: 'Drawing', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs'], teamBased: false }, 
-            { name: 'Fancy Dress', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs'], teamBased: false },
-            { name: 'Karaoke Night', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Master Chef', ageGroups: ['11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Musical Instrument', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Rangoli', ageGroups: ['11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Singing-Bollywood', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Singing-Classical', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false }
-            ]
-            },
-            {
-            category: 'Games',
-            competitions: [
-            { name: 'Build an Object (Teams of 3)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Jump In & Out', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Lemon & Spoon Race', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false }, 
-            { name: 'Musical Chairs', ageGroups: ['3to5yrs', '6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false }, 
-            { name: 'Potato Picking Race', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Price is Right', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Sack Race', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Slow cycling', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Tambola', ageGroups: ['3to5yrs','6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Treasure Hunt (Teams of 4)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Tug of War (Teams of 6)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true }
-            ]
-            },
-            {
-            category: 'Quiz',
-            competitions: [
-            { name: 'Bollywood Quiz (Teams of 3)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'General Knowledge Quiz (Teams of 3)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Spelling Bee', ageGroups: ['6to10yrs', '11to16yrs'], teamBased: false }
-            ]
-            },
-            {
-            category: 'Sports',
-            competitions: [
-            { name: '8 Ball Pool', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Badminton (Singles)', ageGroups: ['6to10yrs', '11to16yrs'], teamBased: false },
-            { name: 'Badminton (Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Badminton (Mixed Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Table Tennis (Singles)', ageGroups: ['6to10yrs', '11to16yrs'], teamBased: false },
-            { name: 'Table Tennis (Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Table Tennis (Mixed Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Lawn Tennis (Singles)', ageGroups: ['6to10yrs', '11to16yrs'], teamBased: false },
-            { name: 'Lawn Tennis (Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Lawn Tennis (Mixed Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Cards-29 (Doubles)', ageGroups: ['17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true }, 
-            { name: 'Carrom (Doubles)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true }, 
-            { name: 'Chess', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false },
-            { name: 'Kabaddi (Teams of 9)', ageGroups: ['6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: true },
-            { name: 'Swimming', ageGroups: ['3to5yrs','6to10yrs', '11to16yrs','17to29yrs','30to35yrs','36to49yrs','50to55yrs','56Yrsabove'], teamBased: false }
-            ]
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Z1 Winterfest 2024</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <style>
+            /* Styling the entire nav-tabs container */
+            .nav-tabs {
+                border-bottom: 3px solid #4caf50; /* Solid border under the tabs */
             }
-         ];
-         
-         function updateCompetitionsDisplay(selectedAgeGroup) {
-             const container = document.getElementById('competitionsContainer');
-             container.innerHTML = ''; // Clear current contents
-         
-             competitionsData.forEach(category => {
-                 const categoryElem = document.createElement('div');
-                 categoryElem.classList.add('category-block');
-                 const header = document.createElement('div');
-                 header.className = 'category-header';
-                 header.textContent = category.category;
-                 categoryElem.appendChild(header);
-         
-                 let hasVisibleCompetitions = false;
-                 
-                 category.competitions.forEach(comp => {
-                     if (comp.ageGroups.includes(selectedAgeGroup)) {
-                         hasVisibleCompetitions = true;
-                         const checkboxId = `comp-${comp.name.replace(/\s+/g, '-')}`;
-                         const compElement = document.createElement('div');
-                         compElement.className = 'form-check';
-                         compElement.innerHTML = `
+            /* Defining the default look of each tab */
+            .nav-link {
+                color: #666;
+                padding: 10px 20px;
+                background-color: #f9f9f9;
+                border: 0 solid transparent;
+                border-radius: 5px 5px 0 0;
+                transition: color 0.2s, background-color 0.2s; /* Smooth transition for hover effects */
+            }
+            /* Darker background and color text when hovering over tab */
+            .nav-link:hover {
+                background-color: #e2e2e2;
+                color: #333;
+                border-color: #ddd; /* Slightly darker border on hover */
+            }
+            /* Styling for when a tab is active */
+            .nav-tabs .nav-link.active,
+            .nav-tabs .nav-link.active:hover {
+                color: #fff;
+                background-color: #4caf50;
+                border: 0;
+                border-bottom-color: transparent; /* No border at the bottom */
+            }
+            /* Responsive adjustments for tablets */
+            @media (max-width: 768px) {
+                .nav-link {
+                    padding: 8px 16px;
+                    font-size: 14px; /* Slightly reduce padding and font size */
+                }
+            }
+            /* Responsive adjustments for small devices (phones) */
+            @media (max-width: 575.98px) {
+                .nav-tabs {
+                    overflow-x: auto;
+                    flex-wrap: nowrap; /* Enable horizontal scrolling and prevent tabs from wrapping */
+                }
+                .nav-link {
+                    padding: 6px 12px;
+                    font-size: 12px; /* Further reduce padding and font size */
+                }
+            }
+            .section-header {
+                background-color: #e6d4e7;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
+            .divider {
+                height: 2px;
+                background-color: #dee2e6;
+                margin: 40px 0;
+            }
+            .category-block {
+                display: none;
+                margin-bottom: 20px;
+            }
+            .category-header {
+                font-size: 20px;
+                font-weight: bold;
+                color: #333;
+            }
+            .bullet-points {
+                list-style: none;
+                padding-left: 20px;
+            }
+            .bullet-points li:before {
+                content: "\2022";
+                color: black;
+                font-weight: bold;
+                display: inline-block;
+                width: 1em;
+                margin-left: -1em;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container py-5">
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#newRegistration">Submit New Registration</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#dashboard">My Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
+                </li>
+            </ul>
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <div id="newRegistration" class="tab-pane fade show active">
+                    <div class="container py-5">
+                        <!-- Welcome Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h1>Z1 Winterfest 2024</h1>
+                            </div>
+                            <img src="banner.png" alt="Banner Image" class="img-fluid" />
+                            &nbsp
+                            <p style="color: #a63a50;"><strong>Instructions:</strong></p>
+                            <ul class="bullet-points">
+                                <li>Participation fee is <strong>Rs.600/- per flat.</strong></li>
+                                <li>Fill a <strong>separate form for each participant</strong> from your flat.</li>
+                                <li>Irrespective of the number of forms submitted from <strong>your flat</strong>, you only need to <strong>pay Rs.600/- once.</strong></li>
+                                <li>If you wish to <strong>host a Food stall</strong>, the fee is <strong>Rs. 700/- per day per stall</strong> (on first come first serve basis).</li>
+                                <li>Please submit form by <strong>Sunday, 27 Oct 2024.</strong></li>
+                            </ul>
+                        </section>
+                        <div class="divider"></div>
+                        <!-- Event Schedule Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Event Schedule</h2>
+                            </div>
+                            <img src="schedule.png" alt="Event Schedule" class="img-fluid" />
+                        </section>
+                        <div class="divider"></div>
+                        <!-- Participant Information Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Participant Information</h2>
+                                <p style="color: #a63a50;"><strong>NOTE:</strong> Fill a separate form for each participant from your flat</p>
+                            </div>
+                            <form id="registrationForm">
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label for="email" class="form-label" style="font-weight: bold;">Email</label>
+                                    <input type="email" class="form-control" id="email" placeholder="Enter email" required />
+                                </div>
+                                <!-- Name -->
+                                <div class="mb-3">
+                                    <label for="name" class="form-label" style="font-weight: bold;">Name</label>
+                                    <input type="text" class="form-control" id="name" placeholder="Enter full name" required />
+                                </div>
+                                <!-- Phone Number -->
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label" style="font-weight: bold;">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        class="form-control"
+                                        id="phoneNumber"
+                                        name="phoneNumber"
+                                        pattern="^\+?(\d{1,4}[\s-]?)?(\(?\d{1,3}\)?[\s-]?)?[\d\s-]{4,10}$"
+                                        title="Enter a valid phone number. Include country and area code if necessary."
+                                        placeholder="Enter phone number"
+                                        required
+                                    />
+                                </div>
+                                <!-- Tower -->
+                                <div class="mb-3">
+                                    <label for="tower" class="form-label" style="font-weight: bold;">Tower</label>
+                                    <select class="form-select" id="tower" required>
+                                        <option value="">Select Tower</option>
+                                        <option value="Tower A">Tower A</option>
+                                        <option value="Tower B">Tower B</option>
+                                        <option value="Tower C">Tower C</option>
+                                        <option value="Tower D">Tower D</option>
+                                        <option value="Tower E">Tower E</option>
+                                        <option value="Tower F">Tower F</option>
+                                        <option value="Tower G">Tower G</option>
+                                        <option value="Tower 1">Tower 1</option>
+                                        <option value="Tower 2">Tower 2</option>
+                                        <option value="Tower 3">Tower 3</option>
+                                        <option value="Tower 4">Tower 4</option>
+                                        <option value="Tower 5">Tower 5</option>
+                                        <option value="Tower 6">Tower 6</option>
+                                        <option value="Tower 7">Tower 7</option>
+                                        <option value="Tower 8">Tower 8</option>
+                                    </select>
+                                </div>
+                                <!-- Flat Number -->
+                                <div class="mb-3">
+                                    <label for="flat" class="form-label" style="font-weight: bold;">Flat Number</label>
+                                    <input type="number" class="form-control" id="flat" placeholder="Enter flat number" required />
+                                </div>
+                                <!-- Gender -->
+                                <div class="mb-3">
+                                    <label style="font-weight: bold;">Gender</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="male" value="Male" required />
+                                        <label class="form-check-label" for="male">Male</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="female" value="Female" />
+                                        <label class="form-check-label" for="female">Female</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gender" id="other" value="Other" />
+                                        <label class="form-check-label" for="other">Other</label>
+                                    </div>
+                                </div>
+                                <!-- Age -->
+                                <div class="mb-3">
+                                    <label for="age" class="form-label" style="font-weight: bold;">Age</label>
+                                    <input type="number" class="form-control" id="age" placeholder="Enter age" required />
+                                </div>
+                                <!-- Age Group -->
+                                <div class="mb-3">
+                                    <label style="font-weight: bold;">Select correct Age Group</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="3to5yrs" value="3to5yrs" onchange="updateCompetitionsDisplay(this.value)" checked required />
+                                        <label class="form-check-label" for="3to5yrs">3 to 5 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="6to10yrs" value="6to10yrs" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="6to10yrs">6 to 10 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="11to16yrs" value="11to16yrs" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="11to16yrs">11 to 16 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="17to29yrs" value="17to29yrs" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="17to29yrs">17 to 29 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="30to35yrs" value="30to35yrs" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="30to35yrs">30 to 35 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="36to49yrs" value="36to49yrs" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="36to49yrs">36 to 49 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="50to55yrs" value="50to55yrs" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="50to55yrs">50 to 55 yrs</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ageGroup" id="56Yrsabove" value="56Yrsabove" onchange="updateCompetitionsDisplay(this.value)" required />
+                                        <label class="form-check-label" for="56Yrsabove">56 Yrs & above</label>
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
+                        <div class="divider"></div>
+                        <!-- Competitions Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Competitions</h2>
+                            </div>
+                            <div id="competitionsContainer" class="mt-3">
+                                <!-- Competitions will be populated here dynamically -->
+                            </div>
+                        </section>
+                        <div class="divider"></div>
+                        <!-- Food Stall Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Book Food Stalls</h2>
+                                <p style="color: #a63a50;"><strong>NOTE:</strong> Booking is on first come first serve basis</p>
+                            </div>
+                            <p>Select if you want to book a <strong>Food Stall at Rs. 700 per day per stall</strong> on competition days.</p>
+                            <!-- Static Checkbox list for dates -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="10nov" value="Sunday, 10 Nov" />
+                                <label class="form-check-label" for="10nov">Sunday, 10 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="16nov" value="Saturday, 16 Nov" />
+                                <label class="form-check-label" for="16nov">Saturday, 16 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="17nov" value="Sunday, 17 Nov" />
+                                <label class="form-check-label" for="17nov">Sunday, 17 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="23nov" value="Saturday, 23 Nov" />
+                                <label class="form-check-label" for="23nov">Saturday, 23 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="24nov" value="Sunday, 24 Nov" />
+                                <label class="form-check-label" for="24nov">Sunday, 24 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="30nov" value="Saturday, 30 Nov" />
+                                <label class="form-check-label" for="30nov">Saturday, 30 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="1dec" value="Sunday, 1 Dec" />
+                                <label class="form-check-label" for="1dec">Sunday, 1 Dec</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="7dec" value="Saturday, 7 Dec" />
+                                <label class="form-check-label" for="7dec">Saturday, 7 Dec</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="8dec" value="Sunday, 8 Dec" />
+                                <label class="form-check-label" for="8dec">Sunday, 8 Dec</label>
+                            </div>
+                            <div>
+                                &nbsp
+                            </div>
+                            <!-- Food Menu -->
+                            <label for="foodMenu" class="form-label">If you are booking a food stall, please mention your <strong>Food menu</strong>. We will not accept booking without this information.</label>
+                            <textarea class="form-control" id="foodMenu" rows="3" required></textarea>
+                        </section>
+                        <!-- Acknowledgement Section -->
+                        <div class="divider"></div>
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Acknowledge Rules</h2>
+                            </div>
+                            <div>
+                                <strong>Eligibility</strong>
+                                <ul class="bullet-points">
+                                    <li>Participants must be residents or owners in Z1.</li>
+                                    <li>Participants can only play in their own age category as specified for that event.</li>
+                                    <li>Age validation - If required, organizers will request for age proof of participants and then assign them to the appropriate age category.</li>
+                                </ul>
+                                &nbsp
+                                <strong>General Rules</strong>
+                                <ul class="bullet-points">
+                                    <li>All participation forms must be received by Sunday, 27 October 2024.</li>
+                                    <li>Participants must arrive on time as per schedule.</li>
+                                    <li>Participants from the senior most age category can choose to drop down to the next age category.</li>
+                                    <li>If an event doesn't have a minimum of 4 individual/ team participation, it will be canceled.</li>
+                                    <li>No changes to teams will be allowed after 27 Oct, 2024.</li>
+                                    <li>All events require a lot of planning and fixtures will be decided in advance. Therefore, organizers will not be able to accommodate entries after the participation due date.</li>
+                                    <li>We have created the competition schedule keeping multiple variables in mind and therefore, it will not be possible to reschedule any of the events.</li>
+                                    <li>Each contest will have a Winner and a Runners-up.</li>
+                                    <li>The decision of Referee/ Umpire/ Linesman/ Judge will be final.</li>
+                                </ul>
+                                &nbsp
+                                <strong>Racket games</strong>
+                                <ul class="bullet-points">
+                                    <li>Seeded players are not allowed to compete.</li>
+                                    <li>For Doubles and Mixed Doubles Racket games, it is mandatory to mention team member names and flat numbers.</li>
+                                    <li>To accommodate all participants, racket games might be held on weekdays. The schedule will be published at least one week in advance.</li>
+                                </ul>
+                                &nbsp
+                            </div>
+                            <strong>Other competition specific rules</strong>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="acknowledge" required />
+                                <label class="form-check-label" for="acknowledge">
+                                    I have read and agree to the <a href="https://docs.google.com/document/d/1BE8XK-kl9kdpqbTX6sVo0VQXfe7bPPDbwTRa9D2aHww" target="_blank">Z1 Winterfest 2024 rules</a>.
+                                </label>
+                            </div>
+                        </section>
+                        <div class="divider"></div>
+                        <!-- Payment Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Payment</h2>
+                            </div>
+                            <p>Please check the appropriate box! &nbsp</p>
+                            &nbsp
+                            <p>If this is the <strong>first registration from your flat</strong> OR if you are registering <strong>again to host a Food stall</strong>, select Option 1, make the payment, and attach payment screenshot.</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="Option 1 : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now." />
+                                <label class="form-check-label" for="option1"><strong>Option 1</strong> : I confirm that I will pay Rs.600 for competitions and/or Rs. 700 for food stall now.</label>
+                            </div>
+                            &nbsp
+                            <p>
+                                If you are submitting another form for another participant from your flat to participate in competitions, and have <strong>already made a payment of Rs.600 for your flat</strong>, select Option 2, skip the
+                                payment, and attach original payment screenshot.
+                            </p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentOption" id="option2" value="Option 2 : I confirm that I have already made a payment of Rs. 600 and will attach the the screenshot." />
+                                <label class="form-check-label" for="option2"><strong>Option 2</strong> : I confirm that I have already made a payment of Rs. 600 and will attach the the screenshot.</label>
+                            </div>
+                            &nbsp
+                            <div class="mb-3">
+                                <p style="color: #a63a50;"><strong>(Preferred method) Pay via Anacity:</strong></p>
+                                <ul class="bullet-points">
+                                    <li>Go to the app => "Z1 Apartments Facilities" account on the top left</li>
+                                    <li>Select Dues => Pay advance => Paying to "Winterfest 2024"</li>
+                                    <li>Choose amount Rs. 600/ 700/ both and proceed with payment</li>
+                                </ul>
+                                <p style="color: #a63a50;">
+                                    <strong>(Alternate method) Pay via UPI:</strong>
+                                </p>
+                                <p>
+                                    Use below QR code or below UPI ID
+                                    <strong>vyapar.171174085726@hdfcbank</strong>
+                                </p>
+                                <img src="qrcode.png" alt="QRcode" class="img-fluid" />
+                            </div>
+                        </section>
+                        <!-- Payment confirmation Section -->
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Confirmation</h2>
+                            </div>
+                            <div class="mb-3">
+                                <label for="paymentConfirmation" class="form-label">Upload Payment Screenshot</label>
+                                <input type="file" class="form-control" id="paymentConfirmation" accept="image/*" required />
+                            </div>
+                        </section>
+                        <!-- Rules and Submission Section -->
+                        <div class="divider"></div>
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Final Submission</h2>
+                            </div>
+                            <button class="btn btn-primary" type="submit" onclick="validateAndSubmitForm(event)">Submit</button>
+                        </section>
+                    </div>
+                </div>
+                <div id="dashboard" class="tab-pane fade">
+                    <!-- Dashboard related information and widgets go here -->
+                    <h4>Dashboard</h4>
+                    <p>Content for Dashboard...</p>
+                </div>
+                <div id="reports" class="tab-pane fade">
+                    <!-- Reports and analytics graphs or data tables go here -->
+                    <h4>Reports</h4>
+                    <p>Content for Reports...</p>
+                </div>
+            </div>
+        </div>
+        <!-- JavaScript for dynamic management -->
+        <script>
+            var paymentScreenshotBytes = null;
+
+            document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (loadEvent) {
+                        // Update the global variable
+                        paymentScreenshotBytes = loadEvent.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Reset to null if the file input is cleared
+                    paymentScreenshotBytes = null;
+                }
+            });
+
+            function validateAndSubmitForm(event) {
+                event.preventDefault(); // Add this to prevent submission.
+
+                const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+                if (selectedCompetitions.length === 0) {
+                    alert("Please select at least one competition");
+                } else {
+                    // Step 1: Validate the data
+                    var email = document.getElementById("email").value;
+                    var name = document.getElementById("name").value;
+                    var phoneNumber = document.getElementById("phoneNumber").value;
+                    var tower = document.getElementById("tower").value;
+                    var flat = document.getElementById("flat").value;
+                    var gender = document.querySelector('input[name="gender"]:checked');
+                    var age = document.getElementById("age").value;
+                    var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
+
+                    //if (!email || !name || !phoneNumber || !tower || !flat || !gender || !age || !ageGroup || !acknowledge || !paymentOption) {  // Basic validation
+                    //  alert("All fields are required!");
+                    //  return;
+                    //}
+
+                    // Step 2: Set the data
+                    let competitionInfo = [];
+                    document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
+                        const teamInfo = comp.parentElement.querySelector('input[type="text"]') ? comp.parentElement.querySelector('input[type="text"]').value : null;
+                        const category = comp.closest(".category-block").querySelector(".category-header").textContent;
+                        competitionInfo.push({
+                            category: category,
+                            name: comp.labels[0].innerText,
+                            teamInfo: teamInfo,
+                        });
+                    });
+                    var competitions = competitionInfo;
+
+                    const foodMenu = document.getElementById("foodMenu").value;
+                    const selectedDates = [];
+                    document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
+                        if (checkbox.checked) {
+                            selectedDates.push(checkbox.value);
+                        }
+                    });
+                    const foodStallInfo = {
+                        menu: foodMenu,
+                        dates: selectedDates,
+                    };
+                    var foodStalls = foodStallInfo;
+
+                    var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
+                    var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
+                    var paymentScreenshotInfo = paymentScreenshotBytes;
+
+                    // Step 3: Prepare data to send
+                    var registrationData = {
+                        email: email,
+                        name: name,
+                        phoneNumber: phoneNumber,
+                        tower: tower,
+                        flat: flat,
+                        gender: gender.value,
+                        age: age,
+                        ageGroup: ageGroup.value,
+                        competitions: competitions,
+                        foodStalls: foodStalls,
+                        acknowledge: acknowledge,
+                        paymentOption: paymentOption.value,
+                        paymentScreenshotInfo: paymentScreenshotInfo,
+                    };
+
+                    // Step 4: Send data using fetch with payload
+                    fetch("https://script.google.com/macros/s/AKfycbyZeC1HmFLg5WPMq2FiqqH3y1cz3cB7yKovtN-t40x2-xYe4UWu9XiT9JGDUH-DhSP5jA/exec", {
+                        redirect: "follow",
+                        mode: "no-cors",
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8",
+                        },
+                        body: JSON.stringify(registrationData),
+                    })
+                        .then((response) => response.text())
+                        .then((data) => {
+                            console.log(data);
+                            alert("Form submitted successfully!");
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            alert("An error occurred while submitting the form.");
+                        });
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                updateCompetitionsDisplay("3to5yrs"); // Default age group on load
+            });
+
+            const competitionsData = [
+                {
+                    category: "Cultural",
+                    competitions: [
+                        { name: "Dance-Bollywood", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Dance-Classical", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "DJ Night", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Drawing", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false },
+                        { name: "Fancy Dress", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false },
+                        { name: "Karaoke Night", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Master Chef", ageGroups: ["11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Musical Instrument", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Rangoli", ageGroups: ["11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Singing-Bollywood", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Singing-Classical", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                    ],
+                },
+                {
+                    category: "Games",
+                    competitions: [
+                        { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Potato Picking Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Price is Right", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Sack Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Slow cycling", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Tambola", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Treasure Hunt (Teams of 4)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                    ],
+                },
+                {
+                    category: "Quiz",
+                    competitions: [
+                        { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "General Knowledge Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
+                    ],
+                },
+                {
+                    category: "Sports",
+                    competitions: [
+                        { name: "8 Ball Pool", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Badminton (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
+                        { name: "Badminton (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Badminton (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Table Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
+                        { name: "Table Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Table Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Lawn Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
+                        { name: "Lawn Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Lawn Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Cards-29 (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Carrom (Doubles)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Chess", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                        { name: "Kabaddi (Teams of 9)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true },
+                        { name: "Swimming", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false },
+                    ],
+                },
+            ];
+
+            function updateCompetitionsDisplay(selectedAgeGroup) {
+                const container = document.getElementById("competitionsContainer");
+                container.innerHTML = ""; // Clear current contents
+
+                competitionsData.forEach((category) => {
+                    const categoryElem = document.createElement("div");
+                    categoryElem.classList.add("category-block");
+                    const header = document.createElement("div");
+                    header.className = "category-header";
+                    header.textContent = category.category;
+                    categoryElem.appendChild(header);
+
+                    let hasVisibleCompetitions = false;
+
+                    category.competitions.forEach((comp) => {
+                        if (comp.ageGroups.includes(selectedAgeGroup)) {
+                            hasVisibleCompetitions = true;
+                            const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
+                            const compElement = document.createElement("div");
+                            compElement.className = "form-check";
+                            compElement.innerHTML = `
                              <input class="form-check-input" type="checkbox" id="${checkboxId}" name="competitions">
                              <label class="form-check-label" for="${checkboxId}">${comp.name}</label>
                          `;
-         
-                         if (comp.teamBased) {
-                             const inputTeamMembers = document.createElement('input');
-                             inputTeamMembers.id = `team-${checkboxId}`;
-                             inputTeamMembers.className = "form-control mt-2";
-                             inputTeamMembers.placeholder = 'Enter team member names';
-                             inputTeamMembers.style.display = 'none';
-         
-                             // Show this input when the checkbox is changed
-                             compElement.querySelector('input[type="checkbox"]').onchange = function() {
-                                 inputTeamMembers.style.display = this.checked ? 'block' : 'none';
-                             };
-                             compElement.appendChild(inputTeamMembers);
-                         }
-                         categoryElem.appendChild(compElement);
-                     }
-                 });
-         
-                 if (hasVisibleCompetitions) {
-                     container.appendChild(categoryElem);
-                     categoryElem.style.display = 'block';
-                 }
-             });
-         }
-      </script>
-      <!-- Bootstrap Bundle with Popper -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-   </body>
+
+                            if (comp.teamBased) {
+                                const inputTeamMembers = document.createElement("input");
+                                inputTeamMembers.id = `team-${checkboxId}`;
+                                inputTeamMembers.className = "form-control mt-2";
+                                inputTeamMembers.placeholder = "Enter team member names";
+                                inputTeamMembers.style.display = "none";
+
+                                // Show this input when the checkbox is changed
+                                compElement.querySelector('input[type="checkbox"]').onchange = function () {
+                                    inputTeamMembers.style.display = this.checked ? "block" : "none";
+                                };
+                                compElement.appendChild(inputTeamMembers);
+                            }
+                            categoryElem.appendChild(compElement);
+                        }
+                    });
+
+                    if (hasVisibleCompetitions) {
+                        container.appendChild(categoryElem);
+                        categoryElem.style.display = "block";
+                    }
+                });
+            }
+        </script>
+        <!-- Bootstrap Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>
