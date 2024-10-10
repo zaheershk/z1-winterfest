@@ -593,17 +593,16 @@
 
                 // Step 4: Send data using fetch with payload
                 fetch("https://script.google.com/macros/s/AKfycbzYUQTMAHwAFrlSpEhfRLhi5VWeLjW394GwdlscaQuiNgUgI93LImiExp4iR-UVp0ATGA/exec", {
-                    redirect: "follow",
-                    mode: "no-cors",
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(registrationData),
-                })
-                    .then((response) => response.text())
+                        redirect: "follow",
+                        mode: "no-cors",
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(registrationData),
+                    })
                     .then(data => {
-                        console.log(data);
+                        //console.log(data);
                         const formSection = document.getElementById('newRegistration');
                         const confirmationSection = document.getElementById('registrationConfirmation');
                 
