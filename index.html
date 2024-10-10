@@ -449,7 +449,7 @@
                 //const v_competitions = document.querySelectorAll('input[name="competitions"]:checked');
                 const v_acknowledge = document.getElementById("acknowledge").checked;
                 const v_paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-                const v_paymentConfirmation = document.getElementById("paymentConfirmation").value;
+                const v_paymentConfirmation = document.getElementById("paymentConfirmation");
 
                 // Mandatory checks
                 [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age].forEach((input) => {
@@ -482,6 +482,7 @@
                     formValid = false;
                 }
 
+                console.log(`File input length: ${v_paymentConfirmation.files.length}`);
                 if (v_paymentConfirmation.files && v_paymentConfirmation.files.length === 0) {
                     v_paymentConfirmation.classList.add(invalidInputClass);
                     formValid = false;
