@@ -482,11 +482,9 @@
                     formValid = false;
                 }
 
-                if (v_paymentConfirmation && v_paymentConfirmation.files.length === 0) {
+                if (v_paymentConfirmation.files && v_paymentConfirmation.files.length === 0) {
                     v_paymentConfirmation.classList.add(invalidInputClass);
                     formValid = false;
-                } else if (!v_paymentConfirmation) {
-                    console.error("Error: 'paymentConfirmation' file input is not found in the document.");
                 }
 
                 //if (v_competitions.length === 0) {
@@ -495,31 +493,22 @@
                 //    formValid = false;
                 //}
 
+                const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+                selectedCompetitions.forEach((comp) => {
+                    const v_compId = comp.id;
+                    if (document.getElementById(`team-${v_compId}`) && document.getElementById(`team-${v_compId}`).value === "") {
+                        formValid = false;
+                        v_teamInfo = document.getElementById(`team-${v_compId}`);
+                        v_teamInfo.classList.add(invalidInputClass);
+                    }
+                });
+
                 if (!formValid) {
                     alert("Please review & fill in all required fields.");
                     return false;
                 }
 
-                const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
-                // Check for mandatory team member inputs
-                let teamInputValid = true;
-                selectedCompetitions.forEach((comp) => {
-                    const compId = comp.id;
-                    if (document.getElementById(`team-${compId}`) && document.getElementById(`team-${compId}`).value === "") {
-                        teamInputValid = false;
-                        alert("Please enter team member details for all selected team events.");
-                        return;
-                    }
-                });
-
-                //if (selectedCompetitions.length === 0) {
-                //    alert("Please select at least one competition.");
-                //} else if (!teamInputValid) {
-                //    // If team input validation failed, do nothing as the alert is already shown
-                //} else {
-                //
-                //}
-
+                // Step 2: Set the data
                 var email = document.getElementById("email").value;
                 var name = document.getElementById("name").value;
                 var phoneNumber = document.getElementById("phoneNumber").value;
@@ -529,7 +518,7 @@
                 var age = document.getElementById("age").value;
                 var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
 
-                // Step 2: Set the data
+                /*
                 let competitionInfo = [];
                 document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
                     const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
@@ -541,6 +530,19 @@
                         // Make sure the input exists and has a value
                         teamInfo = teamInfoInput.value;
                     }
+                    */
+                    
+                    let teamInfo = null;
+                    selectedCompetitions.forEach((comp) => {
+                        const compId = comp.id;
+                        if (document.getElementById(`team-${compId}`)) {
+                            teamInfoInput = document.getElementById(`team-${compId}`);
+                            if (teamInfoInput && teamInfoInput.value) {
+                                // Make sure the input exists and has a value
+                                teamInfo = teamInfoInput.value;
+                            }
+                        }
+                    });
 
                     const category = comp.closest(".category-block").querySelector(".category-header").textContent;
                     competitionInfo.push({
