@@ -531,25 +531,24 @@
                         teamInfo = teamInfoInput.value;
                     }
                     */
-                    
-                    let teamInfo = null;
-                    selectedCompetitions.forEach((comp) => {
-                        const compId = comp.id;
-                        if (document.getElementById(`team-${compId}`)) {
-                            teamInfoInput = document.getElementById(`team-${compId}`);
-                            if (teamInfoInput && teamInfoInput.value) {
-                                // Make sure the input exists and has a value
-                                teamInfo = teamInfoInput.value;
-                            }
-                        }
-                    });
 
-                    const category = comp.closest(".category-block").querySelector(".category-header").textContent;
-                    competitionInfo.push({
-                        category: category,
-                        name: comp.labels[0].innerText,
-                        teamInfo: teamInfo,
-                    });
+                let teamInfo = null;
+                selectedCompetitions.forEach((comp) => {
+                    const compId = comp.id;
+                    if (document.getElementById(`team-${compId}`)) {
+                        teamInfoInput = document.getElementById(`team-${compId}`);
+                        if (teamInfoInput && teamInfoInput.value) {
+                            // Make sure the input exists and has a value
+                            teamInfo = teamInfoInput.value;
+                        }
+                    }
+                });
+
+                const category = comp.closest(".category-block").querySelector(".category-header").textContent;
+                competitionInfo.push({
+                    category: category,
+                    name: comp.labels[0].innerText,
+                    teamInfo: teamInfo,
                 });
 
                 const foodMenu = document.getElementById("foodMenu").value;
