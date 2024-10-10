@@ -316,7 +316,7 @@
                                 <ul class="bullet-points">
                                     <li>Go to "Z1 Apartments Facilities" account on the top left</li>
                                     <li>Select Dues => Pay advance => Paying to "Winterfest 2024"</li>
-                                    <li>Pay amount i.e. Rs. 600/ 700/ or more depending on your selections</li>
+                                    <li>Pay amount mentioned</li>
                                 </ul>
                                 <p style="color: #a63a50;">
                                     <strong>(Alternate method) Pay via UPI:</strong>
@@ -368,24 +368,25 @@
                 return id.replace(/([^\w-])/g, '\\$1');  // This will escape all characters that are not alphanumeric, underscore, or dash.
             }
 
-            document.querySelectorAll('section.mb-4 .form-check-input[type="checkbox"]').forEach((checkbox) => {
+            const foodStallCheckboxSelector = '#10nov, #16nov, #17nov, #23nov, #24nov, #30nov, #1dec, #7dec, #8dec';
+
+            document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
                 checkbox.addEventListener("change", function() {
                     updateTotalAmountDisplay();
                 });
             });
             
-            // Add or adapt similar event listeners if your payment methods and specifics are differently defined.
             document.getElementById('option1').addEventListener('change', function() {
                 updateTotalAmountDisplay();
             });
             
             function updateTotalAmountDisplay() {
                 const option1Selected = document.getElementById('option1').checked;
-                const totalContainer = document.getElementById('totalCharge');
+                const totalContainer = document.getElementById('totalStallCharge');
             
                 if (option1Selected) {
                     const total = calculateFoodStallCount()*700 + 600;
-                    totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
+                    totalContainer.textContent = `Total for Food Stalls: INR ${total}`;
                     totalContainer.style.display = 'block'; 
                 } else {
                     totalContainer.style.display = 'none'; 
@@ -393,14 +394,14 @@
             }
             
             function calculateFoodStallCount() {
-                const checkboxes = document.querySelectorAll('section.mb-4 .form-check-input[type="checkbox"]');
+                const checkboxes = document.querySelectorAll(foodStallCheckboxSelector);
                 let count = 0;
                 checkboxes.forEach(cb => {
                     if (cb.checked) {
                         count++;
                     }
                 });
-                return count;
+                return count; 
             }
 
             document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
