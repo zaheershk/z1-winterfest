@@ -329,7 +329,7 @@
       </div>
       <!-- JavaScript for dynamic management -->
       <script>
-         function validateAndSubmitForm() {
+         function validateAndSubmitForm(event) {
              event.preventDefault(); // Add this to prevent submission.
          
              const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
