@@ -377,10 +377,11 @@
                   };
                
                   // Step 4: Send data using fetch with JSON payload
-                  fetch('https://script.google.com/macros/s/AKfycbzDDWaQ4HQOIB8ik7uaFnQQy8zmlbaZaJppOF0F04okpW1qXDmHWyL86k-qjSi8Kyehwg/exec', {
+                  fetch('https://script.google.com/macros/s/AKfycbyI4UxKFPv4yB_ztRqhwa8I-caBjijfKrnt-gGNTx0Zfo7qx9KxKTnscAOgHWvzFrbspA/exec', {
+                      redirect: "follow",
                       method: 'POST',
                       headers: {
-                          'Content-Type': 'application/json'
+                          'Content-Type': 'text/plain;charset=utf-8'
                       },
                       body: JSON.stringify(registrationData)
                   })
