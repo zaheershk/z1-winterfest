@@ -24,6 +24,8 @@
             .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
             .close:hover,
             .close:focus { color: black; text-decoration: none; cursor: pointer; }
+            .btn { padding: 8px 16px; background-color: #007BFF; color: white; border: none; cursor: pointer; border-radius: 4px; }
+            .btn:hover { background-color: #0056b3; }
         </style>
     </head>
     <body>
@@ -372,6 +374,8 @@
           <div class="modal-content">
             <span class="close">&times;</span>
             <p>Thank you! Your registration has been submitted successfully.</p>
+            <div class="dividerthin"></div>
+            <button id="newRegistrationBtn" class="btn">Submit New Registration</button> 
           </div>
         </div>
         <!-- JavaScript for dynamic management -->
@@ -441,6 +445,8 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const modal = document.getElementById("myModal");
                 const span = document.getElementsByClassName("close")[0];
+                const form = document.getElementById("registrationForm");  // Ensure your form has this ID.
+                const newRegBtn = document.getElementById("newRegistrationBtn");
                 const submitBtn = document.getElementById("submitBtn"); 
 
                 submitBtn.addEventListener('click', function(event) {
@@ -634,9 +640,14 @@
                         modal.style.display = "none";
                     }
                 }
-            });
 
-            
+                // Reset the form and hide the modal when 'Submit New Registration' is clicked
+                newRegBtn.addEventListener('click', function() {
+                    form.reset();  // Resets the form
+                    modal.style.display = "none";  // Hides the modal
+                    form.style.display = "block";  // Ensure this is necessary depending on your layout
+                });
+            });
 
             document.addEventListener("DOMContentLoaded", function () {
                 updateCompetitionsDisplay("3to5yrs"); // Default age group on load
