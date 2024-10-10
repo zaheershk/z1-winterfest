@@ -329,14 +329,22 @@
       </div>
       <!-- JavaScript for dynamic management -->
       <script>
+         var paymentScreenshotBytes = null;
+
          document.getElementById('paymentConfirmation').addEventListener('change', function(event) {
-                    const file = event.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function(loadEvent) {
-                      const paymentScreenshotBytes = loadEvent.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                  });
+             const file = event.target.files[0];
+             if (file) {
+                 const reader = new FileReader();
+                 reader.onload = function(loadEvent) {
+                     // Update the global variable
+                     paymentScreenshotBytes = loadEvent.target.result;
+                 };
+                 reader.readAsDataURL(file);
+             } else {
+                 // Reset to null if the file input is cleared
+                 paymentScreenshotBytes = null;
+             }
+         });
          
          function validateAndSubmitForm(event) {
              event.preventDefault(); // Add this to prevent submission.
