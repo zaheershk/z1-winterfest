@@ -601,7 +601,7 @@
                     },
                     body: JSON.stringify(registrationData),
                 })
-                    .then(response => response.json()) 
+                    .then((response) => response.text())
                     .then(data => {
                         console.log(data);
                         const formSection = document.getElementById('newRegistration');
