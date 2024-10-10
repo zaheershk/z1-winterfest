@@ -555,24 +555,20 @@
                             teamInfo: teamInfo,
                         });
                     });
-                    var competitions = competitionInfo;
 
                     const foodMenu = document.getElementById("foodMenu").value;
                     const selectedDates = [];
                     document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
                         if (checkbox.checked) {
                             selectedDates.push(checkbox.value);
-                            // Removing unwanted 'on' values by ensuring only valued checkboxes are processed.
                         }
                     });
                     const foodStallInfo = {
                         menu: foodMenu,
                         dates: selectedDates,
                     };
-                    var foodStalls = foodStallInfo;
 
-                    var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
-                    var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
+                    var acknowledgeInfo = document.getElementById("acknowledge").checked ? "Yes" : "No";
 
                     // Step 3: Prepare data to send
                     var registrationData = {
@@ -584,9 +580,9 @@
                         gender: gender.value,
                         age: age,
                         ageGroup: ageGroup.value,
-                        competitions: competitions,
-                        foodStalls: foodStalls,
-                        acknowledge: acknowledge,
+                        competitions: competitionInfo,
+                        foodStalls: foodStallInfo,
+                        acknowledge: acknowledgeInfo,
                         paymentOption: paymentOption.value,
                         paymentScreenshotBytes: paymentScreenshotBytes,
                         paymentScreenshotMimeType: paymentScreenshotMimeType
