@@ -752,9 +752,17 @@
             }
 
             function resetForm() {
-                document.getElementById('registrationForm').reset(); // Reset the form
-                document.getElementById('newRegistration').style.display = 'block';  // Show the form section
-                document.getElementById('registrationConfirmation').style.display = 'none'; // Hide the confirmation section
+                const form = document.getElementById('registrationForm');
+                const formSection = document.getElementById('newRegistration');
+                const confirmationSection = document.getElementById('registrationConfirmation');
+            
+                if(form && formSection && confirmationSection) {
+                    form.reset();
+                    formSection.style.display = 'block';
+                    confirmationSection.style.display = 'none';
+                } else {
+                    console.error("One of the required elements is missing.");
+                }
             }
         </script>
         <!-- Bootstrap Bundle with Popper -->
