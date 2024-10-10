@@ -349,7 +349,7 @@
                             </div>
                             <button class="btn btn-primary" type="submit" onclick="validateAndSubmitForm(event)">Submit</button>
                         </section>
-                        <div id="registrationConfirmation" class="tab-pane fade">
+                        <div id="registrationConfirmation" class="tab-pane fade" style="display: none;">
                             <h2>Registration Confirmation</h2>
                             <p>Thank you! Your registration has been submitted.</p>
                             <div class="dividerthin"></div>
@@ -601,11 +601,18 @@
                     },
                     body: JSON.stringify(registrationData),
                 })
-                    .then((response) => response.text())
-                    .then((data) => {
+                    .then(response => response.json()) 
+                    .then(data => {
                         console.log(data);
-                        document.getElementById('newRegistration').style.display = 'none';  // Hide the form section
-                        document.getElementById('registrationConfirmation').style.display = 'block'; // Show the confirmation section
+                        const formSection = document.getElementById('newRegistration');
+                        const confirmationSection = document.getElementById('registrationConfirmation');
+                
+                        if(formSection && confirmationSection && registrationIdSpan) {
+                            formSection.style.display = 'none';
+                            confirmationSection.style.display = 'block';
+                        } else {
+                            console.error("One of the required elements is missing.");
+                        }
                     })
                     .catch((error) => {
                         console.error("Error:", error);
