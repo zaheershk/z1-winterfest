@@ -294,8 +294,10 @@
                             </div>
                             <p>Please check the appropriate option! &nbsp</p>
                             <strong>Option 1 :</strong>
-                            <p>If this is the <strong>first</strong> registration from your flat for <strong>event participation</strong> or <strong>hosting a food stall</strong>, select this option, 
-                                make the payment and attach payment screenshot.</p>
+                            <p>
+                                If this is the <strong>first</strong> registration from your flat for <strong>event participation</strong> or <strong>hosting a food stall</strong>, select this option, make the payment and attach payment
+                                screenshot.
+                            </p>
                             <p id="totalCharge" style="color: red;">Total Amount to be paid: INR 0</p>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentOption" id="option1" value="I will pay for participation and/or food stall now." />
@@ -304,7 +306,8 @@
                             <div class="dividerthin"></div>
                             <strong>Option 2 :</strong>
                             <p>
-                                If you are registering <strong>again</strong> for another participant from your flat, and have <strong>already paid Rs.600</strong>, select this option, skip the payment and re-attach original payment screenshot.
+                                If you are registering <strong>again</strong> for another participant from your flat, and have <strong>already paid Rs.600</strong>, select this option, skip the payment and re-attach original payment
+                                screenshot.
                             </p>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="paymentOption" id="option2" value="I have already made a payment for my flat." />
@@ -366,46 +369,46 @@
             var paymentScreenshotMimeType = null;
 
             function escapeCSSId(id) {
-                return id.replace(/([^\w-])/g, '\\$1');  // This will escape all characters that are not alphanumeric, underscore, or dash.
+                return id.replace(/([^\w-])/g, "\\$1"); // This will escape all characters that are not alphanumeric, underscore, or dash.
             }
 
-            const foodStallCheckboxSelector = '#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec';
+            const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
             document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
-                checkbox.addEventListener("change", function() {
+                checkbox.addEventListener("change", function () {
                     updateTotalAmountDisplay();
                 });
             });
-            
-            document.getElementById('option1').addEventListener('change', function() {
+
+            document.getElementById("option1").addEventListener("change", function () {
                 updateTotalAmountDisplay();
             });
 
-            document.getElementById('option2').addEventListener('change', function() {
+            document.getElementById("option2").addEventListener("change", function () {
                 updateTotalAmountDisplay();
             });
-            
+
             function updateTotalAmountDisplay() {
-                const option1Selected = document.getElementById('option1').checked;
-                const totalContainer = document.getElementById('totalCharge');
+                const option1Selected = document.getElementById("option1").checked;
+                const totalContainer = document.getElementById("totalCharge");
 
-                totalContainer.style.display = 'none'; 
+                totalContainer.style.display = "none";
                 if (option1Selected) {
-                    const total = calculateFoodStallCount()*700 + 600;
+                    const total = calculateFoodStallCount() * 700 + 600;
                     totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
-                    totalContainer.style.display = 'block'; 
+                    totalContainer.style.display = "block";
                 }
             }
-            
+
             function calculateFoodStallCount() {
                 const checkboxes = document.querySelectorAll(foodStallCheckboxSelector);
                 let count = 0;
-                checkboxes.forEach(cb => {
+                checkboxes.forEach((cb) => {
                     if (cb.checked) {
                         count++;
                     }
                 });
-                return count; 
+                return count;
             }
 
             document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
@@ -430,10 +433,10 @@
                 // Step 1: Validate the data
                 let formValid = true;
                 const invalidInputClass = "is-invalid"; // Bootstrap 5 class for invalid input
-            
+
                 // Reset invalid inputs
-                document.querySelectorAll(`.${invalidInputClass}`).forEach(el => el.classList.remove(invalidInputClass));
-            
+                document.querySelectorAll(`.${invalidInputClass}`).forEach((el) => el.classList.remove(invalidInputClass));
+
                 // Collect inputs and checks
                 const v_email = document.getElementById("email");
                 const v_name = document.getElementById("name");
@@ -447,36 +450,43 @@
                 const v_acknowledge = document.getElementById("acknowledge").checked;
                 const v_paymentOption = document.querySelector('input[name="paymentOption"]:checked');
                 const v_paymentConfirmation = document.getElementById("paymentConfirmation").value;
-            
+
                 // Mandatory checks
-                [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age, v_paymentConfirmation].forEach(input => {
+                [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age, v_paymentConfirmation].forEach((input) => {
                     // Check if the element exists and has an empty value
                     if (input && !input.value) {
                         input.classList.add(invalidInputClass);
                         formValid = false;
-                    } else if (!input) { 
+                    } else if (!input) {
                         console.warn(`Element ${input} is not found in the document.`);
                     }
                 });
-            
+
                 if (!v_gender) {
-                    document.querySelectorAll('input[name="gender"]').forEach(input => input.classList.add(invalidInputClass));
+                    document.querySelectorAll('input[name="gender"]').forEach((input) => input.classList.add(invalidInputClass));
                     formValid = false;
                 }
-            
+
                 if (!v_ageGroup) {
-                    document.querySelectorAll('input[name="ageGroup"]').forEach(input => input.classList.add(invalidInputClass));
+                    document.querySelectorAll('input[name="ageGroup"]').forEach((input) => input.classList.add(invalidInputClass));
                     formValid = false;
                 }
-            
+
                 if (!v_acknowledge) {
                     document.getElementById("acknowledge").classList.add(invalidInputClass);
                     formValid = false;
                 }
-            
+
                 if (!v_paymentOption) {
-                    document.querySelectorAll('input[name="paymentOption"]').forEach(input => input.classList.add(invalidInputClass));
+                    document.querySelectorAll('input[name="paymentOption"]').forEach((input) => input.classList.add(invalidInputClass));
                     formValid = false;
+                }
+
+                if (v_paymentConfirmation && v_paymentConfirmation.files.length === 0) {
+                    v_paymentConfirmation.classList.add(invalidInputClass);
+                    formValid = false;
+                } else if (!v_paymentConfirmation) {
+                    console.error("Error: 'paymentConfirmation' file input is not found in the document.");
                 }
 
                 //if (v_competitions.length === 0) {
@@ -484,7 +494,7 @@
                 //    document.querySelectorAll('input[name="competitions"]').forEach(input => input.classList.add(invalidInputClass));
                 //    formValid = false;
                 //}
-                
+
                 if (!formValid) {
                     alert("Please review & fill in all required fields.");
                     return false;
@@ -493,104 +503,105 @@
                 const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
                 // Check for mandatory team member inputs
                 let teamInputValid = true;
-                selectedCompetitions.forEach(comp => {
+                selectedCompetitions.forEach((comp) => {
                     const compId = comp.id;
-                    if (document.getElementById(`team-${compId}`) && document.getElementById(`team-${compId}`).value === '') {
+                    if (document.getElementById(`team-${compId}`) && document.getElementById(`team-${compId}`).value === "") {
                         teamInputValid = false;
                         alert("Please enter team member details for all selected team events.");
                         return;
                     }
                 });
-                
+
                 //if (selectedCompetitions.length === 0) {
                 //    alert("Please select at least one competition.");
                 //} else if (!teamInputValid) {
                 //    // If team input validation failed, do nothing as the alert is already shown
                 //} else {
-                //    
+                //
                 //}
-                
-                    var email = document.getElementById("email").value;
-                    var name = document.getElementById("name").value;
-                    var phoneNumber = document.getElementById("phoneNumber").value;
-                    var tower = document.getElementById("tower").value;
-                    var flat = document.getElementById("flat").value;
-                    var gender = document.querySelector('input[name="gender"]:checked');
-                    var age = document.getElementById("age").value;
-                    var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
 
-                    // Step 2: Set the data
-                    let competitionInfo = [];
-                    document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
-                        const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
-                        const escapedId = escapeCSSId(`team-${checkboxId}`);
-                        const teamInfoInput = document.getElementById(escapedId);
-                    
-                        let teamInfo = null;
-                        if (teamInfoInput && teamInfoInput.value) { // Make sure the input exists and has a value
-                            teamInfo = teamInfoInput.value;
-                        }
-                    
-                        const category = comp.closest(".category-block").querySelector(".category-header").textContent;
-                        competitionInfo.push({
-                            category: category,
-                            name: comp.labels[0].innerText,
-                            teamInfo: teamInfo,
-                        });
+                var email = document.getElementById("email").value;
+                var name = document.getElementById("name").value;
+                var phoneNumber = document.getElementById("phoneNumber").value;
+                var tower = document.getElementById("tower").value;
+                var flat = document.getElementById("flat").value;
+                var gender = document.querySelector('input[name="gender"]:checked');
+                var age = document.getElementById("age").value;
+                var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
+
+                // Step 2: Set the data
+                let competitionInfo = [];
+                document.querySelectorAll('input[name="competitions"]:checked').forEach((comp) => {
+                    const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
+                    const escapedId = escapeCSSId(`team-${checkboxId}`);
+                    const teamInfoInput = document.getElementById(escapedId);
+
+                    let teamInfo = null;
+                    if (teamInfoInput && teamInfoInput.value) {
+                        // Make sure the input exists and has a value
+                        teamInfo = teamInfoInput.value;
+                    }
+
+                    const category = comp.closest(".category-block").querySelector(".category-header").textContent;
+                    competitionInfo.push({
+                        category: category,
+                        name: comp.labels[0].innerText,
+                        teamInfo: teamInfo,
                     });
+                });
 
-                    const foodMenu = document.getElementById("foodMenu").value;
-                    const selectedDates = [];
-                    document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
-                        if (checkbox.checked) {
-                            selectedDates.push(checkbox.value);
-                        }
-                    });
-                    const foodStallInfo = {
-                        menu: foodMenu,
-                        dates: selectedDates,
-                    };
+                const foodMenu = document.getElementById("foodMenu").value;
+                const selectedDates = [];
+                document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
+                    if (checkbox.checked) {
+                        selectedDates.push(checkbox.value);
+                    }
+                });
+                const foodStallInfo = {
+                    menu: foodMenu,
+                    dates: selectedDates,
+                };
 
-                    var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
-                    var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
+                var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
+                var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
 
-                    // Step 3: Prepare data to send
-                    var registrationData = {
-                        email: email,
-                        name: name,
-                        phoneNumber: phoneNumber,
-                        tower: tower,
-                        flat: flat,
-                        gender: gender.value,
-                        age: age,
-                        ageGroup: ageGroup.value,
-                        competitions: competitionInfo,
-                        foodStalls: foodStallInfo,
-                        acknowledge: acknowledge,
-                        paymentOption: paymentOption.value,
-                        paymentScreenshotBytes: paymentScreenshotBytes,
-                        paymentScreenshotMimeType: paymentScreenshotMimeType
-                    };
+                // Step 3: Prepare data to send
+                var registrationData = {
+                    email: email,
+                    name: name,
+                    phoneNumber: phoneNumber,
+                    tower: tower,
+                    flat: flat,
+                    gender: gender.value,
+                    age: age,
+                    ageGroup: ageGroup.value,
+                    competitions: competitionInfo,
+                    foodStalls: foodStallInfo,
+                    acknowledge: acknowledge,
+                    paymentOption: paymentOption.value,
+                    paymentScreenshotBytes: paymentScreenshotBytes,
+                    paymentScreenshotMimeType: paymentScreenshotMimeType,
+                };
 
-                    // Step 4: Send data using fetch with payload
-                    fetch("https://script.google.com/macros/s/AKfycbzs4Vo0Mu_dfkky_cvxS7JVqD2kjWOmfAUx1H9bsyhHr14lD3WyK9P2gCgI-vDBH4xE/exec", {
-                        redirect: "follow",
-                        mode: "no-cors",
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "text/plain;charset=utf-8",
-                        },
-                        body: JSON.stringify(registrationData),
+                // Step 4: Send data using fetch with payload
+                fetch("https://script.google.com/macros/s/AKfycbzs4Vo0Mu_dfkky_cvxS7JVqD2kjWOmfAUx1H9bsyhHr14lD3WyK9P2gCgI-vDBH4xE/exec", {
+                    redirect: "follow",
+                    mode: "no-cors",
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
+                    body: JSON.stringify(registrationData),
+                })
+                    .then((response) => response.text())
+                    .then((data) => {
+                        console.log(data);
+                        alert("Form submitted successfully!");
                     })
-                        .then((response) => response.text())
-                        .then((data) => {
-                            console.log(data);
-                            alert("Form submitted successfully!");
-                        })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            alert("An error occurred while submitting the form.");
-                        });
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("An error occurred while submitting the form.");
+                    });
             }
 
             document.addEventListener("DOMContentLoaded", function () {
@@ -620,7 +631,12 @@
                 {
                     category: "Games",
                     competitions: [
-                        { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
+                        {
+                            name: "Build an Object (Teams of 3)",
+                            ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"],
+                            teamBased: true,
+                            displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above",
+                        },
                         { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
                         { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
                         { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
@@ -629,15 +645,25 @@
                         { name: "Sack Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
                         { name: "Slow cycling", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
                         { name: "Tambola", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Treasure Hunt (Teams of 4)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
-                        { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above"  },
+                        {
+                            name: "Treasure Hunt (Teams of 4)",
+                            ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"],
+                            teamBased: true,
+                            displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above",
+                        },
+                        { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above" },
                     ],
                 },
                 {
                     category: "Quiz",
                     competitions: [
                         { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification" },
-                        { name: "General Knowledge Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification" },
+                        {
+                            name: "General Knowledge Quiz (Teams of 3)",
+                            ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"],
+                            teamBased: true,
+                            displayAgeGroups: "No age category specification",
+                        },
                         { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
                     ],
                 },
@@ -666,7 +692,7 @@
             function updateCompetitionsDisplay(selectedAgeGroup) {
                 const container = document.getElementById("competitionsContainer");
                 container.innerHTML = ""; // Clear current contents
-            
+
                 competitionsData.forEach((category) => {
                     const categoryElem = document.createElement("div");
                     categoryElem.classList.add("category-block");
@@ -674,9 +700,9 @@
                     header.className = "category-header";
                     header.textContent = category.category;
                     categoryElem.appendChild(header);
-            
+
                     let hasVisibleCompetitions = false;
-            
+
                     category.competitions.forEach((comp) => {
                         if (comp.ageGroups.includes(selectedAgeGroup)) {
                             hasVisibleCompetitions = true;
@@ -687,7 +713,7 @@
                                 <input class="form-check-input" type="checkbox" id="${checkboxId}" name="competitions">
                                 <label class="form-check-label" for="${checkboxId}">${comp.name}</label>
                             `;
-            
+
                             if (comp.teamBased) {
                                 const inputTeamMembers = document.createElement("input");
                                 inputTeamMembers.id = `team-${checkboxId}`;
@@ -695,17 +721,17 @@
                                 inputTeamMembers.placeholder = "Enter team member names & flat numbers";
                                 inputTeamMembers.required = true; // Make input field required
                                 inputTeamMembers.style.display = "none"; // Initially hide the input field
-                                
+
                                 // Label for age groups
                                 const ageGroupLabel = document.createElement("label");
                                 ageGroupLabel.className = "form-label mt-2";
                                 ageGroupLabel.textContent = `Age Groups: ${comp.displayAgeGroups}`;
                                 ageGroupLabel.style.display = "none"; // Initially hide the label
-            
+
                                 // Insert age group label before the team members input field
                                 compElement.appendChild(ageGroupLabel);
                                 compElement.appendChild(inputTeamMembers);
-                                
+
                                 // Toggle visibility of age group label and input based on the checkbox
                                 compElement.querySelector('input[type="checkbox"]').onchange = function () {
                                     const displayStyle = this.checked ? "block" : "none";
@@ -716,7 +742,7 @@
                             categoryElem.appendChild(compElement);
                         }
                     });
-            
+
                     if (hasVisibleCompetitions) {
                         container.appendChild(categoryElem);
                         categoryElem.style.display = "block";
@@ -728,3 +754,4 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
+
