@@ -599,6 +599,7 @@
     
                     if (!formValid) {
                         alert("Please review & fill in all required fields.");
+                        document.getElementById('loadingSpinner').hidden = true;
                         return false;
                     }
     
