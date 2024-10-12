@@ -376,6 +376,7 @@
           <div class="modal-content">
             <span class="close">&times;</span>
             <p>Thank you! Your registration has been submitted successfully.</p>
+            <p>Registration Id: <span id="registrationId">12345</span></p>
             <img src="thankyou.png" alt="Thank you" class="img-fluid" />
             &nbsp
             <div class="dividerthin"></div>
@@ -680,19 +681,19 @@
                     };
     
                     // Step 4: Send data using fetch with payload
-                    fetch("https://script.google.com/macros/s/AKfycbwyF7bO3tWhc4NmfEwgLpHg5T2ZoF2N6HoLzrKKJOlfB6yHP9MFt4eDny4YYq7JRTjpzw/exec", {
+                    fetch("https://script.google.com/macros/s/AKfycbxSKTFVA95_TKqGLw7tcmrVRirmK61FJhU42V8hmGgQUmplQI9jq_bky92sDgY0LZo5KQ/exec", {
                             redirect: "follow",
-                            mode: "no-cors",
                             method: "POST",
                             headers: {
-                                "Content-Type": "application/json",
+                                "Content-Type": "text/plain",
                             },
                             body: JSON.stringify(registrationData),
                         })
                         .then((response) => response.text())
-                        .then((data) => {
-                            console.log(data);
+                        .then((result) => {
+                            console.log(result);
                             modal.style.display = "block";
+                            document.getElementById('registrationId').textContent = response.registrationId
                             document.getElementById('loadingSpinner').hidden = true; // Hide spinner
                         })
                         .catch((error) => {
