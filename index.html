@@ -693,7 +693,7 @@
                         .then((result) => {
                             console.log(result);
                             modal.style.display = "block";
-                            document.getElementById('registrationId').textContent = response.registrationId
+                            document.getElementById('registrationId').textContent = result.registrationId
                             document.getElementById('loadingSpinner').hidden = true; // Hide spinner
                         })
                         .catch((error) => {
