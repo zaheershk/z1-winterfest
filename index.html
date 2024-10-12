@@ -375,8 +375,9 @@
         <div id="successModal" class="modal">
           <div class="modal-content">
             <span class="close">&times;</span>
-            <p>Thank you! Your registration is submitted successfully.</p>
-            <p>Registration Id: <span id="registrationId">...</span></p>
+            <p><strong>Thank you!</strong>strong> 
+            <p>Your registration is submitted successfully.</p>
+            <p style="color: #4b0082;">Registration Id: <span id="registrationId">...</span></p>
             <img src="thankyou.png" alt="Thank you" class="img-fluid" />
             &nbsp
             <div class="dividerthin"></div>
@@ -387,7 +388,7 @@
             <div class="modal-content">
               <span class="close">&times;</span>
               <p>An error occurred during registration!</p>
-              <p>Error details: <span id="errorInfo">...</span></p>
+              <p style="color: #820000c2;">Error details: <span id="errorInfo">...</span></p>
               <img src="thankyou.png" alt="Thank you" class="img-fluid" />
               &nbsp
               <div class="dividerthin"></div>
@@ -716,7 +717,7 @@
             
                 // When the user clicks anywhere outside of the modal, close it
                 window.onclick = function(event) {
-                    if (event.target === modal) {
+                    if (event.target === successModal || event.target === errorModal) {
                         successModal.style.display = "none";
                         errorModal.style.display = "none";
                     }
