@@ -27,6 +27,9 @@
             .btn:hover { background-color: #0056b3; }
             .loader { border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 120px; height: 120px; animation: spin 2s linear infinite; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 99; }
             @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+            .iframe-container { position: relative; width: 100%; padding-bottom: 56.25%; height: auto; overflow: hidden; }
+            .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+            @media (max-width: 600px) { .iframe-container { padding-bottom: 75%; } }
         </style>
     </head>
     <body>
@@ -37,10 +40,10 @@
                     <a class="nav-link active" data-bs-toggle="tab" href="#newRegistration">Submit New Registration</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#dashboard">My Dashboard</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#report">Planning Report</a>
                 </li>
             </ul>
             <!-- Tab Content -->
@@ -361,13 +364,15 @@
                 </div>
                 <div id="dashboard" class="tab-pane fade">
                     <!-- Dashboard related information and widgets go here -->
-                    <h4>Dashboard</h4>
-                    <p>Content for Dashboard...</p>
+                    <div class="iframe-container">
+                        <iframe src="https://lookerstudio.google.com/embed/reporting/050bed8b-a53b-4328-aa1e-247550f28c1a/page/qlRiD" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    </div>
                 </div>
-                <div id="reports" class="tab-pane fade">
-                    <!-- Reports and analytics graphs or data tables go here -->
-                    <h4>Reports</h4>
-                    <p>Content for Reports...</p>
+                <div id="report" class="tab-pane fade">
+                    <!-- Planning Report go here -->
+                    <div class="iframe-container">
+                        <iframe src="https://lookerstudio.google.com/embed/reporting/dab56e10-3f25-45cb-a755-560f724a3923/page/p_w970njssbd" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -676,7 +681,7 @@
                     };
     
                     // Step 4: Send data using fetch with payload
-                    fetch("https://script.google.com/macros/s/AKfycbxSKTFVA95_TKqGLw7tcmrVRirmK61FJhU42V8hmGgQUmplQI9jq_bky92sDgY0LZo5KQ/exec", {
+                    fetch("https://script.google.com/macros/s/AKfycbwl_v8-ZtC5srPspp-r1uiwcea9mn0sHrbTejI-MPZ_F3mQ3xhjix12uabMJq-kLiyppw/exec", {
                             redirect: "follow",
                             method: "POST",
                             headers: {
