@@ -627,23 +627,25 @@
                     var age = document.getElementById("age").value;
                     var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
     
-                    let teamInfo = null;
                     let competitionInfo = [];
                     selectedCompetitions.forEach((comp) => {
                         const compId = comp.id;
+
+                        // Reset teamInfo to null at the start of each loop
+                        let teamInfo = null; 
+                        
                         if (document.getElementById(`team-${compId}`)) {
-                            teamInfoInput = document.getElementById(`team-${compId}`);
+                            let teamInfoInput = document.getElementById(`team-${compId}`);
                             if (teamInfoInput && teamInfoInput.value) {
-                                // Make sure the input exists and has a value
                                 teamInfo = teamInfoInput.value;
                             }
                         }
-    
+
                         const category = comp.closest(".category-block").querySelector(".category-header").textContent;
                         competitionInfo.push({
                             category: category,
                             name: comp.labels[0].innerText,
-                            teamInfo: teamInfo,
+                            teamInfo: teamInfo,  
                         });
                     });
     
