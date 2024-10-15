@@ -400,9 +400,8 @@
               <button id="retryRegistrationBtn" class="btn">Retry Registration</button> 
             </div>
           </div>
-          <div id="authenticationModal" class="modal">
+          <div id="loginModal" class="modal">
             <div class="modal-content">
-                <span class="close">&times;</span>
                 <h4>Verify Admin</h4>
                 &nbsp
                 <div class="form-group" style="padding-bottom: 10px;">
@@ -493,16 +492,21 @@
             const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
             document.addEventListener('DOMContentLoaded', function() {
-                const successModal = document.getElementById("successModal");
-                const errorModal = document.getElementById("errorModal");
-                const span = document.getElementsByClassName("close")[0];
                 const form = document.getElementById("registrationForm");  
                 const submitBtn = document.getElementById("submitBtn"); 
+
+                const successModal = document.getElementById("successModal");
+                const successModalCloseBtn = document.getElementsByClassName("close")[0];
                 const newRegBtn = document.getElementById("newRegistrationBtn");
+
+                const errorModal = document.getElementById("errorModal");
+                const errorModalCloseBtn = document.getElementsByClassName("close")[1];
                 const retryRegBtn = document.getElementById("retryRegistrationBtn");
-                var reportTab = document.getElementById("reportTab");
-                var loginModal = document.getElementById("authenticationModal");
+
+                var loginModal = document.getElementById("loginModal");
                 var loginBtn = document.getElementById("loginButton");
+                
+                var reportTab = document.getElementById("reportTab");
 
                 updateCompetitionsDisplay("3to5yrs"); // Default age group on load
 
@@ -715,13 +719,40 @@
                         });
                 });
 
-                reportTab.addEventListener("click", function(e) {
-                    e.preventDefault();  // Prevent the tab from showing its contents
+                // Reset the form and hide the modal when 'Submit New Registration' is clicked
+                newRegBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    resetAllInputFields();
+                    successModal.style.display = "none";  
+                    errorModal.style.display = "none";
+                    form.style.display = "block";  
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'  
+                    });
+                });
+
+                // Reset the form and hide the modal when 'Retry Registration' is clicked
+                retryRegBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    successModal.style.display = "none";  
+                    errorModal.style.display = "none";
+                    form.style.display = "block";  
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'  
+                    });
+                });
+
+                reportTab.addEventListener("click", function(event) {
+                    event.preventDefault();  
                     loginModal.style.display = "block";  // Show login modal
                 });
             
-                loginBtn.addEventListener("click", function() {
-                    event.preventDefault(); // Prevent form from submitting traditionally
+                loginBtn.addEventListener("click", function(event) {
+                    event.preventDefault();
                     document.getElementById('loadingSpinner').hidden = false; // Show spinner
 
                     var userEmail = document.getElementById("userEmail");
@@ -790,45 +821,25 @@
                 });
             
                 // When the user clicks on <span> (x), close the modal
-                span.onclick = function() {
+                successModalCloseBtn.onclick = function() {
                     successModal.style.display = "none";
-                    errorModal.style.display = "none";
-                    loginModal.style.display = "none";  
+                }
+
+                errorModalCloseBtn.onclick = function() {
+                    errorModal.style.display = "none"; 
                 }
             
                 // When the user clicks anywhere outside of the modal, close it
                 window.onclick = function(event) {
-                    if (event.target === successModal || event.target === errorModal || event.target === loginModal) {
+                    if (event.target === successModal || event.target === errorModal) {
                         successModal.style.display = "none";
-                        errorModal.style.display = "none";
-                        loginModal.style.display = "none";  
+                        errorModal.style.display = "none"; 
+                    }
+
+                    if (event.target === loginModal) {
+                        loginModal.style.display = "block";  
                     }
                 }
-
-                // Reset the form and hide the modal when 'Submit New Registration' is clicked
-                newRegBtn.addEventListener('click', function() {
-                    resetAllInputFields();
-                    successModal.style.display = "none";  
-                    errorModal.style.display = "none";
-                    form.style.display = "block";  
-
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'  
-                    });
-                });
-
-                // Reset the form and hide the modal when 'Retry Registration' is clicked
-                retryRegBtn.addEventListener('click', function() {
-                    successModal.style.display = "none";  
-                    errorModal.style.display = "none";
-                    form.style.display = "block";  
-
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'  
-                    });
-                });
             });
 
             function resetAllInputFields() {
