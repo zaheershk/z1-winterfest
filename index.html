@@ -43,7 +43,7 @@
                     <a class="nav-link" data-bs-toggle="tab" href="#dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#report">Planning Report</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#report" id="reportTab">Planning Report</a>
                 </li>
             </ul>
             <!-- Tab Content -->
@@ -400,8 +400,27 @@
               <button id="retryRegistrationBtn" class="btn">Retry Registration</button> 
             </div>
           </div>
+          <div id="authenticationModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h4>Verify Admin</h4>
+                &nbsp
+                <div class="form-group" style="padding-bottom: 10px;">
+                    <input type="email" id="userEmail" class="form-control" placeholder="Enter your email" required>
+                    <div class="invalid-feedback">Please provide your email.</div>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="userPasskey" class="form-control" placeholder="Enter your passkey" required>
+                    <div class="invalid-feedback">Please provide your passkey.</div>
+                </div>
+                <div class="dividerthin"></div>
+                <button id="loginButton" class="btn btn-primary">Login</button>
+            </div>
+        </div>
         <!-- JavaScript for dynamic management -->
         <script>
+            const backendUrl = "https://script.google.com/macros/s/AKfycbxNH1pQd4NDlzWKSCAEZaYNyJL8GFoE9G5FvcS_-uosEec7KFfBi1-p_hn_HoXvJtwbJw/exec"
+            
             const competitionsData = [
                 {
                     category: "Cultural",
@@ -471,64 +490,7 @@
             var paymentScreenshotBytes = null;
             var paymentScreenshotMimeType = null;
 
-            function escapeCSSId(id) {
-                return id.replace(/([^\w-])/g, "\\$1"); // This will escape all characters that are not alphanumeric, underscore, or dash.
-            }
-
             const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
-
-            document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
-                checkbox.addEventListener("change", function () {
-                    updateTotalAmountDisplay();
-                });
-            });
-
-            document.getElementById("option1").addEventListener("change", function () {
-                updateTotalAmountDisplay();
-            });
-
-            document.getElementById("option2").addEventListener("change", function () {
-                updateTotalAmountDisplay();
-            });
-
-            function updateTotalAmountDisplay() {
-                const option1Selected = document.getElementById("option1").checked;
-                const totalContainer = document.getElementById("totalCharge");
-
-                totalContainer.style.display = "none";
-                if (option1Selected) {
-                    const total = calculateFoodStallCount() * 700 + 600;
-                    totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
-                    totalContainer.style.display = "block";
-                }
-            }
-
-            function calculateFoodStallCount() {
-                const checkboxes = document.querySelectorAll(foodStallCheckboxSelector);
-                let count = 0;
-                checkboxes.forEach((cb) => {
-                    if (cb.checked) {
-                        count++;
-                    }
-                });
-                return count;
-            }
-
-            document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (loadEvent) {
-                        paymentScreenshotBytes = loadEvent.target.result;
-                        paymentScreenshotMimeType = file.type;
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    // Reset to null if the file input is cleared
-                    paymentScreenshotBytes = null;
-                    paymentScreenshotMimeType = null;
-                }
-            });
 
             document.addEventListener('DOMContentLoaded', function() {
                 const successModal = document.getElementById("successModal");
@@ -538,6 +500,41 @@
                 const submitBtn = document.getElementById("submitBtn"); 
                 const newRegBtn = document.getElementById("newRegistrationBtn");
                 const retryRegBtn = document.getElementById("retryRegistrationBtn");
+                var reportTab = document.getElementById("reportTab");
+                var loginModal = document.getElementById("authenticationModal");
+                var loginBtn = document.getElementById("loginButton");
+
+                updateCompetitionsDisplay("3to5yrs"); // Default age group on load
+
+                document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
+                    checkbox.addEventListener("change", function () {
+                        updateTotalAmountDisplay();
+                    });
+                });
+    
+                document.getElementById("option1").addEventListener("change", function () {
+                    updateTotalAmountDisplay();
+                });
+    
+                document.getElementById("option2").addEventListener("change", function () {
+                    updateTotalAmountDisplay();
+                });
+
+                document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (loadEvent) {
+                            paymentScreenshotBytes = loadEvent.target.result;
+                            paymentScreenshotMimeType = file.type;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Reset to null if the file input is cleared
+                        paymentScreenshotBytes = null;
+                        paymentScreenshotMimeType = null;
+                    }
+                });
 
                 submitBtn.addEventListener('click', function(event) {
                     event.preventDefault(); // Prevent form from submitting traditionally
@@ -683,12 +680,14 @@
                     };
     
                     // Step 4: Send data using fetch with payload
-                    fetch("https://script.google.com/macros/s/AKfycbxaEGM6YfBEtlw2vuf3aTj3UXgkJO6bCDnpDVGSJM0CLwRC3xpBnC7hITRj_qdIf2OuSg/exec?mode=participant", {
-                            redirect: "follow",
-                            method: "POST",
+                    fetch(backendUrl + "?mode=participant", {
+                            method: 'POST',
+                            mode: 'cors',
+                            cache: 'no-cache',
                             headers: {
                                 "Content-Type": "text/plain",
                             },
+                            redirect: 'follow',
                             body: JSON.stringify(registrationData),
                         })
                         .then((response) => response.text())
@@ -715,18 +714,94 @@
                             document.getElementById('loadingSpinner').hidden = true; // Hide spinner
                         });
                 });
+
+                reportTab.addEventListener("click", function(e) {
+                    e.preventDefault();  // Prevent the tab from showing its contents
+                    loginModal.style.display = "block";  // Show login modal
+                });
+            
+                loginBtn.addEventListener("click", function() {
+                    event.preventDefault(); // Prevent form from submitting traditionally
+                    document.getElementById('loadingSpinner').hidden = false; // Show spinner
+
+                    var userEmail = document.getElementById("userEmail");
+                    var userPasskey = document.getElementById("userPasskey");
+                    var inputsAreValid = true;
+                
+                    // Remove previous invalid styles
+                    [userEmail, userPasskey].forEach(input => {
+                        input.classList.remove('is-invalid');
+                    });
+                
+                    // Check if the userEmail input is valid
+                    if (!userEmail.value || !userEmail.validity.valid) {
+                        userEmail.classList.add('is-invalid');
+                        inputsAreValid = false;
+                    }
+                
+                    // Check if the userPasskey input is non-empty
+                    if (!userPasskey.value) {
+                        userPasskey.classList.add('is-invalid');
+                        inputsAreValid = false;
+                    }
+                
+                    if (!inputsAreValid) {
+                        alert("Please review & fill in all required fields.");
+                        document.getElementById('loadingSpinner').hidden = true;
+                        return;
+                    }
+                
+                    // AJAX call to Google Apps Script
+                    fetch(backendUrl + "?mode=admin", {
+                        method: 'POST',
+                        mode: 'cors',
+                        cache: 'no-cache',
+                        headers: {
+                            "Content-Type": "text/plain",
+                        },
+                        redirect: 'follow',
+                        body: JSON.stringify({
+                            email: userEmail.value,
+                            passKey: btoa(userPasskey.value) // Base64 encode
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.access === 'granted') {
+                            loginModal.style.display = "none";  
+                            document.querySelector('#report').classList.add('show', 'active');  // Display "Report" tab
+                            document.querySelector('.nav-link.active').classList.remove('active');  // Adjust nav link active class if needed
+                            reportTab.classList.add('active');
+                        } else {
+                            alert("You do not have admin access. Please reach out to the team.");
+                            userEmail.classList.add('is-invalid');
+                            userPasskey.classList.add('is-invalid');
+                        }
+                        document.getElementById('loadingSpinner').hidden = true; // Hide spinner
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        errorModal.style.display = "block";
+                        loginModal.style.display = "none";  
+                        document.getElementById('errorInfo').textContent = error
+                        document.getElementById('loadingSpinner').hidden = true; // Hide spinner
+                    });
+                });
             
                 // When the user clicks on <span> (x), close the modal
                 span.onclick = function() {
                     successModal.style.display = "none";
                     errorModal.style.display = "none";
+                    loginModal.style.display = "none";  
                 }
             
                 // When the user clicks anywhere outside of the modal, close it
                 window.onclick = function(event) {
-                    if (event.target === successModal || event.target === errorModal) {
+                    if (event.target === successModal || event.target === errorModal || event.target === loginModal) {
                         successModal.style.display = "none";
                         errorModal.style.display = "none";
+                        loginModal.style.display = "none";  
                     }
                 }
 
@@ -754,43 +829,62 @@
                         behavior: 'smooth'  
                     });
                 });
+            });
 
-                function resetAllInputFields() {
-                    const inputs = document.querySelectorAll('input');
-                    const selects = document.querySelectorAll('select');
-                    const textareas = document.querySelectorAll('textarea');
-            
-                    // Reset input fields
-                    inputs.forEach(input => {
-                        switch (input.type) {
-                            case 'checkbox':
-                            case 'radio':
-                                input.checked = input.defaultChecked;
-                                break;
-                            case 'file':
-                                input.value = ''; // No true way to reset files in standard HTML
-                                break;
-                            default:
-                                input.value = input.defaultValue;
-                                break;
-                        }
-                    });
-            
-                    // Reset select elements
-                    selects.forEach(select => {
-                        select.value = select.selectedIndex = 0;  // Reset to first option
-                    });
-            
-                    // Reset textarea elements
-                    textareas.forEach(textarea => {
-                        textarea.value = '';
-                    });
+            function resetAllInputFields() {
+                const inputs = document.querySelectorAll('input');
+                const selects = document.querySelectorAll('select');
+                const textareas = document.querySelectorAll('textarea');
+        
+                // Reset input fields
+                inputs.forEach(input => {
+                    switch (input.type) {
+                        case 'checkbox':
+                        case 'radio':
+                            input.checked = input.defaultChecked;
+                            break;
+                        case 'file':
+                            input.value = ''; // No true way to reset files in standard HTML
+                            break;
+                        default:
+                            input.value = input.defaultValue;
+                            break;
+                    }
+                });
+        
+                // Reset select elements
+                selects.forEach(select => {
+                    select.value = select.selectedIndex = 0;  // Reset to first option
+                });
+        
+                // Reset textarea elements
+                textareas.forEach(textarea => {
+                    textarea.value = '';
+                });
+            }
+
+            function updateTotalAmountDisplay() {
+                const option1Selected = document.getElementById("option1").checked;
+                const totalContainer = document.getElementById("totalCharge");
+
+                totalContainer.style.display = "none";
+                if (option1Selected) {
+                    const total = calculateFoodStallCount() * 700 + 600;
+                    totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
+                    totalContainer.style.display = "block";
                 }
-            });
+            }
 
-            document.addEventListener("DOMContentLoaded", function () {
-                updateCompetitionsDisplay("3to5yrs"); // Default age group on load
-            });
+            function calculateFoodStallCount() {
+                const checkboxes = document.querySelectorAll(foodStallCheckboxSelector);
+                let count = 0;
+                checkboxes.forEach((cb) => {
+                    if (cb.checked) {
+                        count++;
+                    }
+                });
+                return count;
+            }
 
             function updateCompetitionsDisplay(selectedAgeGroup) {
                 const container = document.getElementById("competitionsContainer");
