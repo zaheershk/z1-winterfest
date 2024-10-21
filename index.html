@@ -43,7 +43,10 @@
                     <a class="nav-link" data-bs-toggle="tab" href="#dashboard">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#report" id="reportTab">Planning Report</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#planningreport" id="planningReportTab">Planning Report</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#paymentreport" id="paymentReportTab">Planning Report</a>
                 </li>
             </ul>
             <!-- Tab Content -->
@@ -368,10 +371,16 @@
                         <iframe src="https://lookerstudio.google.com/embed/reporting/050bed8b-a53b-4328-aa1e-247550f28c1a/page/qlRiD" frameborder="0" style="border:0" allowfullscreen></iframe>
                     </div>
                 </div>
-                <div id="report" class="tab-pane fade">
+                <div id="planningreport" class="tab-pane fade">
                     <!-- Planning Report go here -->
                     <div class="iframe-container">
                         <iframe src="https://lookerstudio.google.com/embed/reporting/dab56e10-3f25-45cb-a755-560f724a3923/page/p_w970njssbd" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div id="paymentreport" class="tab-pane fade">
+                    <!-- Payment Report go here -->
+                    <div class="iframe-container">
+                        <iframe src="https://lookerstudio.google.com/embed/reporting/7206ad0f-4fc4-4842-8876-d5f75e9fc4dc/page/p_w970njssbd" frameborder="0" style="border:0" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
@@ -418,7 +427,7 @@
         </div>
         <!-- JavaScript for dynamic management -->
         <script>
-            const backendUrl = "https://script.google.com/macros/s/AKfycbxhXecmxYZXB2477sD_rzMecO1nlM5fuP-Mu2NCH2xVzQ2ArbTWno0IMbc0Hxh74DyuWg/exec"
+            const backendUrl = "https://script.google.com/macros/s/AKfycbwe5MGWm-G8LX5mfoows_MiM9Y-v1C2APFRW9QFED6N1eMIhoOSWsKhFv9UqV9oLFSPBA/exec"
             
             const competitionsData = [
                 {
@@ -506,7 +515,8 @@
                 var loginModal = document.getElementById("loginModal");
                 var loginBtn = document.getElementById("loginButton");
                 
-                var reportTab = document.getElementById("reportTab");
+                var planningReportTab = document.getElementById("planningReportTab");
+                var paymentReportTab = document.getElementById("paymentReportTab");
 
                 updateCompetitionsDisplay("3to5yrs"); // Default age group on load
 
@@ -746,7 +756,12 @@
                     });
                 });
 
-                reportTab.addEventListener("click", function(event) {
+                planningReportTab.addEventListener("click", function(event) {
+                    event.preventDefault();  
+                    loginModal.style.display = "block";  // Show login modal
+                });
+
+                paymentReportTab.addEventListener("click", function(event) {
                     event.preventDefault();  
                     loginModal.style.display = "block";  // Show login modal
                 });
@@ -801,9 +816,11 @@
                         console.log(data);
                         if (data.access === 'granted') {
                             loginModal.style.display = "none";  
-                            document.querySelector('#report').classList.add('show', 'active');  // Display "Report" tab
+                            document.querySelector('#planningreport').classList.add('show', 'active');  // Display "Planning Report" tab
+                            document.querySelector('#paymentreport').classList.add('show', 'active');  // Display "Payment Report" tab
                             document.querySelector('.nav-link.active').classList.remove('active');  // Adjust nav link active class if needed
-                            reportTab.classList.add('active');
+                            planningReportTab.classList.add('active');
+                            paymentReportTab.classList.add('active');
                         } else {
                             alert("You do not have admin access. Please reach out to the team.");
                             userEmail.classList.add('is-invalid');
