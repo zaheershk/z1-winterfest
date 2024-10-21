@@ -821,12 +821,14 @@
 
                                 if (reportTabClicked === "planning") {
                                     document.querySelector("#planningreport").classList.add("show", "active"); // Display "Planning Report" tab
+                                    document.querySelector(".nav-link.active").classList.remove("active");
                                     planningReportTab.classList.add("active");
                                 } else {
                                     document.querySelector("#paymentreport").classList.add("show", "active"); // Display "Payment Report" tab
+                                    document.querySelector(".nav-link.active").classList.remove("active");
                                     paymentReportTab.classList.add("active");
                                 }
-                                document.querySelector(".nav-link.active").classList.remove("active");
+                                
                             } else {
                                 alert("You do not have admin access. Please reach out to the team.");
                                 userEmail.classList.add("is-invalid");
