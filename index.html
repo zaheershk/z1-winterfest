@@ -368,57 +368,57 @@
                 <div id="dashboard" class="tab-pane fade">
                     <!-- Dashboard related information and widgets go here -->
                     <div class="iframe-container">
-                        <iframe src="https://lookerstudio.google.com/embed/reporting/050bed8b-a53b-4328-aa1e-247550f28c1a/page/qlRiD" frameborder="0" style="border:0" allowfullscreen></iframe>
+                        <iframe src="https://lookerstudio.google.com/embed/reporting/050bed8b-a53b-4328-aa1e-247550f28c1a/page/qlRiD" frameborder="0" style="border: 0;" allowfullscreen></iframe>
                     </div>
                 </div>
                 <div id="planningreport" class="tab-pane fade">
                     <!-- Planning Report go here -->
                     <div class="iframe-container">
-                        <iframe src="https://lookerstudio.google.com/embed/reporting/dab56e10-3f25-45cb-a755-560f724a3923/page/p_w970njssbd" frameborder="0" style="border:0" allowfullscreen></iframe>
+                        <iframe src="https://lookerstudio.google.com/embed/reporting/dab56e10-3f25-45cb-a755-560f724a3923/page/p_w970njssbd" frameborder="0" style="border: 0;" allowfullscreen></iframe>
                     </div>
                 </div>
                 <div id="paymentreport" class="tab-pane fade">
                     <!-- Payment Report go here -->
                     <div class="iframe-container">
-                        <iframe src="https://lookerstudio.google.com/embed/reporting/7206ad0f-4fc4-4842-8876-d5f75e9fc4dc/page/p_w970njssbd" frameborder="0" style="border:0" allowfullscreen></iframe>
+                        <iframe src="https://lookerstudio.google.com/embed/reporting/7206ad0f-4fc4-4842-8876-d5f75e9fc4dc/page/p_w970njssbd" frameborder="0" style="border: 0;" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
         </div>
         <div id="loadingSpinner" class="loader" hidden></div>
         <div id="successModal" class="modal">
-          <div class="modal-content">
-            <span class="close">&times;</span>
-            <p><strong>Thank you!</strong></p>
-            <p>Your registration is submitted successfully.</p>
-            <p style="color: #4b0082;">Registration Id: <span id="registrationId">...</span></p>
-            <img src="thankyou.png" alt="Thank you" class="img-fluid" />
-            &nbsp
-            <div class="dividerthin"></div>
-            <button id="newRegistrationBtn" class="btn">Submit New Registration</button> 
-          </div>
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p><strong>Thank you!</strong></p>
+                <p>Your registration is submitted successfully.</p>
+                <p style="color: #4b0082;">Registration Id: <span id="registrationId">...</span></p>
+                <img src="thankyou.png" alt="Thank you" class="img-fluid" />
+                &nbsp
+                <div class="dividerthin"></div>
+                <button id="newRegistrationBtn" class="btn">Submit New Registration</button>
+            </div>
         </div>
         <div id="errorModal" class="modal">
             <div class="modal-content">
-              <span class="close">&times;</span>
-              <p>An error occurred during registration!</p>
-              <p style="color: #820000c2;">Error details: <span id="errorInfo">...</span></p>
-              <img src="thankyou.png" alt="Thank you" class="img-fluid" />
-              &nbsp
-              <div class="dividerthin"></div>
-              <button id="retryRegistrationBtn" class="btn">Retry Registration</button> 
+                <span class="close">&times;</span>
+                <p>An error occurred during registration!</p>
+                <p style="color: #820000c2;">Error details: <span id="errorInfo">...</span></p>
+                <img src="thankyou.png" alt="Thank you" class="img-fluid" />
+                &nbsp
+                <div class="dividerthin"></div>
+                <button id="retryRegistrationBtn" class="btn">Retry Registration</button>
             </div>
-          </div>
-          <div id="loginModal" class="modal">
+        </div>
+        <div id="loginModal" class="modal">
             <div class="modal-content">
                 <h4>Verify Admin</h4>
                 &nbsp
                 <div class="form-group" style="padding-bottom: 10px;">
-                    <input type="email" id="userEmail" class="form-control" placeholder="Enter your email" required>
+                    <input type="email" id="userEmail" class="form-control" placeholder="Enter your email" required />
                     <div class="invalid-feedback">Please provide your email.</div>
                 </div>
                 <div class="form-group">
-                    <input type="password" id="userPasskey" class="form-control" placeholder="Enter your passkey" required>
+                    <input type="password" id="userPasskey" class="form-control" placeholder="Enter your passkey" required />
                     <div class="invalid-feedback">Please provide your passkey.</div>
                 </div>
                 <div class="dividerthin"></div>
@@ -427,8 +427,8 @@
         </div>
         <!-- JavaScript for dynamic management -->
         <script>
-            const backendUrl = "https://script.google.com/macros/s/AKfycbwe5MGWm-G8LX5mfoows_MiM9Y-v1C2APFRW9QFED6N1eMIhoOSWsKhFv9UqV9oLFSPBA/exec"
-            
+            const backendUrl = "https://script.google.com/macros/s/AKfycbwe5MGWm-G8LX5mfoows_MiM9Y-v1C2APFRW9QFED6N1eMIhoOSWsKhFv9UqV9oLFSPBA/exec";
+
             const competitionsData = [
                 {
                     category: "Cultural",
@@ -494,15 +494,16 @@
                     ],
                 },
             ];
-            
+
             var paymentScreenshotBytes = null;
             var paymentScreenshotMimeType = null;
+            var reportTabClicked = null;
 
             const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.getElementById("registrationForm");  
-                const submitBtn = document.getElementById("submitBtn"); 
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById("registrationForm");
+                const submitBtn = document.getElementById("submitBtn");
 
                 const successModal = document.getElementById("successModal");
                 const successModalCloseBtn = document.getElementsByClassName("close")[0];
@@ -514,7 +515,7 @@
 
                 var loginModal = document.getElementById("loginModal");
                 var loginBtn = document.getElementById("loginButton");
-                
+
                 var planningReportTab = document.getElementById("planningReportTab");
                 var paymentReportTab = document.getElementById("paymentReportTab");
 
@@ -525,11 +526,11 @@
                         updateTotalAmountDisplay();
                     });
                 });
-    
+
                 document.getElementById("option1").addEventListener("change", function () {
                     updateTotalAmountDisplay();
                 });
-    
+
                 document.getElementById("option2").addEventListener("change", function () {
                     updateTotalAmountDisplay();
                 });
@@ -550,17 +551,17 @@
                     }
                 });
 
-                submitBtn.addEventListener('click', function(event) {
+                submitBtn.addEventListener("click", function (event) {
                     event.preventDefault(); // Prevent form from submitting traditionally
-                    document.getElementById('loadingSpinner').hidden = false; // Show spinner
-    
+                    document.getElementById("loadingSpinner").hidden = false; // Show spinner
+
                     // Step 1: Validate the data
                     let formValid = true;
                     const invalidInputClass = "is-invalid"; // Bootstrap 5 class for invalid input
-    
+
                     // Reset invalid inputs
                     document.querySelectorAll(`.${invalidInputClass}`).forEach((el) => el.classList.remove(invalidInputClass));
-    
+
                     // Collect inputs and checks
                     const v_email = document.getElementById("email");
                     const v_name = document.getElementById("name");
@@ -574,7 +575,7 @@
                     const v_acknowledge = document.getElementById("acknowledge").checked;
                     const v_paymentOption = document.querySelector('input[name="paymentOption"]:checked');
                     const v_paymentConfirmation = document.getElementById("paymentConfirmation");
-    
+
                     // Mandatory checks
                     [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age].forEach((input) => {
                         // Check if the element exists and has an empty value
@@ -585,33 +586,33 @@
                             console.warn(`Element ${input} is not found in the document.`);
                         }
                     });
-    
+
                     if (!v_gender) {
                         document.querySelectorAll('input[name="gender"]').forEach((input) => input.classList.add(invalidInputClass));
                         formValid = false;
                     }
-    
+
                     if (!v_ageGroup) {
                         document.querySelectorAll('input[name="ageGroup"]').forEach((input) => input.classList.add(invalidInputClass));
                         formValid = false;
                     }
-    
+
                     if (!v_acknowledge) {
                         document.getElementById("acknowledge").classList.add(invalidInputClass);
                         formValid = false;
                     }
-    
+
                     if (!v_paymentOption) {
                         document.querySelectorAll('input[name="paymentOption"]').forEach((input) => input.classList.add(invalidInputClass));
                         formValid = false;
                     }
-    
+
                     //console.log(`File input length: ${v_paymentConfirmation.files.length}`);
                     if (v_paymentConfirmation.files && v_paymentConfirmation.files.length === 0) {
                         v_paymentConfirmation.classList.add(invalidInputClass);
                         formValid = false;
                     }
-    
+
                     const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
                     selectedCompetitions.forEach((comp) => {
                         const v_compId = comp.id;
@@ -621,13 +622,13 @@
                             v_teamInfo.classList.add(invalidInputClass);
                         }
                     });
-    
+
                     if (!formValid) {
                         alert("Please review & fill in all required fields.");
-                        document.getElementById('loadingSpinner').hidden = true;
+                        document.getElementById("loadingSpinner").hidden = true;
                         return false;
                     }
-    
+
                     // Step 2: Set the data
                     var email = document.getElementById("email").value;
                     var name = document.getElementById("name").value;
@@ -637,14 +638,14 @@
                     var gender = document.querySelector('input[name="gender"]:checked');
                     var age = document.getElementById("age").value;
                     var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-    
+
                     let competitionInfo = [];
                     selectedCompetitions.forEach((comp) => {
                         const compId = comp.id;
 
                         // Reset teamInfo to null at the start of each loop
-                        let teamInfo = null; 
-                        
+                        let teamInfo = null;
+
                         if (document.getElementById(`team-${compId}`)) {
                             let teamInfoInput = document.getElementById(`team-${compId}`);
                             if (teamInfoInput && teamInfoInput.value) {
@@ -656,10 +657,10 @@
                         competitionInfo.push({
                             category: category,
                             name: comp.labels[0].innerText,
-                            teamInfo: teamInfo,  
+                            teamInfo: teamInfo,
                         });
                     });
-    
+
                     const foodMenu = document.getElementById("foodMenu").value;
                     const selectedDates = [];
                     document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
@@ -671,10 +672,10 @@
                         menu: foodMenu,
                         dates: selectedDates,
                     };
-    
+
                     var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
                     var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-    
+
                     // Step 3: Prepare data to send
                     var registrationData = {
                         email: email,
@@ -692,18 +693,18 @@
                         paymentScreenshotBytes: paymentScreenshotBytes,
                         paymentScreenshotMimeType: paymentScreenshotMimeType,
                     };
-    
+
                     // Step 4: Send data using fetch with payload
                     fetch(backendUrl + "?mode=participant", {
-                            method: 'POST',
-                            mode: 'cors',
-                            cache: 'no-cache',
-                            headers: {
-                                "Content-Type": "text/plain",
-                            },
-                            redirect: 'follow',
-                            body: JSON.stringify(registrationData),
-                        })
+                        method: "POST",
+                        mode: "cors",
+                        cache: "no-cache",
+                        headers: {
+                            "Content-Type": "text/plain",
+                        },
+                        redirect: "follow",
+                        body: JSON.stringify(registrationData),
+                    })
                         .then((response) => response.text())
                         .then((result) => {
                             console.log(result);
@@ -711,183 +712,188 @@
                             if (res.result === "success") {
                                 successModal.style.display = "block";
                                 errorModal.style.display = "none";
-                                document.getElementById('registrationId').textContent = res.registrationId
-                            }
-                            else{
+                                document.getElementById("registrationId").textContent = res.registrationId;
+                            } else {
                                 errorModal.style.display = "block";
                                 successModal.style.display = "none";
-                                document.getElementById('errorInfo').textContent = res.error
+                                document.getElementById("errorInfo").textContent = res.error;
                             }
-                            document.getElementById('loadingSpinner').hidden = true; // Hide spinner
+                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
                         })
                         .catch((error) => {
                             console.error("Error:", error);
                             errorModal.style.display = "block";
                             successModal.style.display = "none";
-                            document.getElementById('errorInfo').textContent = error
-                            document.getElementById('loadingSpinner').hidden = true; // Hide spinner
+                            document.getElementById("errorInfo").textContent = error;
+                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
                         });
                 });
 
                 // Reset the form and hide the modal when 'Submit New Registration' is clicked
-                newRegBtn.addEventListener('click', function(event) {
+                newRegBtn.addEventListener("click", function (event) {
                     event.preventDefault();
                     resetAllInputFields();
-                    successModal.style.display = "none";  
+                    successModal.style.display = "none";
                     errorModal.style.display = "none";
-                    form.style.display = "block";  
+                    form.style.display = "block";
 
                     window.scrollTo({
                         top: 0,
-                        behavior: 'smooth'  
+                        behavior: "smooth",
                     });
                 });
 
                 // Reset the form and hide the modal when 'Retry Registration' is clicked
-                retryRegBtn.addEventListener('click', function(event) {
+                retryRegBtn.addEventListener("click", function (event) {
                     event.preventDefault();
-                    successModal.style.display = "none";  
+                    successModal.style.display = "none";
                     errorModal.style.display = "none";
-                    form.style.display = "block";  
+                    form.style.display = "block";
 
                     window.scrollTo({
                         top: 0,
-                        behavior: 'smooth'  
+                        behavior: "smooth",
                     });
                 });
 
-                planningReportTab.addEventListener("click", function(event) {
-                    event.preventDefault();  
-                    loginModal.style.display = "block";  // Show login modal
+                planningReportTab.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    reportTabClicked = "planning";
+                    loginModal.style.display = "block"; // Show login modal
                 });
 
-                paymentReportTab.addEventListener("click", function(event) {
-                    event.preventDefault();  
-                    loginModal.style.display = "block";  // Show login modal
-                });
-            
-                loginBtn.addEventListener("click", function(event) {
+                paymentReportTab.addEventListener("click", function (event) {
                     event.preventDefault();
-                    document.getElementById('loadingSpinner').hidden = false; // Show spinner
+                    reportTabClicked = "payment";
+                    loginModal.style.display = "block"; // Show login modal
+                });
+
+                loginBtn.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    document.getElementById("loadingSpinner").hidden = false; // Show spinner
 
                     var userEmail = document.getElementById("userEmail");
                     var userPasskey = document.getElementById("userPasskey");
                     var inputsAreValid = true;
-                
+
                     // Remove previous invalid styles
-                    [userEmail, userPasskey].forEach(input => {
-                        input.classList.remove('is-invalid');
+                    [userEmail, userPasskey].forEach((input) => {
+                        input.classList.remove("is-invalid");
                     });
-                
+
                     // Check if the userEmail input is valid
                     if (!userEmail.value || !userEmail.validity.valid) {
-                        userEmail.classList.add('is-invalid');
+                        userEmail.classList.add("is-invalid");
                         inputsAreValid = false;
                     }
-                
+
                     // Check if the userPasskey input is non-empty
                     if (!userPasskey.value) {
-                        userPasskey.classList.add('is-invalid');
+                        userPasskey.classList.add("is-invalid");
                         inputsAreValid = false;
                     }
-                
+
                     if (!inputsAreValid) {
                         alert("Please review & fill in all required fields.");
-                        document.getElementById('loadingSpinner').hidden = true;
+                        document.getElementById("loadingSpinner").hidden = true;
                         return;
                     }
-                
+
                     // AJAX call to Google Apps Script
                     fetch(backendUrl + "?mode=admin", {
-                        method: 'POST',
-                        mode: 'cors',
-                        cache: 'no-cache',
+                        method: "POST",
+                        mode: "cors",
+                        cache: "no-cache",
                         headers: {
                             "Content-Type": "text/plain",
                         },
-                        redirect: 'follow',
+                        redirect: "follow",
                         body: JSON.stringify({
                             email: userEmail.value,
-                            passKey: btoa(userPasskey.value) // Base64 encode
-                        })
+                            passKey: btoa(userPasskey.value), // Base64 encode
+                        }),
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        if (data.access === 'granted') {
-                            loginModal.style.display = "none";  
-                            document.querySelector('#planningreport').classList.add('show', 'active');  // Display "Planning Report" tab
-                            document.querySelector('#paymentreport').classList.add('show', 'active');  // Display "Payment Report" tab
-                            document.querySelector('.nav-link.active').classList.remove('active');  // Adjust nav link active class if needed
-                            planningReportTab.classList.add('active');
-                            paymentReportTab.classList.add('active');
-                        } else {
-                            alert("You do not have admin access. Please reach out to the team.");
-                            userEmail.classList.add('is-invalid');
-                            userPasskey.classList.add('is-invalid');
-                        }
-                        document.getElementById('loadingSpinner').hidden = true; // Hide spinner
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        errorModal.style.display = "block";
-                        loginModal.style.display = "none";  
-                        document.getElementById('errorInfo').textContent = error
-                        document.getElementById('loadingSpinner').hidden = true; // Hide spinner
-                    });
-                });
-            
-                // When the user clicks on <span> (x), close the modal
-                successModalCloseBtn.onclick = function() {
-                    successModal.style.display = "none";
-                }
+                        .then((response) => response.json())
+                        .then((data) => {
+                            console.log(data);
+                            if (data.access === "granted") {
+                                loginModal.style.display = "none";
 
-                errorModalCloseBtn.onclick = function() {
-                    errorModal.style.display = "none"; 
-                }
-            
+                                if (reportTabClicked === "planning") {
+                                    document.querySelector("#planningreport").classList.add("show", "active"); // Display "Planning Report" tab
+                                    planningReportTab.classList.add("active");
+                                } else {
+                                    document.querySelector("#paymentreport").classList.add("show", "active"); // Display "Payment Report" tab
+                                    paymentReportTab.classList.add("active");
+                                }
+                                document.querySelector(".nav-link.active").classList.remove("active");
+                            } else {
+                                alert("You do not have admin access. Please reach out to the team.");
+                                userEmail.classList.add("is-invalid");
+                                userPasskey.classList.add("is-invalid");
+                            }
+                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            errorModal.style.display = "block";
+                            loginModal.style.display = "none";
+                            document.getElementById("errorInfo").textContent = error;
+                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
+                        });
+                });
+
+                // When the user clicks on <span> (x), close the modal
+                successModalCloseBtn.onclick = function () {
+                    successModal.style.display = "none";
+                };
+
+                errorModalCloseBtn.onclick = function () {
+                    errorModal.style.display = "none";
+                };
+
                 // When the user clicks anywhere outside of the modal, close it
-                window.onclick = function(event) {
+                window.onclick = function (event) {
                     if (event.target === successModal || event.target === errorModal) {
                         successModal.style.display = "none";
-                        errorModal.style.display = "none"; 
+                        errorModal.style.display = "none";
                     }
 
                     if (event.target === loginModal) {
-                        loginModal.style.display = "block";  
+                        loginModal.style.display = "block";
                     }
-                }
+                };
             });
 
             function resetAllInputFields() {
-                const inputs = document.querySelectorAll('input');
-                const selects = document.querySelectorAll('select');
-                const textareas = document.querySelectorAll('textarea');
-        
+                const inputs = document.querySelectorAll("input");
+                const selects = document.querySelectorAll("select");
+                const textareas = document.querySelectorAll("textarea");
+
                 // Reset input fields
-                inputs.forEach(input => {
+                inputs.forEach((input) => {
                     switch (input.type) {
-                        case 'checkbox':
-                        case 'radio':
+                        case "checkbox":
+                        case "radio":
                             input.checked = input.defaultChecked;
                             break;
-                        case 'file':
-                            input.value = ''; // No true way to reset files in standard HTML
+                        case "file":
+                            input.value = ""; // No true way to reset files in standard HTML
                             break;
                         default:
                             input.value = input.defaultValue;
                             break;
                     }
                 });
-        
+
                 // Reset select elements
-                selects.forEach(select => {
-                    select.value = select.selectedIndex = 0;  // Reset to first option
+                selects.forEach((select) => {
+                    select.value = select.selectedIndex = 0; // Reset to first option
                 });
-        
+
                 // Reset textarea elements
-                textareas.forEach(textarea => {
-                    textarea.value = '';
+                textareas.forEach((textarea) => {
+                    textarea.value = "";
                 });
             }
 
