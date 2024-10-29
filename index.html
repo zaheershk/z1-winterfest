@@ -37,10 +37,10 @@
             <!-- Tab Navigation -->
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#newRegistration">Registration</a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#newRegistration" id="registrationTab">Registration</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#dashboard">Dashboard</a>
+                    <a class="nav-link active" data-bs-toggle="tab" href="#dashboard" id="dashboardTab">Dashboard</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#planningreport" id="planningReportTab">Planning</a>
@@ -433,6 +433,8 @@
                 <p style="color: #4b0082;">You may reach out via WhatsApp for any support needed.</p>
                 <img src="thankyou.png" alt="Thank you" class="img-fluid" />
                 &nbsp
+                <div class="dividerthin"></div>
+                <button id="dashboardButton" class="btn">View Dashboard</button>
             </div>
         </div>
         <!-- JavaScript for dynamic management -->
@@ -483,7 +485,7 @@
                         { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
                     ],
                 },
-                /*{
+                {
                     category: "Sports",
                     competitions: [
                         { name: "8 Ball Pool", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
@@ -502,7 +504,7 @@
                         { name: "Kabaddi (Teams of 9)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above" },
                         { name: "Swimming", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
                     ],
-                },*/
+                },
             ];
 
             var paymentScreenshotBytes = null;
@@ -512,9 +514,6 @@
             const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
             document.addEventListener("DOMContentLoaded", function () {
-                const registrationsClosedModal = document.getElementById("registrationClosedModal");
-                registrationsClosedModal.style.display = "block";
-
                 const form = document.getElementById("registrationForm");
                 const submitBtn = document.getElementById("submitBtn");
 
@@ -531,6 +530,10 @@
 
                 var planningReportTab = document.getElementById("planningReportTab");
                 var paymentReportTab = document.getElementById("paymentReportTab");
+
+                var registrationTab = document.getElementById("registrationTab");
+                const registrationsClosedModal = document.getElementById("registrationClosedModal");
+                const dashboardBtn = document.getElementById("dashboardButton");
 
                 updateCompetitionsDisplay("3to5yrs"); // Default age group on load
 
@@ -769,21 +772,31 @@
                     });
                 });
 
+                dashboardBtn.addEventListener("click", function (event) {
+                    window.location.reload();
+                });
+
+                registrationTab.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    reportTabClicked = "registrationTab";
+                    registrationsClosedModal.style.display = "block";
+                });
+
                 planningReportTab.addEventListener("click", function (event) {
                     event.preventDefault();
                     reportTabClicked = "planning";
-                    loginModal.style.display = "block"; // Show login modal
+                    loginModal.style.display = "block"; 
                 });
 
                 paymentReportTab.addEventListener("click", function (event) {
                     event.preventDefault();
                     reportTabClicked = "payment";
-                    loginModal.style.display = "block"; // Show login modal
+                    loginModal.style.display = "block"; 
                 });
 
                 loginBtn.addEventListener("click", function (event) {
                     event.preventDefault();
-                    document.getElementById("loadingSpinner").hidden = false; // Show spinner
+                    document.getElementById("loadingSpinner").hidden = false; 
 
                     var userEmail = document.getElementById("userEmail");
                     var userPasskey = document.getElementById("userPasskey");
