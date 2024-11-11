@@ -1,4 +1,4 @@
-const backendUrl = "https://script.google.com/macros/s/AKfycbwe5MGWm-G8LX5mfoows_MiM9Y-v1C2APFRW9QFED6N1eMIhoOSWsKhFv9UqV9oLFSPBA/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbwQQqverrSGRwzWgXJGlVpp4sFd0kEY3Q0f2R2pneFLZNZZDeDKtx-l7-knLYBvRDSyzw/exec";
 
 const competitionsData = [
     {
@@ -362,12 +362,13 @@ document.addEventListener("DOMContentLoaded", function () {
         loginModal.style.display = "block"; 
     });
 
+    var userEmail,userPasskey;
     loginBtn.addEventListener("click", function (event) {
         event.preventDefault();
         document.getElementById("loadingSpinner").hidden = false; 
 
-        var userEmail = document.getElementById("userEmail");
-        var userPasskey = document.getElementById("userPasskey");
+        userEmail = document.getElementById("userEmail");
+        userPasskey = document.getElementById("userPasskey");
         var inputsAreValid = true;
 
         // Remove previous invalid styles
@@ -603,20 +604,44 @@ document.addEventListener("DOMContentLoaded", function () {
             firstPlace: {
                 name: document.getElementById('firstPlaceName').value,
                 apartment: document.getElementById('firstPlaceApartment').value,
+                teamMembers: document.getElementById('firstPlaceteamMembers').value
             },
             secondPlace: {
                 name: document.getElementById('secondPlaceName').value,
                 apartment: document.getElementById('secondPlaceApartment').value,
+                teamMembers: document.getElementById('secondPlaceteamMembers').value
             },
-            teamMembers: document.getElementById('teamMembers').value
+            adminEmail: userEmail.value
         };
         return JSON.stringify(formData);
     }
     
     // Placeholder function for sending data to the server or an Apps Script
-    function sendWinnerDataToGoogleScript(data) {
-        console.log("Sending data:", data);
-        // Replace with actual POST request logic
+    async function sendWinnerDataToGoogleScript(data) {
+        try {
+            const response = await fetch(backendUrl + "?mode=winner", {
+                method: 'POST',
+                mode: "cors",
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "text/plain",
+                },
+                redirect: "follow",
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
+            if (result.status === 'success') {
+                alert(`Entry submitted!`);
+                resetAllInputFields();
+            } else {
+                alert('Failed to submit entry.');
+            }
+        } catch (error) {
+            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
+            alert('Failed to submit entry. Check console for logs..');
+            console.error('Failed to place order:', error);
+        }
     }
 });
 
