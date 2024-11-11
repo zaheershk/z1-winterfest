@@ -3,34 +3,9 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Z1 Winterfest 2024</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-        <style>
-            .nav-tabs { border-bottom: 3px solid #4caf50; }
-            .nav-link { color: #666; padding: 10px 20px; background-color: #f9f9f9; border: 0 solid transparent; border-radius: 5px 5px 0 0; transition: color 0.2s, background-color 0.2s; }
-            .nav-link:hover { background-color: #e2e2e2; color: #333; border-color: #ddd; }
-            .nav-tabs .nav-link.active, .nav-tabs .nav-link.active:hover { color: #fff; background-color: #4caf50; border: 0; border-bottom-color: transparent; }
-            @media (max-width: 768px) { .nav-link { padding: 8px 16px; font-size: 14px; } }
-            @media (max-width: 575.98px) { .nav-tabs { overflow-x: auto; flex-wrap: nowrap; } .nav-link { padding: 6px 12px; font-size: 12px; } }
-            .section-header { background-color: #e6d4e7; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-            .divider { height: 2px; background-color: #dee2e6; margin: 40px 0; }
-            .dividerthin { height: 1px; background-color: #dee2e6; margin: 10px 0; }
-            .category-block { display: none; margin-bottom: 20px; }
-            .category-header { font-size: 20px; font-weight: bold; color: #333; }
-            .bullet-points { list-style: none; padding-left: 20px; }
-            .bullet-points li:before { content: "\2022"; color: black; font-weight: bold; display: inline-block; width: 1em; margin-left: -1em; }
-            .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-            .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; }
-            .close { position: absolute; top: 10px; right: 15px; color: #333; float: none; font-size: 24px; font-weight: bold; cursor: pointer; opacity: 0.6; }
-            .close:hover, .close:focus { color: #000; text-decoration: none; cursor: pointer; opacity: 1; }
-            .btn { padding: 8px 16px; background-color: #007BFF; color: white; border: none; cursor: pointer; border-radius: 4px; }
-            .btn:hover { background-color: #0056b3; }
-            .loader { border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 120px; height: 120px; animation: spin 2s linear infinite; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 99; }
-            @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-            .iframe-container { position: relative; width: 100%; padding-bottom: 56.25%; height: auto; overflow: hidden; }
-            .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-            @media (max-width: 600px) { .iframe-container { padding-bottom: 75%; } }
-        </style>
+        <title>Z1 Winterfest</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="styles.css">
     </head>
     <body>
         <div class="container py-5">
@@ -48,6 +23,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#paymentreport" id="paymentReportTab">Payment</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#winnersForm" id="winnersFormTab">Winners</a>
+                </li>
             </ul>
             <!-- Tab Content -->
             <div class="tab-content">
@@ -58,7 +36,7 @@
                             <div class="section-header">
                                 <h1>Z1 Winterfest 2024</h1>
                             </div>
-                            <img src="banner.png" alt="Banner Image" class="img-fluid" />
+                            <img src="resources/banner.png" alt="Banner Image" class="img-fluid" />
                             &nbsp
                             <p style="color: #4b0082;"><strong>Instructions:</strong></p>
                             <ul class="bullet-points">
@@ -75,7 +53,7 @@
                             <div class="section-header">
                                 <h2>Event Schedule</h2>
                             </div>
-                            <img src="schedule.png" alt="Event Schedule" class="img-fluid" />
+                            <img src="resources/schedule.png" alt="Event Schedule" class="img-fluid" />
                         </section>
                         <div class="divider"></div>
                         <!-- Participant Information Section -->
@@ -343,7 +321,7 @@
                                     Use below QR code or below UPI ID
                                     <strong>vyapar.171174085726@hdfcbank</strong>
                                 </p>
-                                <img src="qrcode.png" alt="QRcode" class="img-fluid" />
+                                <img src="resources/qrcode.png" alt="QRcode" class="img-fluid" />
                             </div>
                         </section>
                         <!-- Payment confirmation Section -->
@@ -367,21 +345,104 @@
                     </div>
                 </div>
                 <div id="dashboard" class="tab-pane fade show active">
-                    <!-- Dashboard related information and widgets go here -->
                     <div class="iframe-container">
                         <iframe src="https://lookerstudio.google.com/embed/reporting/050bed8b-a53b-4328-aa1e-247550f28c1a/page/qlRiD" frameborder="0" style="border: 0;" allowfullscreen></iframe>
                     </div>
                 </div>
                 <div id="planningreport" class="tab-pane fade">
-                    <!-- Planning Report go here -->
                     <div class="iframe-container">
                         <iframe src="https://lookerstudio.google.com/embed/reporting/dab56e10-3f25-45cb-a755-560f724a3923/page/p_w970njssbd" frameborder="0" style="border: 0;" allowfullscreen></iframe>
                     </div>
                 </div>
                 <div id="paymentreport" class="tab-pane fade">
-                    <!-- Payment Report go here -->
                     <div class="iframe-container">
                         <iframe src="https://lookerstudio.google.com/embed/reporting/7206ad0f-4fc4-4842-8876-d5f75e9fc4dc/page/p_w970njssbd" frameborder="0" style="border: 0;" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div id="winnersForm" class="tab-pane fade">
+                    <div class="container py-5">
+                        <section class="mb-4">
+                            <div class="section-header">
+                                <h2>Winner Information</h2>
+                                <p style="color: #4b0082;"><strong>NOTE:</strong> Fill a separate form for each event.</p>
+                            </div>
+                            <form id="winnerEntryForm">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label" style="font-weight: bold;">Category:</label>
+                                    <select id="category" class="form-control">
+                                        <!-- Options populated via JS -->
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="eventName" class="form-label" style="font-weight: bold;">Name:</label>
+                                    <select id="eventName" class="form-control">
+                                        <!-- Options populated via JS -->
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="ageGroup" class="form-label" style="font-weight: bold;">Age Group:</label>
+                                    <select id="ageGroup" class="form-control">
+                                        <!-- Options populated via JS -->
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="genderFormat" class="form-label" style="font-weight: bold;">Gender Format:</label>
+                                    <select id="genderFormat" class="form-control">
+                                        <option value="Male">Male (Boys/Mens)</option>
+                                        <option value="Female">Female (Girls/Womens)</option>
+                                        <option value="Mixed">Mixed</option>
+                                    </select>
+                                </div>
+
+                                <section class="mb-4">
+                                    <div class="section-header">
+                                        <h2>1st Place</h2>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="firstPlaceName" class="form-label" style="font-weight: bold;">Name:</label>
+                                        <input type="text" id="firstPlaceName" class="form-control">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="firstPlaceApartment" class="form-label" style="font-weight: bold;">Apartment Number:</label>
+                                        <input type="text" id="firstPlaceApartment" class="form-control">
+                                    </div>
+    
+                                    <div class="mb-3" id="firstPlaceteamMemberArea" class="form-label" style="font-weight: bold;display:none;">
+                                        <label for="firstPlaceteamMembers">Team Members:</label>
+                                        <textarea id="firstPlaceteamMembers" class="form-control"></textarea>
+                                    </div>
+                                </section>
+
+                                <section class="mb-4">
+                                    <div class="section-header">
+                                        <h2>2nd Place</h2>
+                                    </div>
+                                
+                                    <div class="mb-3">
+                                        <label for="secondPlaceName" class="form-label" style="font-weight: bold;">Name:</label>
+                                        <input type="text" id="secondPlaceName" class="form-control">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="secondPlaceApartment" class="form-label" style="font-weight: bold;">Apartment Number:</label>
+                                        <input type="text" id="secondPlaceApartment" class="form-control">
+                                    </div>
+                                    
+                                    <div class="mb-3" id="secondPlaceteamMemberArea" class="form-label" style="font-weight: bold;display:none;">
+                                        <label for="secondPlaceteamMembers">Team Members:</label>
+                                        <textarea id="secondPlaceteamMembers" class="form-control"></textarea>
+                                    </div>
+
+                                </section>
+
+                                <div class="divider"></div>
+                                <button id="winnersFormSubmitBtn" type="button" class="btn btn-primary">Submit</button>
+                            </form>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -393,7 +454,7 @@
                 <p><strong>Thank you!</strong></p>
                 <p>Your registration is submitted successfully.</p>
                 <p style="color: #4b0082;">Registration Id: <span id="registrationId">...</span></p>
-                <img src="thankyou.png" alt="Thank you" class="img-fluid" />
+                <img src="resources/thankyou.png" alt="Thank you" class="img-fluid" />
                 &nbsp
                 <div class="dividerthin"></div>
                 <button id="newRegistrationBtn" class="btn">Submit New Registration</button>
@@ -404,7 +465,7 @@
                 <span class="close">&times;</span>
                 <p>An error occurred during registration!</p>
                 <p style="color: #820000c2;">Error details: <span id="errorInfo">...</span></p>
-                <img src="thankyou.png" alt="Thank you" class="img-fluid" />
+                <img src="resources/thankyou.png" alt="Thank you" class="img-fluid" />
                 &nbsp
                 <div class="dividerthin"></div>
                 <button id="retryRegistrationBtn" class="btn">Retry Registration</button>
@@ -431,584 +492,15 @@
                 <p><strong>Thank you!</strong></p>
                 <p>Z1 Winterfest 2024 registrations are closed now.</p>
                 <p style="color: #4b0082;">You may reach out via WhatsApp for any support needed.</p>
-                <img src="thankyou.png" alt="Thank you" class="img-fluid" />
+                <img src="resources/thankyou.png" alt="Thank you" class="img-fluid" />
                 &nbsp
                 <div class="dividerthin"></div>
                 <button id="dashboardButton" class="btn">View Dashboard</button>
             </div>
         </div>
-        <!-- JavaScript for dynamic management -->
-        <script>
-            const backendUrl = "https://script.google.com/macros/s/AKfycbwe5MGWm-G8LX5mfoows_MiM9Y-v1C2APFRW9QFED6N1eMIhoOSWsKhFv9UqV9oLFSPBA/exec";
 
-            const competitionsData = [
-                {
-                    category: "Cultural",
-                    competitions: [
-                        { name: "Dance", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Dance-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Dance-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "DJ Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Drawing", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Fancy Dress", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Karaoke Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Master Chef (Cooking without fire)", ageGroups: ["11to16yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Master Chef", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Musical Instrument", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Rangoli", ageGroups: ["11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Singing", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Singing-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Singing-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                    ],
-                },
-                {
-                    category: "Games",
-                    competitions: [
-                        { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above"},
-                        { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Potato Picking Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Price is Right (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
-                        { name: "Sack Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Slow cycling", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Tambola", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Treasure Hunt (Teams of 4)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
-                        { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above" },
-                    ],
-                },
-                {
-                    category: "Quiz",
-                    competitions: [
-                        { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification" },
-                        { name: "General Knowledge Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification" },
-                        { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
-                    ],
-                },
-                {
-                    category: "Sports",
-                    competitions: [
-                        { name: "8 Ball Pool", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Badminton (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Badminton (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-                        { name: "Badminton (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-                        { name: "Table Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Table Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-                        { name: "Table Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-                        { name: "Lawn Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Lawn Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-                        { name: "Lawn Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-                        { name: "Cards-29 (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "18 & above" },
-                        { name: "Carrom (Doubles)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-29, 30-49, 50 & above" },
-                        { name: "Chess", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                        { name: "Kabaddi (Teams of 9)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above" },
-                        { name: "Swimming", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-                    ],
-                },
-            ];
+        <script src="app.js"></script>
 
-            var paymentScreenshotBytes = null;
-            var paymentScreenshotMimeType = null;
-            var reportTabClicked = null;
-
-            const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
-
-            document.addEventListener("DOMContentLoaded", function () {
-                const form = document.getElementById("registrationForm");
-                const submitBtn = document.getElementById("submitBtn");
-
-                const successModal = document.getElementById("successModal");
-                const successModalCloseBtn = document.getElementsByClassName("close")[0];
-                const newRegBtn = document.getElementById("newRegistrationBtn");
-
-                const errorModal = document.getElementById("errorModal");
-                const errorModalCloseBtn = document.getElementsByClassName("close")[1];
-                const retryRegBtn = document.getElementById("retryRegistrationBtn");
-
-                var loginModal = document.getElementById("loginModal");
-                var loginBtn = document.getElementById("loginButton");
-
-                var planningReportTab = document.getElementById("planningReportTab");
-                var paymentReportTab = document.getElementById("paymentReportTab");
-
-                var registrationTab = document.getElementById("registrationTab");
-                const registrationsClosedModal = document.getElementById("registrationClosedModal");
-                const dashboardBtn = document.getElementById("dashboardButton");
-
-                updateCompetitionsDisplay("3to5yrs"); // Default age group on load
-
-                document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
-                    checkbox.addEventListener("change", function () {
-                        updateTotalAmountDisplay();
-                    });
-                });
-
-                document.getElementById("option1").addEventListener("change", function () {
-                    updateTotalAmountDisplay();
-                });
-
-                document.getElementById("option2").addEventListener("change", function () {
-                    updateTotalAmountDisplay();
-                });
-
-                document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function (loadEvent) {
-                            paymentScreenshotBytes = loadEvent.target.result;
-                            paymentScreenshotMimeType = file.type;
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        // Reset to null if the file input is cleared
-                        paymentScreenshotBytes = null;
-                        paymentScreenshotMimeType = null;
-                    }
-                });
-
-                submitBtn.addEventListener("click", function (event) {
-                    event.preventDefault(); // Prevent form from submitting traditionally
-                    document.getElementById("loadingSpinner").hidden = false; // Show spinner
-
-                    // Step 1: Validate the data
-                    let formValid = true;
-                    const invalidInputClass = "is-invalid"; // Bootstrap 5 class for invalid input
-
-                    // Reset invalid inputs
-                    document.querySelectorAll(`.${invalidInputClass}`).forEach((el) => el.classList.remove(invalidInputClass));
-
-                    // Collect inputs and checks
-                    const v_email = document.getElementById("email");
-                    const v_name = document.getElementById("name");
-                    const v_phoneNumber = document.getElementById("phoneNumber");
-                    const v_tower = document.getElementById("tower");
-                    const v_flat = document.getElementById("flat");
-                    const v_gender = document.querySelector('input[name="gender"]:checked');
-                    const v_age = document.getElementById("age");
-                    const v_ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-                    //const v_competitions = document.querySelectorAll('input[name="competitions"]:checked');
-                    const v_acknowledge = document.getElementById("acknowledge").checked;
-                    const v_paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-                    const v_paymentConfirmation = document.getElementById("paymentConfirmation");
-
-                    // Mandatory checks
-                    [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age].forEach((input) => {
-                        // Check if the element exists and has an empty value
-                        if (input && !input.value) {
-                            input.classList.add(invalidInputClass);
-                            formValid = false;
-                        } else if (!input) {
-                            console.warn(`Element ${input} is not found in the document.`);
-                        }
-                    });
-
-                    if (!v_gender) {
-                        document.querySelectorAll('input[name="gender"]').forEach((input) => input.classList.add(invalidInputClass));
-                        formValid = false;
-                    }
-
-                    if (!v_ageGroup) {
-                        document.querySelectorAll('input[name="ageGroup"]').forEach((input) => input.classList.add(invalidInputClass));
-                        formValid = false;
-                    }
-
-                    if (!v_acknowledge) {
-                        document.getElementById("acknowledge").classList.add(invalidInputClass);
-                        formValid = false;
-                    }
-
-                    if (!v_paymentOption) {
-                        document.querySelectorAll('input[name="paymentOption"]').forEach((input) => input.classList.add(invalidInputClass));
-                        formValid = false;
-                    }
-
-                    //console.log(`File input length: ${v_paymentConfirmation.files.length}`);
-                    if (v_paymentConfirmation.files && v_paymentConfirmation.files.length === 0) {
-                        v_paymentConfirmation.classList.add(invalidInputClass);
-                        formValid = false;
-                    }
-
-                    const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
-                    selectedCompetitions.forEach((comp) => {
-                        const v_compId = comp.id;
-                        if (document.getElementById(`team-${v_compId}`) && document.getElementById(`team-${v_compId}`).value === "") {
-                            formValid = false;
-                            v_teamInfo = document.getElementById(`team-${v_compId}`);
-                            v_teamInfo.classList.add(invalidInputClass);
-                        }
-                    });
-
-                    if (!formValid) {
-                        alert("Please review & fill in all required fields.");
-                        document.getElementById("loadingSpinner").hidden = true;
-                        return false;
-                    }
-
-                    // Step 2: Set the data
-                    var email = document.getElementById("email").value;
-                    var name = document.getElementById("name").value;
-                    var phoneNumber = document.getElementById("phoneNumber").value;
-                    var tower = document.getElementById("tower").value;
-                    var flat = document.getElementById("flat").value;
-                    var gender = document.querySelector('input[name="gender"]:checked');
-                    var age = document.getElementById("age").value;
-                    var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-
-                    let competitionInfo = [];
-                    selectedCompetitions.forEach((comp) => {
-                        const compId = comp.id;
-
-                        // Reset teamInfo to null at the start of each loop
-                        let teamInfo = null;
-
-                        if (document.getElementById(`team-${compId}`)) {
-                            let teamInfoInput = document.getElementById(`team-${compId}`);
-                            if (teamInfoInput && teamInfoInput.value) {
-                                teamInfo = teamInfoInput.value;
-                            }
-                        }
-
-                        const category = comp.closest(".category-block").querySelector(".category-header").textContent;
-                        competitionInfo.push({
-                            category: category,
-                            name: comp.labels[0].innerText,
-                            teamInfo: teamInfo,
-                        });
-                    });
-
-                    const foodMenu = document.getElementById("foodMenu").value;
-                    const selectedDates = [];
-                    document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
-                        if (checkbox.checked) {
-                            selectedDates.push(checkbox.value);
-                        }
-                    });
-                    const foodStallInfo = {
-                        menu: foodMenu,
-                        dates: selectedDates,
-                    };
-
-                    var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
-                    var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-
-                    // Step 3: Prepare data to send
-                    var registrationData = {
-                        email: email,
-                        name: name,
-                        phoneNumber: phoneNumber,
-                        tower: tower,
-                        flat: flat,
-                        gender: gender.value,
-                        age: age,
-                        ageGroup: ageGroup.value,
-                        competitions: competitionInfo,
-                        foodStalls: foodStallInfo,
-                        acknowledge: acknowledge,
-                        paymentOption: paymentOption.value,
-                        paymentScreenshotBytes: paymentScreenshotBytes,
-                        paymentScreenshotMimeType: paymentScreenshotMimeType,
-                    };
-
-                    // Step 4: Send data using fetch with payload
-                    fetch(backendUrl + "?mode=participant", {
-                        method: "POST",
-                        mode: "cors",
-                        cache: "no-cache",
-                        headers: {
-                            "Content-Type": "text/plain",
-                        },
-                        redirect: "follow",
-                        body: JSON.stringify(registrationData),
-                    })
-                        .then((response) => response.text())
-                        .then((result) => {
-                            console.log(result);
-                            const res = JSON.parse(result);
-                            if (res.result === "success") {
-                                successModal.style.display = "block";
-                                errorModal.style.display = "none";
-                                document.getElementById("registrationId").textContent = res.registrationId;
-                            } else {
-                                errorModal.style.display = "block";
-                                successModal.style.display = "none";
-                                document.getElementById("errorInfo").textContent = res.error;
-                            }
-                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-                        })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            errorModal.style.display = "block";
-                            successModal.style.display = "none";
-                            document.getElementById("errorInfo").textContent = error;
-                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-                        });
-                });
-
-                // Reset the form and hide the modal when 'Submit New Registration' is clicked
-                newRegBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    resetAllInputFields();
-                    successModal.style.display = "none";
-                    errorModal.style.display = "none";
-                    form.style.display = "block";
-
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                });
-
-                // Reset the form and hide the modal when 'Retry Registration' is clicked
-                retryRegBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    successModal.style.display = "none";
-                    errorModal.style.display = "none";
-                    form.style.display = "block";
-
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                });
-
-                dashboardBtn.addEventListener("click", function (event) {
-                    window.location.reload();
-                });
-
-                registrationTab.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    reportTabClicked = "registrationTab";
-                    registrationsClosedModal.style.display = "block";
-                });
-
-                planningReportTab.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    reportTabClicked = "planning";
-                    loginModal.style.display = "block"; 
-                });
-
-                paymentReportTab.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    reportTabClicked = "payment";
-                    loginModal.style.display = "block"; 
-                });
-
-                loginBtn.addEventListener("click", function (event) {
-                    event.preventDefault();
-                    document.getElementById("loadingSpinner").hidden = false; 
-
-                    var userEmail = document.getElementById("userEmail");
-                    var userPasskey = document.getElementById("userPasskey");
-                    var inputsAreValid = true;
-
-                    // Remove previous invalid styles
-                    [userEmail, userPasskey].forEach((input) => {
-                        input.classList.remove("is-invalid");
-                    });
-
-                    // Check if the userEmail input is valid
-                    if (!userEmail.value || !userEmail.validity.valid) {
-                        userEmail.classList.add("is-invalid");
-                        inputsAreValid = false;
-                    }
-
-                    // Check if the userPasskey input is non-empty
-                    if (!userPasskey.value) {
-                        userPasskey.classList.add("is-invalid");
-                        inputsAreValid = false;
-                    }
-
-                    if (!inputsAreValid) {
-                        alert("Please review & fill in all required fields.");
-                        document.getElementById("loadingSpinner").hidden = true;
-                        return;
-                    }
-
-                    // AJAX call to Google Apps Script
-                    fetch(backendUrl + "?mode=admin", {
-                        method: "POST",
-                        mode: "cors",
-                        cache: "no-cache",
-                        headers: {
-                            "Content-Type": "text/plain",
-                        },
-                        redirect: "follow",
-                        body: JSON.stringify({
-                            email: userEmail.value,
-                            passKey: btoa(userPasskey.value), // Base64 encode
-                        }),
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            console.log(data);
-                            if (data.access === "granted") {
-                                loginModal.style.display = "none";
-
-                                if (reportTabClicked === "planning") {
-                                    document.querySelector("#planningreport").classList.add("show", "active"); // Display "Planning Report" tab
-                                    document.querySelector(".nav-link.active").classList.remove("active");
-                                    planningReportTab.classList.add("active");
-                                } else {
-                                    document.querySelector("#paymentreport").classList.add("show", "active"); // Display "Payment Report" tab
-                                    document.querySelector(".nav-link.active").classList.remove("active");
-                                    paymentReportTab.classList.add("active");
-                                }
-                                
-                            } else {
-                                alert("You do not have admin access. Please reach out to the team.");
-                                userEmail.classList.add("is-invalid");
-                                userPasskey.classList.add("is-invalid");
-                            }
-                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-                        })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            errorModal.style.display = "block";
-                            loginModal.style.display = "none";
-                            document.getElementById("errorInfo").textContent = error;
-                            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-                        });
-                });
-
-                // When the user clicks on <span> (x), close the modal
-                successModalCloseBtn.onclick = function () {
-                    successModal.style.display = "none";
-                };
-
-                errorModalCloseBtn.onclick = function () {
-                    errorModal.style.display = "none";
-                };
-
-                // When the user clicks anywhere outside of the modal, close it
-                window.onclick = function (event) {
-                    if (event.target === successModal || event.target === errorModal) {
-                        successModal.style.display = "none";
-                        errorModal.style.display = "none";
-                    }
-
-                    if (event.target === loginModal) {
-                        loginModal.style.display = "block";
-                    }
-                };
-            });
-
-            function resetAllInputFields() {
-                const inputs = document.querySelectorAll("input");
-                const selects = document.querySelectorAll("select");
-                const textareas = document.querySelectorAll("textarea");
-
-                // Reset input fields
-                inputs.forEach((input) => {
-                    switch (input.type) {
-                        case "checkbox":
-                        case "radio":
-                            input.checked = input.defaultChecked;
-                            break;
-                        case "file":
-                            input.value = ""; // No true way to reset files in standard HTML
-                            break;
-                        default:
-                            input.value = input.defaultValue;
-                            break;
-                    }
-                });
-
-                // Reset select elements
-                selects.forEach((select) => {
-                    select.value = select.selectedIndex = 0; // Reset to first option
-                });
-
-                // Reset textarea elements
-                textareas.forEach((textarea) => {
-                    textarea.value = "";
-                });
-            }
-
-            function updateTotalAmountDisplay() {
-                const option1Selected = document.getElementById("option1").checked;
-                const totalContainer = document.getElementById("totalCharge");
-
-                totalContainer.style.display = "none";
-                if (option1Selected) {
-                    const total = calculateFoodStallCount() * 700 + 600;
-                    totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
-                    totalContainer.style.display = "block";
-                }
-            }
-
-            function calculateFoodStallCount() {
-                const checkboxes = document.querySelectorAll(foodStallCheckboxSelector);
-                let count = 0;
-                checkboxes.forEach((cb) => {
-                    if (cb.checked) {
-                        count++;
-                    }
-                });
-                return count;
-            }
-
-            function updateCompetitionsDisplay(selectedAgeGroup) {
-                const container = document.getElementById("competitionsContainer");
-                container.innerHTML = ""; // Clear current contents
-
-                competitionsData.forEach((category) => {
-                    const categoryElem = document.createElement("div");
-                    categoryElem.classList.add("category-block");
-                    const header = document.createElement("div");
-                    header.className = "category-header";
-                    header.textContent = category.category;
-                    categoryElem.appendChild(header);
-
-                    let hasVisibleCompetitions = false;
-
-                    category.competitions.forEach((comp) => {
-                        if (comp.ageGroups.includes(selectedAgeGroup)) {
-                            hasVisibleCompetitions = true;
-                            const checkboxId = `comp-${comp.name.replace(/\s+/g, "-")}`;
-                            const compElement = document.createElement("div");
-                            compElement.className = "form-check";
-                            compElement.innerHTML = `
-                                <input class="form-check-input" type="checkbox" id="${checkboxId}" name="competitions">
-                                <label class="form-check-label" for="${checkboxId}">${comp.name}</label>
-                            `;
-
-                            if (comp.teamBased) {
-                                const inputTeamMembers = document.createElement("input");
-                                inputTeamMembers.id = `team-${checkboxId}`;
-                                inputTeamMembers.className = "form-control mt-2";
-                                inputTeamMembers.placeholder = "Enter team member names & flat numbers";
-                                inputTeamMembers.required = true; // Make input field required
-                                inputTeamMembers.style.display = "none"; // Initially hide the input field
-
-                                // Label for age groups
-                                const ageGroupLabel = document.createElement("label");
-                                ageGroupLabel.className = "form-label mt-2";
-                                ageGroupLabel.textContent = `Age Groups: ${comp.displayAgeGroups}`;
-                                ageGroupLabel.style.display = "none"; // Initially hide the label
-
-                                // Insert age group label before the team members input field
-                                compElement.appendChild(ageGroupLabel);
-                                compElement.appendChild(inputTeamMembers);
-
-                                // Toggle visibility of age group label and input based on the checkbox
-                                compElement.querySelector('input[type="checkbox"]').onchange = function () {
-                                    const displayStyle = this.checked ? "block" : "none";
-                                    inputTeamMembers.style.display = displayStyle;
-                                    ageGroupLabel.style.display = displayStyle;
-                                };
-                            }
-                            categoryElem.appendChild(compElement);
-                        }
-                    });
-
-                    if (hasVisibleCompetitions) {
-                        container.appendChild(categoryElem);
-                        categoryElem.style.display = "block";
-                    }
-                });
-            }
-        </script>
         <!-- Bootstrap Bundle with Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
