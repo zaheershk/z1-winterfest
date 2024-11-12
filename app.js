@@ -1,67 +1,67 @@
-const backendUrl = "https://script.google.com/macros/s/AKfycbxLgYBxuisKPoA8f5dnzF6X1dhWc7P-pS1kGFeRtsrhHgTYVB5vOlGxUivVU6_y6gGF6A/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbzcO4QzvrtHjfVgVknog5A59eO6A7RJOYMfwQJJJJ_9JY77_mla2Qn4pYGqDg2mlUZ32Q/exec";
 
 const competitionsData = [
     {
         category: "Cultural",
         competitions: [
-            { name: "Dance", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Dance-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Dance-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "DJ Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Drawing", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Fancy Dress", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Karaoke Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Master Chef (Cooking without fire)", ageGroups: ["11to16yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Master Chef", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Musical Instrument", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Rangoli", ageGroups: ["11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Singing", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Singing-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Singing-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
+            { name: "Dance", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Dance-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Dance-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "DJ Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 0 },
+            { name: "Drawing", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Fancy Dress", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Karaoke Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 0 },
+            { name: "Master Chef (Cooking without fire)", ageGroups: ["11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Master Chef", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Musical Instrument", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Rangoli", ageGroups: ["11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Singing", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Singing-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Singing-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
         ],
     },
     {
         category: "Games",
         competitions: [
-            { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
-            { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Potato Picking Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Price is Right (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
-            { name: "Sack Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Slow cycling", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Tambola", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Treasure Hunt (Teams of 4)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
-            { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above" },
+            { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above", numberOfWinners: 3 },
+            { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Potato Picking Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Price is Right (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above", numberOfWinners: 3 },
+            { name: "Sack Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Slow cycling", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Tambola", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Treasure Hunt (Teams of 4)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above", numberOfWinners: 4 },
+            { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above", numberOfWinners: 6 },
         ],
     },
     {
         category: "Quiz",
         competitions: [
-            { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification" },
-            { name: "General Knowledge Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification" },
-            { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false },
+            { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification", numberOfWinners: 3 },
+            { name: "General Knowledge Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification", numberOfWinners: 3 },
+            { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, numberOfWinners: 1 },
         ],
     },
     {
         category: "Sports",
         competitions: [
-            { name: "8 Ball Pool", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Badminton (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Badminton (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-            { name: "Badminton (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-            { name: "Table Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Table Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-            { name: "Table Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-            { name: "Lawn Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "" },
-            { name: "Lawn Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-            { name: "Lawn Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above" },
-            { name: "Cards-29 (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "18 & above" },
-            { name: "Carrom (Doubles)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-29, 30-49, 50 & above" },
-            { name: "Chess", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
-            { name: "Kabaddi (Teams of 9)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above" },
-            { name: "Swimming", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
+            { name: "8 Ball Pool", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Badminton (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Badminton (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Badminton (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Table Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Table Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Table Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Lawn Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Lawn Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Lawn Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Cards-29 (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "18 & above", numberOfWinners: 2 },
+            { name: "Carrom (Doubles)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-29, 30-49, 50 & above", numberOfWinners: 2 },
+            { name: "Chess", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
+            { name: "Kabaddi (Teams of 9)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above", numberOfWinners: 9 },
+            { name: "Swimming", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
         ],
     },
 ];
@@ -287,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((result) => {
                 console.log(result);
                 const res = JSON.parse(result);
-                if (res.result === "success") {
+                if (res.status === "success") {
                     successModal.style.display = "block";
                     errorModal.style.display = "none";
                     document.getElementById("registrationId").textContent = res.registrationId;
@@ -513,7 +513,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById('eventName').addEventListener('change', function () {
         updateAgeGroupsAndGender();
-        toggleTeamMemberArea();
+        updateWinnerInputSection(this.value);
     });
 
     function updateAgeGroupsAndGender() {
@@ -531,24 +531,58 @@ document.addEventListener("DOMContentLoaded", function () {
             ?.ageGroups || [];
 
         let ageGroupSelect = document.getElementById('ageGroup');
-        ageGroupSelect.innerHTML = `<option value="">Select</option>` + ageGroups
+        ageGroupSelect.innerHTML = `<option value="">Select</option>` + `<option value="N/A">N/A</option>` + ageGroups
             .map(ageGroup => `<option value="${ageGroup}">${ageGroup}</option>`)
             .join('');
 
         ageGroupSelect.value = "";
     }
 
-    function toggleTeamMemberArea() {
-        let selectedCategory = document.getElementById('category').value;
-        let selectedName = document.getElementById('eventName').value;
-        let isTeamBased = competitionsData
-            .find(comp => comp.category === selectedCategory)
-            ?.competitions
-            .find(comp => comp.name === selectedName)
-            ?.teamBased;
+    document.getElementById('eventConducted').addEventListener('change', function () {
+        var displayStyle = this.value === 'No' ? 'none' : 'block';
+        document.getElementById('firstPlaceSection').style.display = displayStyle;
+        document.getElementById('secondPlaceSection').style.display = displayStyle;
+    });
 
-        document.getElementById('firstPlaceteamMemberArea').style.display = isTeamBased ? 'block' : 'none';
-        document.getElementById('secondPlaceteamMemberArea').style.display = isTeamBased ? 'block' : 'none';
+    function updateWinnerInputSection(eventName) {
+        const numberOfWinners = findNumberOfWinners(eventName);
+        createWinnerInputs(numberOfWinners, 'firstPlaceContent', 'first');
+        createWinnerInputs(numberOfWinners, 'secondPlaceContent', 'second');
+        loadDataAndApplyAutocomplete();
+    }
+
+    function findNumberOfWinners(eventName) {
+        for (const category of competitionsData) {
+            for (const competition of category.competitions) {
+                if (competition.name === eventName) {
+                    return competition.numberOfWinners;
+                }
+            }
+        }
+        return 0; // Default to 0 if no match is found
+    }
+
+    function createWinnerInputs(numberOfWinners, containerId, positionPrefix) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            return; // Ensure winnerSection div exists
+        }
+
+        let inputHtml = '';
+        for (let i = 1; i <= numberOfWinners; i++) {
+            var labelPrefix = numberOfWinners === 1 ? '' : 'Player - ' + i + ' ';
+            inputHtml += `
+                <div class="mb-3">
+                <label for="${positionPrefix}PlaceName-${i}" class="form-label" style="font-weight: bold;">${labelPrefix}Name:</label>
+                <input type="text" id="${positionPrefix}PlaceName-${i}" class="form-control name-input">
+                </div>
+                <div class="mb-3">
+                <label for="${positionPrefix}PlaceApartment-${i}" class="form-label" style="font-weight: bold;">${labelPrefix}Apartment Number:</label>
+                <input type="text" id="${positionPrefix}PlaceApartment-${i}" class="form-control apartment-input">
+                </div>
+            `;
+        }
+        container.innerHTML = inputHtml;
     }
 
     winnersFormSubmitBtn.addEventListener("click", function (event) {
@@ -577,7 +611,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then((result) => {
                 console.log(result);
                 const res = JSON.parse(result);
-                if (res.result === "success") {
+                if (res.status === "success") {
                     alert(`Entry submitted!`);
                     resetAllInputFields();
                 } else {
@@ -608,37 +642,63 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        ['firstPlaceName', 'firstPlaceApartment', 'secondPlaceName', 'secondPlaceApartment']
-            .forEach(id => {
-                let input = document.getElementById(id);
-                if (!input.value.trim()) {
-                    input.style.borderColor = 'red';
-                    isValid = false;
-                } else {
-                    input.style.borderColor = 'initial';
-                }
-            });
+        // Validate all name fields
+        document.querySelectorAll('.name-input').forEach(input => {
+            if (!input.value.trim()) {
+                input.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                input.style.borderColor = 'initial';
+            }
+        });
+
+        // Validate all apartment fields
+        document.querySelectorAll('.apartment-input').forEach(input => {
+            if (!input.value.trim()) {
+                input.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                input.style.borderColor = 'initial';
+            }
+        });
+
         return isValid;
     }
 
     function gatherWinnerFormData() {
+
+        const winnerInfo = {
+            firstPlace: [],
+            secondPlace: []
+        };
+
+        // Get all name and apartment inputs
+        const nameInputs = document.querySelectorAll('.name-input');
+        const apartmentInputs = document.querySelectorAll('.apartment-input');
+
+        // Assuming every name input has a corresponding apartment input
+        for (let i = 0; i < nameInputs.length; i++) {
+            const place = i % 2 === 0 ? 'firstPlace' : 'secondPlace';  // Alternate between first and second place
+            const entry = {
+                name: nameInputs[i].value.trim(),
+                apartment: apartmentInputs[i].value.trim()
+            };
+
+            // Push entry to the correct place
+            winnerInfo[place].push(entry);
+        }
+
         let formData = {
             category: document.getElementById('category').value,
             eventName: document.getElementById('eventName').value,
             ageGroup: document.getElementById('ageGroup').value,
             genderFormat: document.getElementById('genderFormat').value,
-            firstPlace: {
-                name: document.getElementById('firstPlaceName').value,
-                apartment: document.getElementById('firstPlaceApartment').value,
-                teamMembers: document.getElementById('firstPlaceteamMembers').value
-            },
-            secondPlace: {
-                name: document.getElementById('secondPlaceName').value,
-                apartment: document.getElementById('secondPlaceApartment').value,
-                teamMembers: document.getElementById('secondPlaceteamMembers').value
-            },
+            firstPlace: winnerInfo.firstPlace,
+            secondPlace: winnerInfo.secondPlace,
+            additionalRemarks : document.getElementById('additionalRemarks').value,
             adminEmail: localStorage.getItem('userEmail')
         };
+
         return formData;
     }
 });
@@ -756,5 +816,43 @@ function updateCompetitionsDisplay(selectedAgeGroup) {
             container.appendChild(categoryElem);
             categoryElem.style.display = "block";
         }
+    });
+}
+
+function loadDataAndApplyAutocomplete() {
+    let allNames = localStorage.getItem('allNames');
+    let allApartments = localStorage.getItem('allApartments');
+
+    if (!allNames || !allApartments) {
+        // Fetch Names if not already in local storage
+        $.getJSON(backendUrl + "?type=registrationData&property=name", function (data) {
+            allNames = JSON.stringify(data);
+            localStorage.setItem('allNames', allNames);
+            applyAutocompleteNames(JSON.parse(allNames));
+        });
+
+        // Fetch Apartments if not already in local storage
+        $.getJSON(backendUrl + "?type=registrationData&property=apartment", function (data) {
+            allApartments = JSON.stringify(data);
+            localStorage.setItem('allApartments', allApartments);
+            applyAutocompleteApartments(JSON.parse(allApartments));
+        });
+    } else {
+        applyAutocompleteNames(JSON.parse(allNames));
+        applyAutocompleteApartments(JSON.parse(allApartments));
+    }
+}
+
+function applyAutocompleteNames(namesData) {
+    $("input[id^='firstPlaceName'], input[id^='secondPlaceName']").autocomplete({
+        source: namesData,
+        minLength: 1
+    });
+}
+
+function applyAutocompleteApartments(apartmentsData) {
+    $("input[id^='firstPlaceApartment'], input[id^='secondPlaceApartment']").autocomplete({
+        source: apartmentsData,
+        minLength: 1
     });
 }
