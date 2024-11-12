@@ -1,4 +1,4 @@
-const backendUrl = "https://script.google.com/macros/s/AKfycbwQQqverrSGRwzWgXJGlVpp4sFd0kEY3Q0f2R2pneFLZNZZDeDKtx-l7-knLYBvRDSyzw/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbz18-YKv9_2VqfYVC61Zus41QtT9j2Ro6fo_1zV2ZMNM9qsMmvDJ7vAgH5lriIlrYJpDA/exec";
 
 const competitionsData = [
     {
@@ -23,7 +23,7 @@ const competitionsData = [
     {
         category: "Games",
         competitions: [
-            { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above"},
+            { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above" },
             { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
             { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
             { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "" },
@@ -347,25 +347,25 @@ document.addEventListener("DOMContentLoaded", function () {
     planningReportTab.addEventListener("click", function (event) {
         event.preventDefault();
         reportTabClicked = "planning";
-        loginModal.style.display = "block"; 
+        loginModal.style.display = "block";
     });
 
     winnersFormTab.addEventListener("click", function (event) {
         event.preventDefault();
         reportTabClicked = "winners";
-        loginModal.style.display = "block"; 
+        loginModal.style.display = "block";
     });
 
     paymentReportTab.addEventListener("click", function (event) {
         event.preventDefault();
         reportTabClicked = "payment";
-        loginModal.style.display = "block"; 
+        loginModal.style.display = "block";
     });
 
-    var userEmail,userPasskey;
+    var userEmail, userPasskey;
     loginBtn.addEventListener("click", function (event) {
         event.preventDefault();
-        document.getElementById("loadingSpinner").hidden = false; 
+        document.getElementById("loadingSpinner").hidden = false;
 
         userEmail = document.getElementById("userEmail");
         userPasskey = document.getElementById("userPasskey");
@@ -419,7 +419,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         document.querySelector(".nav-link.active").classList.remove("active");
                         planningReportTab.classList.add("active");
                     }
-                    
+
                     if (reportTabClicked === "payment") {
                         document.querySelector("#paymentreport").classList.add("show", "active"); // Display "Payment Report" tab
                         document.querySelector(".nav-link.active").classList.remove("active");
@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         winnersFormTab.classList.add("active");
                         initializeWinnersForm();
                     }
-                    
+
                 } else {
                     alert("You do not have admin access. Please reach out to the team.");
                     userEmail.classList.add("is-invalid");
@@ -476,19 +476,19 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('eventName').innerHTML = "";
         document.getElementById('ageGroup').innerHTML = "";
     }
-    
+
     function populateCategories() {
         let categories = competitionsData.map(comp => comp.category);
         let categorySelect = document.getElementById('category');
         categorySelect.innerHTML = `<option value="">Select</option>` + categories
             .map(category => `<option value="${category}">${category}</option>`)
             .join('');
-    
+
         categorySelect.value = "";
     }
-    
+
     document.getElementById('category').addEventListener('change', populateNames);
-    
+
     function populateNames() {
         let selectedCategory = document.getElementById('category').value;
         if (!selectedCategory) {
@@ -496,21 +496,21 @@ document.addEventListener("DOMContentLoaded", function () {
             updateAgeGroupsAndGender();  // To reset subsequent dropdowns
             return;
         }
-    
+
         let names = competitionsData
             .find(comp => comp.category === selectedCategory)
             ?.competitions
             ?.map(comp => comp.name) || [];
-    
+
         let nameSelect = document.getElementById('eventName');
         nameSelect.innerHTML = `<option value="">Select</option>` + names
             .map(name => `<option value="${name}">${name}</option>`)
             .join('');
-    
+
         nameSelect.value = "";
     }
-    
-    document.getElementById('eventName').addEventListener('change', function() {
+
+    document.getElementById('eventName').addEventListener('change', function () {
         updateAgeGroupsAndGender();
         toggleTeamMemberArea();
     });
@@ -522,21 +522,21 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('ageGroup').innerHTML = `<option value="">Select</option>`;
             return;
         }
-    
+
         let ageGroups = competitionsData
             .find(comp => comp.category === selectedCategory)
             ?.competitions
             .find(comp => comp.name === selectedName)
             ?.ageGroups || [];
-    
+
         let ageGroupSelect = document.getElementById('ageGroup');
         ageGroupSelect.innerHTML = `<option value="">Select</option>` + ageGroups
             .map(ageGroup => `<option value="${ageGroup}">${ageGroup}</option>`)
             .join('');
-    
+
         ageGroupSelect.value = "";
     }
-    
+
     function toggleTeamMemberArea() {
         let selectedCategory = document.getElementById('category').value;
         let selectedName = document.getElementById('eventName').value;
@@ -545,33 +545,58 @@ document.addEventListener("DOMContentLoaded", function () {
             ?.competitions
             .find(comp => comp.name === selectedName)
             ?.teamBased;
-    
+
         document.getElementById('firstPlaceteamMemberArea').style.display = isTeamBased ? 'block' : 'none';
         document.getElementById('secondPlaceteamMemberArea').style.display = isTeamBased ? 'block' : 'none';
     }
 
     winnersFormSubmitBtn.addEventListener("click", function (event) {
-        event.preventDefault(); 
+        event.preventDefault();
         document.getElementById("loadingSpinner").hidden = false; // Show spinner
 
-        if (validateWinnerForm()) {
-            let payload = gatherWinnerFormData();
-            sendWinnerDataToGoogleScript(payload); // implement this function to send data
-        }
-        else {
+        if (!validateWinnerForm()) {
             alert("Please review & fill in all required fields.");
             document.getElementById("loadingSpinner").hidden = true; // Hide spinner
             return false;
         }
+
+        let winnerFormData = gatherWinnerFormData();
+
+        fetch(backendUrl + "?mode=winner", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "text/plain",
+            },
+            redirect: "follow",
+            body: JSON.stringify(winnerFormData),
+        })
+            .then((response) => response.text())
+            .then((result) => {
+                console.log(result);
+                const res = JSON.parse(result);
+                if (res.result === "success") {
+                    alert(`Entry submitted!`);
+                    resetAllInputFields();
+                } else {
+                    alert('Failed to submit entry.');
+                }
+                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
+            })
+            .catch((error) => {
+                console.error('Failed to submit entry:', error);
+                alert('Failed to submit entry. Check console for logs..');
+                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
+            });
+
     });
-    
+
     function validateWinnerForm() {
-        // validate that all required fields have values
-        // example for validation: 
         let isValid = true;
 
         let dropdowns = ['category', 'eventName', 'ageGroup', 'genderFormat'];
-    
+
         dropdowns.forEach(id => {
             let element = document.getElementById(id);
             if (element.value === "") {
@@ -594,7 +619,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         return isValid;
     }
-    
+
     function gatherWinnerFormData() {
         let formData = {
             category: document.getElementById('category').value,
@@ -613,35 +638,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             adminEmail: userEmail.value
         };
-        return JSON.stringify(formData);
-    }
-    
-    // Placeholder function for sending data to the server or an Apps Script
-    async function sendWinnerDataToGoogleScript(data) {
-        try {
-            const response = await fetch(backendUrl + "?mode=winner", {
-                method: 'POST',
-                mode: "cors",
-                cache: "no-cache",
-                headers: {
-                    "Content-Type": "text/plain",
-                },
-                redirect: "follow",
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            if (result.status === 'success') {
-                alert(`Entry submitted!`);
-                resetAllInputFields();
-            } else {
-                alert('Failed to submit entry.');
-            }
-        } catch (error) {
-            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            alert('Failed to submit entry. Check console for logs..');
-            console.error('Failed to place order:', error);
-        }
+        return formData;
     }
 });
 
