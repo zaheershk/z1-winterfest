@@ -1,4 +1,4 @@
-const backendUrl = "https://script.google.com/macros/s/AKfycbz18-YKv9_2VqfYVC61Zus41QtT9j2Ro6fo_1zV2ZMNM9qsMmvDJ7vAgH5lriIlrYJpDA/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbxLgYBxuisKPoA8f5dnzF6X1dhWc7P-pS1kGFeRtsrhHgTYVB5vOlGxUivVU6_y6gGF6A/exec";
 
 const competitionsData = [
     {
@@ -413,6 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log(data);
                 if (data.access === "granted") {
                     loginModal.style.display = "none";
+                    localStorage.setItem('userEmail', userEmail.value);
 
                     if (reportTabClicked === "planning") {
                         document.querySelector("#planningreport").classList.add("show", "active"); // Display "Planning Report" tab
@@ -636,7 +637,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 apartment: document.getElementById('secondPlaceApartment').value,
                 teamMembers: document.getElementById('secondPlaceteamMembers').value
             },
-            adminEmail: userEmail.value
+            adminEmail: localStorage.getItem('userEmail')
         };
         return formData;
     }
