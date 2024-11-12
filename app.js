@@ -642,25 +642,29 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Validate all name fields
-        document.querySelectorAll('.name-input').forEach(input => {
-            if (!input.value.trim()) {
-                input.style.borderColor = 'red';
-                isValid = false;
-            } else {
-                input.style.borderColor = 'initial';
-            }
-        });
+        let shouldValidateWinnerInfo = document.getElementById('eventConducted').value === 'No' ? false : true;
+        if (shouldValidateWinnerInfo) {
 
-        // Validate all apartment fields
-        document.querySelectorAll('.apartment-input').forEach(input => {
-            if (!input.value.trim()) {
-                input.style.borderColor = 'red';
-                isValid = false;
-            } else {
-                input.style.borderColor = 'initial';
-            }
-        });
+            // Validate all name fields
+            document.querySelectorAll('.name-input').forEach(input => {
+                if (!input.value.trim()) {
+                    input.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    input.style.borderColor = 'initial';
+                }
+            });
+
+            // Validate all apartment fields
+            document.querySelectorAll('.apartment-input').forEach(input => {
+                if (!input.value.trim()) {
+                    input.style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    input.style.borderColor = 'initial';
+                }
+            });
+        }
 
         return isValid;
     }
@@ -695,7 +699,7 @@ document.addEventListener("DOMContentLoaded", function () {
             genderFormat: document.getElementById('genderFormat').value,
             firstPlace: winnerInfo.firstPlace,
             secondPlace: winnerInfo.secondPlace,
-            additionalRemarks : document.getElementById('additionalRemarks').value,
+            additionalRemarks: document.getElementById('additionalRemarks').value,
             adminEmail: localStorage.getItem('userEmail')
         };
 
