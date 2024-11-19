@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const registrationsClosedModal = document.getElementById("registrationClosedModal");
     const dashboardBtn = document.getElementById("dashboardButton");
 
-    /* var winnersFormTab = document.getElementById("winnersFormTab");
-    winnersFormSubmitBtn = document.getElementById("winnersFormSubmitBtn"); */
+    // var winnersFormTab = document.getElementById("winnersFormTab");
+    // winnersFormSubmitBtn = document.getElementById("winnersFormSubmitBtn");
 
     updateCompetitionsDisplay("3to5yrs"); // Default age group on load
 
@@ -350,11 +350,11 @@ document.addEventListener("DOMContentLoaded", function () {
         loginModal.style.display = "block";
     });
 
-    /* winnersFormTab.addEventListener("click", function (event) {
-        event.preventDefault();
-        reportTabClicked = "winners";
-        loginModal.style.display = "block";
-    }); */
+    // winnersFormTab.addEventListener("click", function (event) {
+    //     event.preventDefault();
+    //     reportTabClicked = "winners";
+    //     loginModal.style.display = "block";
+    // });
 
     paymentReportTab.addEventListener("click", function (event) {
         event.preventDefault();
@@ -427,12 +427,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         paymentReportTab.classList.add("active");
                     }
 
-                    /* if (reportTabClicked === "winners") {
-                        document.querySelector("#winnersForm").classList.add("show", "active"); // Display "Winners" tab
-                        document.querySelector(".nav-link.active").classList.remove("active");
-                        winnersFormTab.classList.add("active");
-                        initializeWinnersForm();
-                    } */
+                    // if (reportTabClicked === "winners") {
+                    //     document.querySelector("#winnersForm").classList.add("show", "active"); // Display "Winners" tab
+                    //     document.querySelector(".nav-link.active").classList.remove("active");
+                    //     winnersFormTab.classList.add("active");
+                    //     initializeWinnersForm();
+                    // }
 
                 } else {
                     alert("You do not have admin access. Please reach out to the team.");
