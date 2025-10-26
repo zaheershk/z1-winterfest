@@ -8,67 +8,86 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
-    <div class="container py-5">
-        <!-- Tab Navigation -->
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#newRegistration" id="registrationTab">Registration</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#dashboard" id="dashboardTab">Dashboard</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#planningreport" id="planningReportTab">Planning</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#paymentreport" id="paymentReportTab">Payment</a>
-            </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#winnersForm" id="winnersFormTab">Winners</a>
-            </li> -->
-        </ul>
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <div id="newRegistration" class="tab-pane fade">
-                <div class="container py-5">
+    <div class="mobile-container">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <div class="brand">
+                <h1>Z1 Winterfest 2025</h1>
+            </div>
+        </header>
+
+        <!-- Mobile Main -->
+        <main class="mobile-main">
+            <!-- Navigation Bar -->
+            <nav class="mobile-nav" id="mobile-nav">
+                <button class="mobile-nav-btn active" id="nav-information">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Information</span>
+                </button>
+                <button class="mobile-nav-btn" id="nav-registration">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registration</span>
+                </button>
+                <button class="mobile-nav-btn" id="nav-checkout">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Checkout</span>
+                </button>
+                <button class="mobile-nav-btn" id="nav-dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="mobile-nav-btn" id="nav-support">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Support</span>
+                </button>
+            </nav>
+
+            <!-- Sections -->
+            <section id="information-section" class="mobile-section active">
+                <div class="container py-3">
                     <!-- Welcome Section -->
-                    <section class="mb-4">
+                    <section class="mb-3">
                         <div class="section-header">
-                            <h1>Z1 Winterfest 2024</h1>
+                            <h1>Instructions</h1>
                         </div>
-                        <img src="resources/banner.png" alt="Banner Image" class="img-fluid" />
-                        &nbsp
-                        <p style="color: #4b0082;"><strong>Instructions:</strong></p>
                         <ul class="bullet-points">
-                            <li>Participation fee is <strong>Rs.600/- per flat.</strong></li>
-                            <li>Fill a <strong>separate form for each participant</strong> from your flat.</li>
+                            <li>Participation fee is <strong>Rs.700/- per flat.</strong></li>
                             <li>Irrespective of the number of forms submitted from <strong>your flat</strong>, you only
-                                need to <strong>pay Rs.600/- once.</strong></li>
-                            <li>If you wish to <strong>host a Food stall</strong>, the fee is <strong>Rs. 700/- per day
+                                need to <strong>pay Rs.700/- once.</strong></li>
+                            <li>If you wish to <strong>host a Food stall</strong>, the fee is <strong>Rs. 800/- per day
                                     per stall</strong> (on first come first serve basis).</li>
-                            <li>Please submit form by <strong>Sunday, 27 Oct 2024.</strong></li>
+                            <li>Please submit form by <strong>Monday, 3rd November 2025.</strong></li>
                         </ul>
                     </section>
-                    <div class="divider"></div>
                     <!-- Event Schedule Section -->
-                    <section class="mb-4">
+                    <section class="mb-3">
                         <div class="section-header">
                             <h2>Event Schedule</h2>
                         </div>
-                        <img src="resources/schedule.png" alt="Event Schedule" class="img-fluid" />
+                        <strong style="color: #8B4513;">[Will be shared soon!]</strong>
                     </section>
-                    <div class="divider"></div>
-                    <!-- Participant Information Section -->
-                    <section class="mb-4">
-                        <div class="section-header">
-                            <h2>Participant Information</h2>
-                            <p style="color: #4b0082;"><strong>NOTE:</strong> Fill a separate form for each participant
-                                from your flat</p>
-                        </div>
-                        <form id="registrationForm">
+                    &nbsp;
+                    <!-- Register Button -->
+                    <section class="text-center">
+                        <button class="modern-btn" id="registerParticipantBtn">
+                            <i class="fas fa-user-plus"></i> Register Participant
+                        </button>
+                    </section>
+                </div>
+            </section>
+
+            <section id="registration-section" class="mobile-section">
+                <div class="container py-3">
+                    <form id="registrationForm">
+                        <!-- Participant Information Section -->
+                        <section class="mb-3" id="participantSection">
+                            <div class="section-header">
+                                <h2>Participant Information</h2>
+                            </div>
                             <!-- Email -->
                             <div class="mb-3">
                                 <label for="email" class="form-label" style="font-weight: bold;">Email</label>
@@ -85,7 +104,7 @@
                             <div class="mb-3">
                                 <label for="phone" class="form-label" style="font-weight: bold;">Phone Number</label>
                                 <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
-                                    pattern="^\+?(\d{1,4}[\s-]?)?(\(?\d{1,3}\)?[\s-]?)?[\d\s-]{4,10}$"
+                                    pattern="^\+?(\d{1,4}[\s\-]?)?(\(?\d{1,3}\)?[\s\-]?)?[\d\s\-]{4,10}$"
                                     title="Enter a valid phone number. Include country and area code if necessary."
                                     placeholder="Enter phone number" required />
                             </div>
@@ -136,128 +155,217 @@
                                     <label class="form-check-label" for="other">Other</label>
                                 </div>
                             </div>
-                            <!-- Age -->
-                            <div class="mb-3">
-                                <label for="age" class="form-label" style="font-weight: bold;">Age</label>
-                                <input type="number" class="form-control" id="age" placeholder="Enter age" required />
-                            </div>
                             <!-- Age Group -->
                             <div class="mb-3">
-                                <label style="font-weight: bold;">Select correct Age Group</label>
+                                <label style="font-weight: bold;">Age Group</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="3to5yrs"
-                                        value="3to5yrs" onchange="updateCompetitionsDisplay(this.value)" checked
-                                        required />
-                                    <label class="form-check-label" for="3to5yrs">3 to 5 yrs</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="3-5"
+                                        value="3-5" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="3-5">3-5</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="6to10yrs"
-                                        value="6to10yrs" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="6to10yrs">6 to 10 yrs</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="6-9"
+                                        value="6-9" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="6-9">6-9</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="11to16yrs"
-                                        value="11to16yrs" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="11to16yrs">11 to 16 yrs</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="10-13"
+                                        value="10-13" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="10-13">10-13</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="17to29yrs"
-                                        value="17to29yrs" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="17to29yrs">17 to 29 yrs</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="14-17"
+                                        value="14-17" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="14-17">14-17</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="30to35yrs"
-                                        value="30to35yrs" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="30to35yrs">30 to 35 yrs</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="18-35"
+                                        value="18-35" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="18-35">18-35</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="36to49yrs"
-                                        value="36to49yrs" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="36to49yrs">36 to 49 yrs</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="36-55"
+                                        value="36-55" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="36-55">36-55</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="50to55yrs"
-                                        value="50to55yrs" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="50to55yrs">50 to 55 yrs</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ageGroup" id="56Yrsabove"
-                                        value="56Yrsabove" onchange="updateCompetitionsDisplay(this.value)" required />
-                                    <label class="form-check-label" for="56Yrsabove">56 Yrs & above</label>
+                                    <input class="form-check-input" type="radio" name="ageGroup" id="56+"
+                                        value="56+" onchange="updateCompetitionsDisplay(this.value)" required />
+                                    <label class="form-check-label" for="56+">56+</label>
                                 </div>
                             </div>
-                        </form>
-                    </section>
-                    <div class="divider"></div>
-                    <!-- Competitions Section -->
-                    <section class="mb-4">
-                        <div class="section-header">
-                            <h2>Competitions</h2>
-                        </div>
-                        <div id="competitionsContainer" class="mt-3">
-                            <!-- Competitions will be populated here dynamically -->
-                        </div>
-                    </section>
-                    <div class="divider"></div>
-                    <!-- Food Stall Section -->
-                    <section class="mb-4">
-                        <div class="section-header">
-                            <h2>Food Stalls</h2>
-                            <p style="color: #4b0082;"><strong>NOTE:</strong> Booking is on first come first serve basis
+                        </section>
+
+                        <!-- Registration Type Selection -->
+                        <section class="mb-3" id="registrationTypeSection" style="display: none;">
+                            <div class="section-header">
+                                <h2>Registration Type</h2>     
+                            </div>
+                            <p style="color: #4b0082;">What would you like to register for?</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="registrationType"
+                                    id="competitionType" value="competition" required />
+                                <label class="form-check-label" for="competitionType">
+                                    <strong>Competition</strong> - Participate in an event
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="registrationType" id="foodstallType"
+                                    value="foodstall" />
+                                <label class="form-check-label" for="foodstallType">
+                                    <strong>Food Stall</strong> - Book a food stall
+                                </label>
+                            </div>
+                        </section>
+
+                        <!-- Competitions Section -->
+                        <section class="mb-3" id="competitionsSection" style="display: none;">
+                            <div class="section-header">
+                                <h2>Competitions</h2>
+                            </div>
+                            <div id="competitionsContainer" class="mt-3">
+                                <!-- Competitions will be populated here dynamically -->
+                            </div>
+                        </section>
+
+                        <!-- Food Stall Section -->
+                        <section class="mb-3" id="foodstallSection" style="display: none;">
+                            <div class="section-header">
+                                <h2>Food Stalls</h2>
+                            </div>
+                            <p>Food Stall charges are <strong>Rs. 800 per day per stall</strong>.
                             </p>
-                        </div>
-                        <p>Select if you want to book a <strong>Food Stall at Rs. 700 per day per stall</strong> on
-                            competition days.</p>
-                        <!-- Static Checkbox list for dates -->
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-10nov" value="Sunday, 10 Nov" />
-                            <label class="form-check-label" for="date-10nov">Sunday, 10 Nov</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-16nov" value="Saturday, 16 Nov" />
-                            <label class="form-check-label" for="date-16nov">Saturday, 16 Nov</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-17nov" value="Sunday, 17 Nov" />
-                            <label class="form-check-label" for="date-17nov">Sunday, 17 Nov</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-23nov" value="Saturday, 23 Nov" />
-                            <label class="form-check-label" for="date-23nov">Saturday, 23 Nov</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-24nov" value="Sunday, 24 Nov" />
-                            <label class="form-check-label" for="date-24nov">Sunday, 24 Nov</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-30nov" value="Saturday, 30 Nov" />
-                            <label class="form-check-label" for="date-30nov">Saturday, 30 Nov</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-1dec" value="Sunday, 1 Dec" />
-                            <label class="form-check-label" for="date-1dec">Sunday, 1 Dec</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-7dec" value="Saturday, 7 Dec" />
-                            <label class="form-check-label" for="date-7dec">Saturday, 7 Dec</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="date-8dec" value="Sunday, 8 Dec" />
-                            <label class="form-check-label" for="date-8dec">Sunday, 8 Dec</label>
-                        </div>
-                        <div>
-                            &nbsp
-                        </div>
-                        <!-- Food Menu -->
-                        <label for="foodMenu" class="form-label">If you are booking a food stall, please mention your
-                            <strong>Food menu</strong>. We will not accept booking without this information.</label>
-                        <textarea class="form-control" id="foodMenu" rows="3" required></textarea>
-                    </section>
-                    <!-- Acknowledgement Section -->
-                    <div class="divider"></div>
-                    <section class="mb-4">
+                            <!-- Static Checkbox list for dates -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-9nov" value="Sunday, 9 Nov" />
+                                <label class="form-check-label" for="date-9nov">Sunday, 9 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-15nov"
+                                    value="Saturday, 15 Nov" />
+                                <label class="form-check-label" for="date-15nov">Saturday, 15 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-16nov"
+                                    value="Sunday, 16 Nov" />
+                                <label class="form-check-label" for="date-16nov">Sunday, 16 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-22nov"
+                                    value="Saturday, 22 Nov" />
+                                <label class="form-check-label" for="date-22nov">Saturday, 22 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-23nov"
+                                    value="Sunday, 23 Nov" />
+                                <label class="form-check-label" for="date-23nov">Sunday, 23 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-29nov"
+                                    value="Saturday, 29 Nov" />
+                                <label class="form-check-label" for="date-29nov">Saturday, 29 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-30nov"
+                                    value="Sunday, 30 Nov" />
+                                <label class="form-check-label" for="date-30nov">Sunday, 30 Nov</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-6dec"
+                                    value="Saturday, 6 Dec" />
+                                <label class="form-check-label" for="date-6dec">Saturday, 6 Dec</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="date-7dec" value="Sunday, 7 Dec" />
+                                <label class="form-check-label" for="date-7dec">Sunday, 7 Dec</label>
+                            </div>
+                            <div>&nbsp;</div>
+                            <!-- Food Menu -->
+                            <label for="foodMenu" class="form-label">Please mention your <strong>Food menu</strong>. We
+                                will not accept booking without this information.</label>
+                            <textarea class="form-control" id="foodMenu" rows="3" required></textarea>
+                        </section>
+
+                        <!-- Next Step Button (appears after registration type details are filled) -->
+                        <section class="mb-3" id="nextStepSection" style="display: none;">
+                            <div class="text-center">
+                                <button type="button" class="modern-btn" id="nextStepBtn">
+                                    Next <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Add Another Participant Question (for competitions only) -->
+                        <section class="mb-3" id="addAnotherSection" style="display: none;">
+                            <div class="section-header">
+                                <h2>Add Another Participant</h2>
+                            </div>
+                            <p>Do you want to submit details of another participant from your Flat?</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="addAnother" id="addAnotherYes"
+                                    value="yes" />
+                                <label class="form-check-label" for="addAnotherYes">Yes, add another participant</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="addAnother" id="addAnotherNo"
+                                    value="no" />
+                                <label class="form-check-label" for="addAnotherNo">No, proceed to checkout</label>
+                            </div>
+                        </section>
+
+                        <!-- Action Buttons -->
+                        <section class="mb-3" id="actionButtonsSection" style="display: none;">
+                            <div class="text-center">
+                                <button type="button" class="modern-btn me-2" id="backBtn"
+                                    style="display: none;">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button type="button" class="modern-btn" id="continueBtn">
+                                    Continue <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="modern-btn" id="addToCartBtn" style="display: none;">
+                                    <i class="fas fa-arrow-right"></i> Proceed
+                                </button>
+                            </div>
+                        </section>
+                    </form>
+                </div>
+            </section>
+
+            <section id="checkout-section" class="mobile-section">
+                <div class="container py-3">
+
+                    <!-- Cart Items -->
+                    <section class="mb-3" id="cartSection">
                         <div class="section-header">
-                            <h2>Acknowledge Rules</h2>
+                            <h3>Registered Participants</h3>
+                        </div>
+                        <div id="flatDisplay" class="mb-3" style="display: none;">
+                            <strong><span id="flatNumberDisplay"></span></strong>
+                        </div>
+                        <div id="cartItems" class="table-responsive">
+                            <table class="table table-striped" id="cartTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Age Group</th>
+                                        <th>Details</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-muted">No participants registered yet. Add participants from the Registration tab.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Acknowledgement Section -->
+                    <section class="mb-3" id="checkoutRulesSection">
+                        <div class="section-header">
+                            <h3>Acknowledgement</h3>
                         </div>
                         <div>
                             <strong>Eligibility</strong>
@@ -274,209 +382,120 @@
                             &nbsp
                             <strong>General Rules</strong>
                             <ul class="bullet-points">
-                                <li>All participation forms must be received by Sunday, 27 October 2024.</li>
+                                <li>All participation forms must be received by Monday, 3rd November 2025.</li>
                                 <li>Participants must arrive on time as per schedule.</li>
-                                <li>Participants from the senior most age category can choose to drop down to the next
-                                    age category.</li>
                                 <li>If an event doesn't have a minimum of 4 individual/ team participation, it will be
                                     canceled.</li>
-                                <li>No changes to teams will be allowed after 27 Oct, 2024.</li>
-                                <li>All events require a lot of planning and fixtures will be decided in advance.
-                                    Therefore, organizers will not be able to accommodate entries after the
-                                    participation due date.</li>
-                                <li>We have created the competition schedule keeping multiple variables in mind and
-                                    therefore, it will not be possible to reschedule any of the events.</li>
-                                <li>Each contest will have a Winner and a Runners-up.</li>
-                                <li>The decision of Referee/ Umpire/ Linesman/ Judge will be final.</li>
+                                <li>Participants from the senior most age category can choose to drop down to the
+                                    previous age category.</li>
+                                <li>Each contest will have a Winner and a Runners-up. The decision of Referee/ Umpire/
+                                    Linesman/ Judge will be final.</li>
                             </ul>
                             &nbsp
                             <strong>Racket games</strong>
                             <ul class="bullet-points">
-                                <li>Seeded players are not allowed to compete.</li>
-                                <li>For Doubles and Mixed Doubles Racket games, it is mandatory to mention team member
-                                    names and flat numbers.</li>
-                                <li>To accommodate all participants, racket games might be held on weekdays. The
-                                    schedule will be published at least one week in advance.</li>
+                                <li>Racket games such as Badminton, Lawn Tennis and Table Tennis will be conducted as a
+                                    separate event in the month of January 2026.</li>
                             </ul>
                             &nbsp
-                        </div>
-                        <strong>Other competition specific rules</strong>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="acknowledge" required />
-                            <label class="form-check-label" for="acknowledge">
-                                I have read and agree to the <a
-                                    href="https://docs.google.com/document/d/1BE8XK-kl9kdpqbTX6sVo0VQXfe7bPPDbwTRa9D2aHww"
-                                    target="_blank">Z1 Winterfest 2024 rules</a>.
-                            </label>
+                            <strong>Other competition specific rules</strong>
+                            <ul class="bullet-points">
+                                <li><strong style="color: #8B4513;">[Will be shared soon!]</strong></li>
+                                <!-- <a
+                                        href="https://docs.google.com/document/d/1BE8XK-kl9kdpqbTX6sVo0VQXfe7bPPDbwTRa9D2aHww"
+                                        target="_blank"> -->
+                            </ul>
+                            <div class="acknowledgement-highlight">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="checkoutAcknowledge" required />
+                                    <label class="form-check-label" for="checkoutAcknowledge">
+                                        <strong>I have read and agree to the Z1 Winterfest 2025 rules.</strong>
+                                    </label>
+                                </div>
+                            </div> 
                         </div>
                     </section>
-                    <div class="divider"></div>
+
                     <!-- Payment Section -->
-                    <section class="mb-4">
+                    <section class="mb-3" id="checkoutPaymentSection">
                         <div class="section-header">
-                            <h2>Payment</h2>
+                            <h3>Payment</h3>
                         </div>
                         <p>Please check the appropriate option! &nbsp</p>
                         <strong>Option 1 :</strong>
                         <p>
-                            If this is the <strong>first</strong> registration from your flat for <strong>event
-                                participation</strong> or <strong>hosting a food stall</strong>, select this option,
-                            make the payment and attach payment
-                            screenshot.
+                            If this is the <strong>first</strong> submission from your flat, select this option,
+                            make the payment and attach payment screenshot.
                         </p>
-                        <p id="totalCharge" style="color: #4b0082;">Total Amount to be paid: INR 0</p>
+                        <p id="checkoutTotalCharge" style="color: #4b0082;">Total Amount to be paid: INR 0</p>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentOption" id="option1"
-                                value="I will pay for participation and/or food stall now." />
-                            <label class="form-check-label" for="option1">I will pay for participation and/or food stall
-                                now.</label>
+                            <input class="form-check-input" type="radio" name="checkoutPaymentOption"
+                                id="checkoutOption1" value="I will pay for participation and/or food stall now." />
+                            <label class="form-check-label" for="checkoutOption1">I will pay for participation and/or
+                                food stall now.</label>
                         </div>
                         <div class="dividerthin"></div>
                         <strong>Option 2 :</strong>
                         <p>
-                            If you are registering <strong>again</strong> for another participant from your flat, and
-                            have <strong>already paid Rs.600</strong>, select this option, skip the payment and
-                            re-attach original payment
-                            screenshot.
+                            If you are registering <strong>again</strong> for additional participation from your flat, and
+                            have <strong>already paid Rs.700</strong>, select this option, skip the payment and
+                            attach original payment screenshot.
                         </p>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentOption" id="option2"
-                                value="I have already made a payment for my flat." />
-                            <label class="form-check-label" for="option2">I have already made a payment for my
+                            <input class="form-check-input" type="radio" name="checkoutPaymentOption"
+                                id="checkoutOption2" value="I have already made a payment for my flat." />
+                            <label class="form-check-label" for="checkoutOption2">I have already made a payment for my
                                 flat.</label>
                         </div>
                         <div class="dividerthin"></div>
                         <div class="mb-3">
-                            <p style="color: #4b0082;"><strong>(Preferred method) Pay via Anacity:</strong></p>
-                            <ul class="bullet-points">
-                                <li>Go to "Z1 Apartments Facilities" account on the top left</li>
-                                <li>Select Dues => Pay advance => Paying to "Winterfest 2024"</li>
-                                <li>Pay amount mentioned</li>
-                            </ul>
                             <p style="color: #4b0082;">
-                                <strong>(Alternate method) Pay via UPI:</strong>
+                                <strong>Pay via UPI:</strong>
                             </p>
-                            <p>
+                            <!-- <p>
                                 Use below QR code or below UPI ID
                                 <strong>vyapar.171174085726@hdfcbank</strong>
                             </p>
-                            <img src="resources/qrcode.png" alt="QRcode" class="img-fluid" />
-                        </div>
-                    </section>
-                    <!-- Payment confirmation Section -->
-                    <section class="mb-4">
-                        <div class="section-header">
-                            <h2>Confirmation</h2>
+                            <img src="resources/qrcode.png" alt="QRcode" class="img-fluid" /> -->
                         </div>
                         <div class="mb-3">
-                            <label for="paymentConfirmation" class="form-label">Upload Payment Screenshot</label>
-                            <input type="file" class="form-control" id="paymentConfirmation" accept="image/*"
+                            <label for="checkoutPaymentConfirmation" class="form-label">Upload Payment
+                                Screenshot</label>
+                            <input type="file" class="form-control" id="checkoutPaymentConfirmation" accept="image/*"
                                 required />
                         </div>
                     </section>
-                    <!-- Rules and Submission Section -->
-                    <div class="divider"></div>
-                    <section class="mb-4">
-                        <div class="section-header">
-                            <h2>Final Submission</h2>
-                        </div>
-                        <button id="submitBtn" class="btn btn-primary" type="submit">Submit</button>
-                    </section>
-                </div>
-            </div>
-            <div id="dashboard" class="tab-pane fade show active">
-                <div class="iframe-container">
-                    <iframe
-                        src="https://lookerstudio.google.com/embed/reporting/050bed8b-a53b-4328-aa1e-247550f28c1a/page/qlRiD"
-                        frameborder="0" style="border: 0;" allowfullscreen></iframe>
-                </div>
-            </div>
-            <div id="planningreport" class="tab-pane fade">
-                <div class="iframe-container">
-                    <iframe
-                        src="https://lookerstudio.google.com/embed/reporting/dab56e10-3f25-45cb-a755-560f724a3923/page/p_w970njssbd"
-                        frameborder="0" style="border: 0;" allowfullscreen></iframe>
-                </div>
-            </div>
-            <div id="paymentreport" class="tab-pane fade">
-                <div class="iframe-container">
-                    <iframe
-                        src="https://lookerstudio.google.com/embed/reporting/7206ad0f-4fc4-4842-8876-d5f75e9fc4dc/page/p_w970njssbd"
-                        frameborder="0" style="border: 0;" allowfullscreen></iframe>
-                </div>
-            </div>
-            <div id="winnersForm" class="tab-pane fade">
-                <div class="container py-5">
-                    <section class="mb-4">
-                        <div class="section-header">
-                            <h2>Winner Information</h2>
-                            <p style="color: #4b0082;"><strong>NOTE:</strong> Fill a separate form for each event.</p>
+                    &nbsp;
+                    <!-- Submit Section -->
+                    <section class="mb-3">
+                        <div class="text-center">
+                            <button type="button" class="modern-btn" id="finalSubmitBtn">
+                                <i class="fas fa-paper-plane"></i> Submit Registrations
+                            </button>
                         </div>
                     </section>
-                    <form id="winnerEntryForm">
-                        <div class="mb-3">
-                            <label for="category" class="form-label" style="font-weight: bold;">Category:</label>
-                            <select id="category" class="form-control">
-                                <!-- Options populated via JS -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="eventName" class="form-label" style="font-weight: bold;">Name:</label>
-                            <select id="eventName" class="form-control">
-                                <!-- Options populated via JS -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="ageGroup" class="form-label" style="font-weight: bold;">Age Group:</label>
-                            <select id="ageGroup" class="form-control">
-                                <!-- Options populated via JS -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="genderFormat" class="form-label" style="font-weight: bold;">Gender
-                                Format:</label>
-                            <select id="genderFormat" class="form-control">
-                                <option value="Male">Male (Boys/Mens)</option>
-                                <option value="Female">Female (Girls/Womens)</option>
-                                <option value="Mixed">Mixed</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="eventConducted" class="form-label" style="font-weight: bold;">Was the event
-                                conducted?</label>
-                            <select id="eventConducted" name="eventConducted" class="form-control">
-                                <option value="Yes" selected>Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div id="winnerInfo">
-                            <section class="mb-4" id="firstPlaceSection">
-                                <div class="section-header">
-                                    <h2>1st Place</h2>
-                                </div>
-                                <div id="firstPlaceContent">
-                                </div>
-                            </section>
-                            <section class="mb-4" id="secondPlaceSection">
-                                <div class="section-header">
-                                    <h2>2nd Place</h2>
-                                </div>
-                                <div id="secondPlaceContent">
-                                </div>
-                            </section>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="mb-3">
-                            <label for="additionalRemarks" class="form-label"
-                                style="font-weight: bold;">Remarks:</label>
-                            <input type="text" id="additionalRemarks" class="form-control">
-                        </div>
-                        <div class="divider"></div>
-                        <button id="winnersFormSubmitBtn" type="button" class="btn btn-primary">Submit</button>
-                    </form>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <section id="dashboard-section" class="mobile-section">
+                <div class="container py-3">
+                    <div class="section-header">
+                        <h2>Dashboard</h2>
+                    </div>
+                    
+                    <p><strong style="color: #8B4513;">Coming soon!</strong></p>
+                </div>
+            </section>
+
+            <section id="support-section" class="mobile-section">
+                <div class="container py-3">
+                    <div class="section-header">
+                        <h2>Support</h2>
+                    </div>
+                    <p><strong style="color: #8B4513;">Coming soon!</strong></p>
+                </div>
+            </section>
+        </main>
     </div>
     <div id="loadingSpinner" class="loader" hidden></div>
     <div id="successModal" class="modal">
@@ -488,7 +507,7 @@
             <img src="resources/thankyou.png" alt="Thank you" class="img-fluid" />
             &nbsp
             <div class="dividerthin"></div>
-            <button id="newRegistrationBtn" class="btn">Submit New Registration</button>
+            <button id="newRegistrationBtn" class="modern-btn">Submit New Registration</button>
         </div>
     </div>
     <div id="errorModal" class="modal">
@@ -499,7 +518,7 @@
             <img src="resources/thankyou.png" alt="Thank you" class="img-fluid" />
             &nbsp
             <div class="dividerthin"></div>
-            <button id="retryRegistrationBtn" class="btn">Retry Registration</button>
+            <button id="retryRegistrationBtn" class="modern-btn">Retry Registration</button>
         </div>
     </div>
     <div id="loginModal" class="modal">
@@ -522,7 +541,7 @@
     <div id="registrationClosedModal" class="modal">
         <div class="modal-content">
             <p><strong>Thank you!</strong></p>
-            <p>Z1 Winterfest 2024 registrations are closed now.</p>
+            <p>Z1 Winterfest 2025 registrations are closed now.</p>
             <p style="color: #4b0082;">You may reach out via WhatsApp for any support needed.</p>
             <img src="resources/thankyou.png" alt="Thank you" class="img-fluid" />
             &nbsp
@@ -531,7 +550,13 @@
         </div>
     </div>
 
+    <script src="competitions.js"></script>
     <script src="app.js"></script>
+
+    <!-- IMPORTANT: Update the Google Apps Script URL in app.js
+         Replace YOUR_SCRIPT_ID with your actual Google Apps Script deployment ID
+         The URL should look like: https://script.google.com/macros/s/YOUR_ACTUAL_SCRIPT_ID/exec
+    -->
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

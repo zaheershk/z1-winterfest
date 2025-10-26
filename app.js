@@ -1,711 +1,144 @@
-const backendUrl = "https://script.google.com/macros/s/AKfycbzcO4QzvrtHjfVgVknog5A59eO6A7RJOYMfwQJJJJ_9JY77_mla2Qn4pYGqDg2mlUZ32Q/exec";
 
-const competitionsData = [
-    {
-        category: "Cultural",
-        competitions: [
-            { name: "Dance", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Dance-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Dance-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "DJ Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 0 },
-            { name: "Drawing", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Fancy Dress", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Karaoke Night", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 0 },
-            { name: "Master Chef (Cooking without fire)", ageGroups: ["11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Master Chef", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Musical Instrument", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Rangoli", ageGroups: ["11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Singing", ageGroups: ["3to5yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Singing-Bollywood", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Singing-Classical", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-        ],
-    },
-    {
-        category: "Games",
-        competitions: [
-            { name: "Build an Object (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above", numberOfWinners: 3 },
-            { name: "Jump In & Out", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Lemon & Spoon Race", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Musical Chairs", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Potato Picking Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Price is Right (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above", numberOfWinners: 3 },
-            { name: "Sack Race", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Slow cycling", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Tambola", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Treasure Hunt (Teams of 4)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-35, 36-55, 56 & above", numberOfWinners: 4 },
-            { name: "Tug of War (Teams of 6)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above", numberOfWinners: 6 },
-        ],
-    },
-    {
-        category: "Quiz",
-        competitions: [
-            { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification", numberOfWinners: 3 },
-            { name: "General Knowledge Quiz (Teams of 3)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "No age category specification", numberOfWinners: 3 },
-            { name: "Spelling Bee", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, numberOfWinners: 1 },
-        ],
-    },
-    {
-        category: "Sports",
-        competitions: [
-            { name: "8 Ball Pool", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Badminton (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Badminton (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Badminton (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Table Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Table Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Table Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Lawn Tennis (Singles)", ageGroups: ["6to10yrs", "11to16yrs"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Lawn Tennis (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Lawn Tennis (Mixed Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Cards-29 (Doubles)", ageGroups: ["17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "18 & above", numberOfWinners: 2 },
-            { name: "Carrom (Doubles)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "6-10, 11-16, 17-29, 30-49, 50 & above", numberOfWinners: 2 },
-            { name: "Chess", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-            { name: "Kabaddi (Teams of 9)", ageGroups: ["6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: true, displayAgeGroups: "Up to 16, 17 & above", numberOfWinners: 9 },
-            { name: "Swimming", ageGroups: ["3to5yrs", "6to10yrs", "11to16yrs", "17to29yrs", "30to35yrs", "36to49yrs", "50to55yrs", "56Yrsabove"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
-        ],
-    },
-];
+const backendUrl = "https://script.google.com/macros/s/AKfycbxgDxv3yP4VJDnZkSwsxPStppQFGATZHADxUww15JIFScGOMEvtxFE4n1O7d9sf2v6S/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
 var reportTabClicked = null;
 
+// Cart management
+let registrationCart = [];
+
+// Registration flow state
+let currentRegistrationType = null;
+
 const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("registrationForm");
-    const submitBtn = document.getElementById("submitBtn");
+    // Clear cart data on page refresh
+    localStorage.removeItem('registrationCart');
+    registrationCart = [];
 
-    const successModal = document.getElementById("successModal");
-    const successModalCloseBtn = document.getElementsByClassName("close")[0];
-    const newRegBtn = document.getElementById("newRegistrationBtn");
+    // Initialize competitions display with no selection
+    updateCompetitionsDisplay(null);
 
-    const errorModal = document.getElementById("errorModal");
-    const errorModalCloseBtn = document.getElementsByClassName("close")[1];
-    const retryRegBtn = document.getElementById("retryRegistrationBtn");
+    // Navigation event listeners
+    const navInformation = document.getElementById("nav-information");
+    const navRegistration = document.getElementById("nav-registration");
+    const navCheckout = document.getElementById("nav-checkout");
+    const navDashboard = document.getElementById("nav-dashboard");
+    const navSupport = document.getElementById("nav-support");
 
-    var loginModal = document.getElementById("loginModal");
-    var loginBtn = document.getElementById("loginButton");
-
-    var planningReportTab = document.getElementById("planningReportTab");
-    var paymentReportTab = document.getElementById("paymentReportTab");
-
-    var registrationTab = document.getElementById("registrationTab");
-    const registrationsClosedModal = document.getElementById("registrationClosedModal");
-    const dashboardBtn = document.getElementById("dashboardButton");
-
-    // var winnersFormTab = document.getElementById("winnersFormTab");
-    // winnersFormSubmitBtn = document.getElementById("winnersFormSubmitBtn");
-
-    updateCompetitionsDisplay("3to5yrs"); // Default age group on load
-
-    document.querySelectorAll(foodStallCheckboxSelector).forEach((checkbox) => {
-        checkbox.addEventListener("change", function () {
-            updateTotalAmountDisplay();
+    if (navInformation) {
+        navInformation.addEventListener("click", function () {
+            switchSection("information");
         });
-    });
+    }
 
-    document.getElementById("option1").addEventListener("change", function () {
-        updateTotalAmountDisplay();
-    });
-
-    document.getElementById("option2").addEventListener("change", function () {
-        updateTotalAmountDisplay();
-    });
-
-    document.getElementById("paymentConfirmation").addEventListener("change", function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (loadEvent) {
-                paymentScreenshotBytes = loadEvent.target.result;
-                paymentScreenshotMimeType = file.type;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // Reset to null if the file input is cleared
-            paymentScreenshotBytes = null;
-            paymentScreenshotMimeType = null;
-        }
-    });
-
-    submitBtn.addEventListener("click", function (event) {
-        event.preventDefault(); // Prevent form from submitting traditionally
-        document.getElementById("loadingSpinner").hidden = false; // Show spinner
-
-        // Step 1: Validate the data
-        let formValid = true;
-        const invalidInputClass = "is-invalid"; // Bootstrap 5 class for invalid input
-
-        // Reset invalid inputs
-        document.querySelectorAll(`.${invalidInputClass}`).forEach((el) => el.classList.remove(invalidInputClass));
-
-        // Collect inputs and checks
-        const v_email = document.getElementById("email");
-        const v_name = document.getElementById("name");
-        const v_phoneNumber = document.getElementById("phoneNumber");
-        const v_tower = document.getElementById("tower");
-        const v_flat = document.getElementById("flat");
-        const v_gender = document.querySelector('input[name="gender"]:checked');
-        const v_age = document.getElementById("age");
-        const v_ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-        //const v_competitions = document.querySelectorAll('input[name="competitions"]:checked');
-        const v_acknowledge = document.getElementById("acknowledge").checked;
-        const v_paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-        const v_paymentConfirmation = document.getElementById("paymentConfirmation");
-
-        // Mandatory checks
-        [v_email, v_name, v_phoneNumber, v_tower, v_flat, v_age].forEach((input) => {
-            // Check if the element exists and has an empty value
-            if (input && !input.value) {
-                input.classList.add(invalidInputClass);
-                formValid = false;
-            } else if (!input) {
-                console.warn(`Element ${input} is not found in the document.`);
+    if (navRegistration) {
+        navRegistration.addEventListener("click", function () {
+            switchSection("registration");
+            // If clicking registration tab directly, show participant section if not already shown
+            const participantSection = document.getElementById('participantSection');
+            const actionButtonsSection = document.getElementById('actionButtonsSection');
+            if (participantSection && participantSection.style.display === 'none') {
+                resetRegistrationForm();
+                showParticipantSection();
             }
         });
+    }
 
-        if (!v_gender) {
-            document.querySelectorAll('input[name="gender"]').forEach((input) => input.classList.add(invalidInputClass));
-            formValid = false;
-        }
-
-        if (!v_ageGroup) {
-            document.querySelectorAll('input[name="ageGroup"]').forEach((input) => input.classList.add(invalidInputClass));
-            formValid = false;
-        }
-
-        if (!v_acknowledge) {
-            document.getElementById("acknowledge").classList.add(invalidInputClass);
-            formValid = false;
-        }
-
-        if (!v_paymentOption) {
-            document.querySelectorAll('input[name="paymentOption"]').forEach((input) => input.classList.add(invalidInputClass));
-            formValid = false;
-        }
-
-        //console.log(`File input length: ${v_paymentConfirmation.files.length}`);
-        if (v_paymentConfirmation.files && v_paymentConfirmation.files.length === 0) {
-            v_paymentConfirmation.classList.add(invalidInputClass);
-            formValid = false;
-        }
-
-        const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
-        selectedCompetitions.forEach((comp) => {
-            const v_compId = comp.id;
-            if (document.getElementById(`team-${v_compId}`) && document.getElementById(`team-${v_compId}`).value === "") {
-                formValid = false;
-                v_teamInfo = document.getElementById(`team-${v_compId}`);
-                v_teamInfo.classList.add(invalidInputClass);
-            }
+    if (navCheckout) {
+        navCheckout.addEventListener("click", function () {
+            switchSection("checkout");
         });
+    }
 
-        if (!formValid) {
-            alert("Please review & fill in all required fields.");
-            document.getElementById("loadingSpinner").hidden = true;
-            return false;
-        }
-
-        // Step 2: Set the data
-        var email = document.getElementById("email").value;
-        var name = document.getElementById("name").value;
-        var phoneNumber = document.getElementById("phoneNumber").value;
-        var tower = document.getElementById("tower").value;
-        var flat = document.getElementById("flat").value;
-        var gender = document.querySelector('input[name="gender"]:checked');
-        var age = document.getElementById("age").value;
-        var ageGroup = document.querySelector('input[name="ageGroup"]:checked');
-
-        let competitionInfo = [];
-        selectedCompetitions.forEach((comp) => {
-            const compId = comp.id;
-
-            // Reset teamInfo to null at the start of each loop
-            let teamInfo = null;
-
-            if (document.getElementById(`team-${compId}`)) {
-                let teamInfoInput = document.getElementById(`team-${compId}`);
-                if (teamInfoInput && teamInfoInput.value) {
-                    teamInfo = teamInfoInput.value;
-                }
-            }
-
-            const category = comp.closest(".category-block").querySelector(".category-header").textContent;
-            competitionInfo.push({
-                category: category,
-                name: comp.labels[0].innerText,
-                teamInfo: teamInfo,
-            });
+    if (navDashboard) {
+        navDashboard.addEventListener("click", function () {
+            switchSection("dashboard");
         });
+    }
 
-        const foodMenu = document.getElementById("foodMenu").value;
-        const selectedDates = [];
-        document.querySelectorAll('.form-check-input[type="checkbox"]').forEach((checkbox) => {
-            if (checkbox.checked) {
-                selectedDates.push(checkbox.value);
-            }
+    if (navSupport) {
+        navSupport.addEventListener("click", function () {
+            switchSection("support");
         });
-        const foodStallInfo = {
-            menu: foodMenu,
-            dates: selectedDates,
-        };
+    }
 
-        var acknowledge = document.getElementById("acknowledge").checked ? "Yes" : "No";
-        var paymentOption = document.querySelector('input[name="paymentOption"]:checked');
-
-        // Step 3: Prepare data to send
-        var registrationData = {
-            email: email,
-            name: name,
-            phoneNumber: phoneNumber,
-            tower: tower,
-            flat: flat,
-            gender: gender.value,
-            age: age,
-            ageGroup: ageGroup.value,
-            competitions: competitionInfo,
-            foodStalls: foodStallInfo,
-            acknowledge: acknowledge,
-            paymentOption: paymentOption.value,
-            paymentScreenshotBytes: paymentScreenshotBytes,
-            paymentScreenshotMimeType: paymentScreenshotMimeType,
-        };
-
-        // Step 4: Send data using fetch with payload
-        fetch(backendUrl + "?mode=participant", {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "text/plain",
-            },
-            redirect: "follow",
-            body: JSON.stringify(registrationData),
-        })
-            .then((response) => response.text())
-            .then((result) => {
-                console.log(result);
-                const res = JSON.parse(result);
-                if (res.status === "success") {
-                    successModal.style.display = "block";
-                    errorModal.style.display = "none";
-                    document.getElementById("registrationId").textContent = res.registrationId;
-                } else {
-                    errorModal.style.display = "block";
-                    successModal.style.display = "none";
-                    document.getElementById("errorInfo").textContent = res.error;
-                }
-                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                errorModal.style.display = "block";
-                successModal.style.display = "none";
-                document.getElementById("errorInfo").textContent = error;
-                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            });
-    });
-
-    // Reset the form and hide the modal when 'Submit New Registration' is clicked
-    newRegBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        resetAllInputFields();
-        successModal.style.display = "none";
-        errorModal.style.display = "none";
-        form.style.display = "block";
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
+    // Information tab - Register Participant button
+    const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+    if (registerParticipantBtn) {
+        registerParticipantBtn.addEventListener('click', function () {
+            switchSection('registration');
+            resetRegistrationForm();
+            showParticipantSection();
         });
-    });
-
-    // Reset the form and hide the modal when 'Retry Registration' is clicked
-    retryRegBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        successModal.style.display = "none";
-        errorModal.style.display = "none";
-        form.style.display = "block";
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-        });
-    });
-
-    dashboardBtn.addEventListener("click", function (event) {
-        window.location.reload();
-    });
-
-    registrationTab.addEventListener("click", function (event) {
-        event.preventDefault();
-        reportTabClicked = "registrationTab";
-        registrationsClosedModal.style.display = "block";
-    });
-
-    planningReportTab.addEventListener("click", function (event) {
-        event.preventDefault();
-        reportTabClicked = "planning";
-        loginModal.style.display = "block";
-    });
-
-    // winnersFormTab.addEventListener("click", function (event) {
-    //     event.preventDefault();
-    //     reportTabClicked = "winners";
-    //     loginModal.style.display = "block";
-    // });
-
-    paymentReportTab.addEventListener("click", function (event) {
-        event.preventDefault();
-        reportTabClicked = "payment";
-        loginModal.style.display = "block";
-    });
-
-    var userEmail, userPasskey;
-    loginBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        document.getElementById("loadingSpinner").hidden = false;
-
-        userEmail = document.getElementById("userEmail");
-        userPasskey = document.getElementById("userPasskey");
-        var inputsAreValid = true;
-
-        // Remove previous invalid styles
-        [userEmail, userPasskey].forEach((input) => {
-            input.classList.remove("is-invalid");
-        });
-
-        // Check if the userEmail input is valid
-        if (!userEmail.value || !userEmail.validity.valid) {
-            userEmail.classList.add("is-invalid");
-            inputsAreValid = false;
-        }
-
-        // Check if the userPasskey input is non-empty
-        if (!userPasskey.value) {
-            userPasskey.classList.add("is-invalid");
-            inputsAreValid = false;
-        }
-
-        if (!inputsAreValid) {
-            alert("Please review & fill in all required fields.");
-            document.getElementById("loadingSpinner").hidden = true;
-            return;
-        }
-
-        // AJAX call to Google Apps Script
-        fetch(backendUrl + "?mode=admin", {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "text/plain",
-            },
-            redirect: "follow",
-            body: JSON.stringify({
-                email: userEmail.value,
-                passKey: btoa(userPasskey.value), // Base64 encode
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                if (data.access === "granted") {
-                    loginModal.style.display = "none";
-                    localStorage.setItem('userEmail', userEmail.value);
-
-                    if (reportTabClicked === "planning") {
-                        document.querySelector("#planningreport").classList.add("show", "active"); // Display "Planning Report" tab
-                        document.querySelector(".nav-link.active").classList.remove("active");
-                        planningReportTab.classList.add("active");
-                    }
-
-                    if (reportTabClicked === "payment") {
-                        document.querySelector("#paymentreport").classList.add("show", "active"); // Display "Payment Report" tab
-                        document.querySelector(".nav-link.active").classList.remove("active");
-                        paymentReportTab.classList.add("active");
-                    }
-
-                    // if (reportTabClicked === "winners") {
-                    //     document.querySelector("#winnersForm").classList.add("show", "active"); // Display "Winners" tab
-                    //     document.querySelector(".nav-link.active").classList.remove("active");
-                    //     winnersFormTab.classList.add("active");
-                    //     initializeWinnersForm();
-                    // }
-
-                } else {
-                    alert("You do not have admin access. Please reach out to the team.");
-                    userEmail.classList.add("is-invalid");
-                    userPasskey.classList.add("is-invalid");
-                }
-                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                errorModal.style.display = "block";
-                loginModal.style.display = "none";
-                document.getElementById("errorInfo").textContent = error;
-                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            });
-    });
-
-    // When the user clicks on <span> (x), close the modal
-    successModalCloseBtn.onclick = function () {
-        successModal.style.display = "none";
-    };
-
-    errorModalCloseBtn.onclick = function () {
-        errorModal.style.display = "none";
-    };
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event) {
-        if (event.target === successModal || event.target === errorModal) {
-            successModal.style.display = "none";
-            errorModal.style.display = "none";
-        }
-
-        if (event.target === loginModal) {
-            loginModal.style.display = "block";
-        }
-    };
-
-    // --- Winner form
-    function initializeWinnersForm() {
-        populateCategories();
-        document.getElementById('eventName').innerHTML = "";
-        document.getElementById('ageGroup').innerHTML = "";
     }
 
-    function populateCategories() {
-        let categories = competitionsData.map(comp => comp.category);
-        let categorySelect = document.getElementById('category');
-        categorySelect.innerHTML = `<option value="">Select</option>` + categories
-            .map(category => `<option value="${category}">${category}</option>`)
-            .join('');
-
-        categorySelect.value = "";
-    }
-
-    document.getElementById('category').addEventListener('change', populateNames);
-
-    function populateNames() {
-        let selectedCategory = document.getElementById('category').value;
-        if (!selectedCategory) {
-            document.getElementById('eventName').innerHTML = `<option value="">Select</option>`;
-            updateAgeGroupsAndGender();  // To reset subsequent dropdowns
-            return;
-        }
-
-        let names = competitionsData
-            .find(comp => comp.category === selectedCategory)
-            ?.competitions
-            ?.map(comp => comp.name) || [];
-
-        let nameSelect = document.getElementById('eventName');
-        nameSelect.innerHTML = `<option value="">Select</option>` + names
-            .map(name => `<option value="${name}">${name}</option>`)
-            .join('');
-
-        nameSelect.value = "";
-    }
-
-    document.getElementById('eventName').addEventListener('change', function () {
-        updateAgeGroupsAndGender();
-        updateWinnerInputSection(this.value);
+    // Registration flow event listeners
+    // Note: Registration type event listeners are attached in handleContinue when the section is shown
+    document.querySelectorAll('input[name="addAnother"]').forEach(radio => {
+        radio.addEventListener('change', handleAddAnotherChange);
     });
 
-    function updateAgeGroupsAndGender() {
-        let selectedCategory = document.getElementById('category').value;
-        let selectedName = document.getElementById('eventName').value;
-        if (!selectedCategory || !selectedName) {
-            document.getElementById('ageGroup').innerHTML = `<option value="">Select</option>`;
-            return;
-        }
+    const continueBtn = document.getElementById('continueBtn');
+    if (continueBtn) continueBtn.addEventListener('click', handleContinue);
 
-        let ageGroups = competitionsData
-            .find(comp => comp.category === selectedCategory)
-            ?.competitions
-            .find(comp => comp.name === selectedName)
-            ?.ageGroups || [];
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.addEventListener('click', handleBack);
 
-        let ageGroupSelect = document.getElementById('ageGroup');
-        ageGroupSelect.innerHTML = `<option value="">Select</option>` + `<option value="N/A">N/A</option>` + ageGroups
-            .map(ageGroup => `<option value="${ageGroup}">${ageGroup}</option>`)
-            .join('');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    if (addToCartBtn) addToCartBtn.addEventListener('click', handleAddToCart);
 
-        ageGroupSelect.value = "";
-    }
+    // Next Step button (appears after filling registration details)
+    const nextStepBtn = document.getElementById('nextStepBtn');
+    if (nextStepBtn) nextStepBtn.addEventListener('click', handleNextStep);
 
-    document.getElementById('eventConducted').addEventListener('change', function () {
-        var displayStyle = this.value === 'No' ? 'none' : 'block';
-        document.getElementById('firstPlaceSection').style.display = displayStyle;
-        document.getElementById('secondPlaceSection').style.display = displayStyle;
-    });
-
-    function updateWinnerInputSection(eventName) {
-        const numberOfWinners = findNumberOfWinners(eventName);
-        createWinnerInputs(numberOfWinners, 'firstPlaceContent', 'first');
-        createWinnerInputs(numberOfWinners, 'secondPlaceContent', 'second');
-        loadDataAndApplyAutocomplete();
-    }
-
-    function findNumberOfWinners(eventName) {
-        for (const category of competitionsData) {
-            for (const competition of category.competitions) {
-                if (competition.name === eventName) {
-                    return competition.numberOfWinners;
-                }
-            }
-        }
-        return 0; // Default to 0 if no match is found
-    }
-
-    function createWinnerInputs(numberOfWinners, containerId, positionPrefix) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            return; // Ensure winnerSection div exists
-        }
-
-        let inputHtml = '';
-        for (let i = 1; i <= numberOfWinners; i++) {
-            var labelPrefix = numberOfWinners === 1 ? '' : 'Player - ' + i + ' ';
-            inputHtml += `
-                <div class="mb-3">
-                <label for="${positionPrefix}PlaceName-${i}" class="form-label" style="font-weight: bold;">${labelPrefix}Name:</label>
-                <input type="text" id="${positionPrefix}PlaceName-${i}" class="form-control name-input">
-                </div>
-                <div class="mb-3">
-                <label for="${positionPrefix}PlaceApartment-${i}" class="form-label" style="font-weight: bold;">${labelPrefix}Apartment Number:</label>
-                <input type="text" id="${positionPrefix}PlaceApartment-${i}" class="form-control apartment-input">
-                </div>
-            `;
-        }
-        container.innerHTML = inputHtml;
-    }
-
-    winnersFormSubmitBtn.addEventListener("click", function (event) {
-        event.preventDefault();
-        document.getElementById("loadingSpinner").hidden = false; // Show spinner
-
-        if (!validateWinnerForm()) {
-            alert("Please review & fill in all required fields.");
-            document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            return false;
-        }
-
-        let winnerFormData = gatherWinnerFormData();
-
-        fetch(backendUrl + "?mode=winner", {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            headers: {
-                "Content-Type": "text/plain",
-            },
-            redirect: "follow",
-            body: JSON.stringify(winnerFormData),
-        })
-            .then((response) => response.text())
-            .then((result) => {
-                console.log(result);
-                const res = JSON.parse(result);
-                if (res.status === "success") {
-                    alert(`Entry submitted!`);
-                    resetAllInputFields();
-                } else {
-                    alert('Failed to submit entry.');
-                }
-                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            })
-            .catch((error) => {
-                console.error('Failed to submit entry:', error);
-                alert('Failed to submit entry. Check console for logs..');
-                document.getElementById("loadingSpinner").hidden = true; // Hide spinner
-            });
-
-    });
-
-    function validateWinnerForm() {
-        let isValid = true;
-
-        let dropdowns = ['category', 'eventName', 'ageGroup', 'genderFormat'];
-
-        dropdowns.forEach(id => {
-            let element = document.getElementById(id);
-            if (element.value === "") {
-                element.classList.add('error'); // Apply an error class for styling
-                isValid = false;
-            } else {
-                element.classList.remove('error'); // Remove error class if selection is valid
-            }
-        });
-
-        let shouldValidateWinnerInfo = document.getElementById('eventConducted').value === 'No' ? false : true;
-        if (shouldValidateWinnerInfo) {
-
-            // Validate all name fields
-            document.querySelectorAll('.name-input').forEach(input => {
-                if (!input.value.trim()) {
-                    input.style.borderColor = 'red';
-                    isValid = false;
-                } else {
-                    input.style.borderColor = 'initial';
-                }
-            });
-
-            // Validate all apartment fields
-            document.querySelectorAll('.apartment-input').forEach(input => {
-                if (!input.value.trim()) {
-                    input.style.borderColor = 'red';
-                    isValid = false;
-                } else {
-                    input.style.borderColor = 'initial';
-                }
-            });
-        }
-
-        return isValid;
-    }
-
-    function gatherWinnerFormData() {
-
-        const winnerInfo = {
-            firstPlace: [],
-            secondPlace: []
-        };
-
-        // Get all name and apartment inputs
-        const nameInputs = document.querySelectorAll('.name-input');
-        const apartmentInputs = document.querySelectorAll('.apartment-input');
-
-        // Assuming every name input has a corresponding apartment input
-        for (let i = 0; i < nameInputs.length; i++) {
-            const place = i % 2 === 0 ? 'firstPlace' : 'secondPlace';  // Alternate between first and second place
-            const entry = {
-                name: nameInputs[i].value.trim(),
-                apartment: apartmentInputs[i].value.trim()
-            };
-
-            // Push entry to the correct place
-            winnerInfo[place].push(entry);
-        }
-
-        let formData = {
-            category: document.getElementById('category').value,
-            eventName: document.getElementById('eventName').value,
-            ageGroup: document.getElementById('ageGroup').value,
-            genderFormat: document.getElementById('genderFormat').value,
-            firstPlace: winnerInfo.firstPlace,
-            secondPlace: winnerInfo.secondPlace,
-            additionalRemarks: document.getElementById('additionalRemarks').value,
-            adminEmail: localStorage.getItem('userEmail')
-        };
-
-        return formData;
-    }
+    // Checkout event listeners
+    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+    if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', handleFinalSubmit);
 });
+
+// Navigation function
+function switchSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.mobile-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    // Remove active from nav buttons
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    // Show selected section
+    document.getElementById(sectionName + '-section').classList.add('active');
+    // Add active to clicked button
+    document.getElementById('nav-' + sectionName).classList.add('active');
+
+    // Special handling for registration section - only when coming from checkout
+    if (sectionName === 'registration' && document.getElementById('checkout-section').classList.contains('active')) {
+        // When coming from checkout, show the "add another" section to continue the flow
+        document.getElementById('participantSection').style.display = 'none';
+        document.getElementById('actionButtonsSection').style.display = 'none';
+        document.getElementById('registrationTypeSection').style.display = 'none';
+        document.getElementById('competitionsSection').style.display = 'none';
+        document.getElementById('foodstallSection').style.display = 'none';
+        document.getElementById('nextStepSection').style.display = 'none';
+        document.getElementById('addAnotherSection').style.display = 'block';
+
+        // Show Add to Cart button for continuing the flow
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        if (addToCartBtn) addToCartBtn.style.display = 'inline-block';
+    }
+
+    // Special handling for checkout section
+    if (sectionName === 'checkout') {
+        // Reset payment option radio buttons when entering checkout
+        const paymentRadios = document.querySelectorAll('input[name="checkoutPaymentOption"]');
+        paymentRadios.forEach(radio => radio.checked = false);
+
+        updatePaymentTotal();
+    }
+}
 
 function resetAllInputFields() {
     const inputs = document.querySelectorAll("input");
@@ -745,7 +178,7 @@ function updateTotalAmountDisplay() {
 
     totalContainer.style.display = "none";
     if (option1Selected) {
-        const total = calculateFoodStallCount() * 700 + 600;
+        const total = calculateFoodStallCount() * 800 + 700;
         totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
         totalContainer.style.display = "block";
     }
@@ -766,6 +199,16 @@ function updateCompetitionsDisplay(selectedAgeGroup) {
     const container = document.getElementById("competitionsContainer");
     container.innerHTML = ""; // Clear current contents
 
+    if (!selectedAgeGroup) {
+        // Show message when no age group is selected
+        container.innerHTML = `
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> Please select an age group above to view available competitions.
+            </div>
+        `;
+        return;
+    }
+
     competitionsData.forEach((category) => {
         const categoryElem = document.createElement("div");
         categoryElem.classList.add("category-block");
@@ -783,7 +226,7 @@ function updateCompetitionsDisplay(selectedAgeGroup) {
                 const compElement = document.createElement("div");
                 compElement.className = "form-check";
                 compElement.innerHTML = `
-                    <input class="form-check-input" type="checkbox" id="${checkboxId}" name="competitions">
+                    <input class="form-check-input" type="checkbox" id="${checkboxId}" name="competitions" value="${comp.name}">
                     <label class="form-check-label" for="${checkboxId}">${comp.name}</label>
                 `;
 
@@ -858,5 +301,553 @@ function applyAutocompleteApartments(apartmentsData) {
     $("input[id^='firstPlaceApartment'], input[id^='secondPlaceApartment']").autocomplete({
         source: apartmentsData,
         minLength: 1
+    });
+}
+
+// Registration flow functions
+function resetRegistrationForm() {
+    const form = document.getElementById('registrationForm');
+    if (form) form.reset();
+
+    // Reset all sections visibility
+    document.getElementById('participantSection').style.display = 'block';
+    document.getElementById('actionButtonsSection').style.display = 'block';
+    document.getElementById('registrationTypeSection').style.display = 'none';
+    document.getElementById('competitionsSection').style.display = 'none';
+    document.getElementById('foodstallSection').style.display = 'none';
+    document.getElementById('nextStepSection').style.display = 'none';
+    document.getElementById('addAnotherSection').style.display = 'none';
+
+    // Reset button states
+    const continueBtn = document.getElementById('continueBtn');
+    const backBtn = document.getElementById('backBtn');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+
+    if (continueBtn) continueBtn.style.display = 'inline-block';
+    if (backBtn) backBtn.style.display = 'inline-block';
+    if (addToCartBtn) addToCartBtn.style.display = 'none';
+
+    currentRegistrationType = null;
+}
+
+function resetParticipantSpecificFields() {
+    // Only reset participant-specific fields, keep flat info for multiple registrations
+    const nameField = document.getElementById('name');
+    if (nameField) nameField.value = '';
+
+    // Reset gender radio buttons
+    const genderRadios = document.querySelectorAll('input[name="gender"]');
+    genderRadios.forEach(radio => radio.checked = false);
+
+    // Reset age group radio buttons
+    const ageGroupRadios = document.querySelectorAll('input[name="ageGroup"]');
+    ageGroupRadios.forEach(radio => radio.checked = false);
+
+    // Reset registration type radio buttons
+    const registrationTypeRadios = document.querySelectorAll('input[name="registrationType"]');
+    registrationTypeRadios.forEach(radio => radio.checked = false);
+
+    // Reset competitions checkboxes
+    const competitionCheckboxes = document.querySelectorAll('input[name="competitions"]');
+    competitionCheckboxes.forEach(checkbox => checkbox.checked = false);
+
+    // Reset food stall date checkboxes
+    const foodStallCheckboxes = document.querySelectorAll('input[id^="date-"]');
+    foodStallCheckboxes.forEach(checkbox => checkbox.checked = false);
+
+    // Reset food menu textarea
+    const foodMenuField = document.getElementById('foodMenu');
+    if (foodMenuField) foodMenuField.value = '';
+
+    // Reset all sections visibility back to participant section
+    document.getElementById('participantSection').style.display = 'block';
+    document.getElementById('actionButtonsSection').style.display = 'block';
+    document.getElementById('registrationTypeSection').style.display = 'none';
+    document.getElementById('competitionsSection').style.display = 'none';
+    document.getElementById('foodstallSection').style.display = 'none';
+    document.getElementById('nextStepSection').style.display = 'none';
+    document.getElementById('addAnotherSection').style.display = 'none';
+
+    // Reset button states
+    const continueBtn = document.getElementById('continueBtn');
+    const backBtn = document.getElementById('backBtn');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+
+    if (continueBtn) continueBtn.style.display = 'inline-block';
+    if (backBtn) backBtn.style.display = 'inline-block';
+    if (addToCartBtn) addToCartBtn.style.display = 'none';
+
+    currentRegistrationType = null;
+}
+
+function showParticipantSection() {
+    document.getElementById('participantSection').style.display = 'block';
+    document.getElementById('actionButtonsSection').style.display = 'block';
+    const continueBtn = document.getElementById('continueBtn');
+    if (continueBtn) {
+        continueBtn.style.display = 'inline-block';
+    }
+
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) backBtn.style.display = 'inline-block';
+}
+
+function handleAddAnotherChange() {
+    // This function is called when the user selects an option in the add another section
+    // The actual logic is handled in handleAddToCart when the user clicks "Add to Cart"
+}
+
+function handleRegistrationTypeChange() {
+    const selectedRadio = document.querySelector('input[name="registrationType"]:checked');
+    if (!selectedRadio) {
+        return;
+    }
+
+    currentRegistrationType = selectedRadio.value;
+
+    if (currentRegistrationType === 'competition') {
+        document.getElementById('competitionsSection').style.display = 'block';
+        document.getElementById('foodstallSection').style.display = 'none';
+    } else if (currentRegistrationType === 'foodstall') {
+        document.getElementById('foodstallSection').style.display = 'block';
+        document.getElementById('competitionsSection').style.display = 'none';
+    }
+
+    // Show the Next Step button when registration type is selected
+    const nextStepSection = document.getElementById('nextStepSection');
+    nextStepSection.style.display = 'block';
+}
+
+function handleNextStep() {
+    if (validateRegistrationDetails()) {
+        document.getElementById('registrationTypeSection').style.display = 'none';
+        document.getElementById('competitionsSection').style.display = 'none';
+        document.getElementById('foodstallSection').style.display = 'none';
+        document.getElementById('nextStepSection').style.display = 'none';
+        document.getElementById('addAnotherSection').style.display = 'block';
+
+        // Show the Add to Cart button
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        if (addToCartBtn) addToCartBtn.style.display = 'inline-block';
+    }
+}
+
+function validateRegistrationDetails() {
+    if (currentRegistrationType === 'competition') {
+        const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+        if (selectedCompetitions.length === 0) {
+            alert('Please select at least one competition.');
+            return false;
+        }
+    } else if (currentRegistrationType === 'foodstall') {
+        const selectedDates = document.querySelectorAll('input[id^="date-"]:checked');
+        if (selectedDates.length === 0) {
+            alert('Please select at least one date for your food stall.');
+            return false;
+        }
+
+        const foodMenu = document.getElementById('foodMenu').value.trim();
+        if (!foodMenu) {
+            alert('Please enter your food menu.');
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function handleContinue() {
+    if (validateParticipantForm()) {
+        // Hide participant section and show registration type selection
+        document.getElementById('participantSection').style.display = 'none';
+        document.getElementById('registrationTypeSection').style.display = 'block';
+        document.getElementById('nextStepSection').style.display = 'block'; // Show initially
+
+        // Attach event listeners to registration type radio buttons
+        const radioButtons = document.querySelectorAll('input[name="registrationType"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', handleRegistrationTypeChange);
+            radio.addEventListener('click', handleRegistrationTypeChange);
+        });
+
+        // Also attach to labels for better UX
+        const labels = document.querySelectorAll('label[for="competitionType"], label[for="foodstallType"]');
+        labels.forEach(label => {
+            label.addEventListener('click', function () {
+                setTimeout(handleRegistrationTypeChange, 10); // Small delay to let radio button update
+            });
+        });
+
+        // Update button states
+        const continueBtn = document.getElementById('continueBtn');
+        const backBtn = document.getElementById('backBtn');
+
+        if (continueBtn) continueBtn.style.display = 'none';
+        if (backBtn) backBtn.style.display = 'inline-block';
+    }
+}
+
+function handleBack() {
+    if (document.getElementById('addAnotherSection').style.display === 'block') {
+        // Go back to registration details
+        document.getElementById('addAnotherSection').style.display = 'none';
+        document.getElementById('nextStepSection').style.display = 'block';
+
+        // Show the appropriate section based on current registration type
+        if (currentRegistrationType === 'competition') {
+            document.getElementById('competitionsSection').style.display = 'block';
+        } else if (currentRegistrationType === 'foodstall') {
+            document.getElementById('foodstallSection').style.display = 'block';
+        }
+
+        // Hide Add to Cart button
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        if (addToCartBtn) addToCartBtn.style.display = 'none';
+
+    } else if (document.getElementById('nextStepSection').style.display === 'block' ||
+        document.getElementById('competitionsSection').style.display === 'block' ||
+        document.getElementById('foodstallSection').style.display === 'block') {
+        // Go back to registration type selection
+        document.getElementById('registrationTypeSection').style.display = 'block';
+        document.getElementById('competitionsSection').style.display = 'none';
+        document.getElementById('foodstallSection').style.display = 'none';
+        document.getElementById('nextStepSection').style.display = 'none';
+
+        // Reset registration type radio buttons when going back to registration type selection
+        const registrationTypeRadios = document.querySelectorAll('input[name="registrationType"]');
+        registrationTypeRadios.forEach(radio => radio.checked = false);
+
+    } else if (document.getElementById('registrationTypeSection').style.display === 'block') {
+        // Go back to participant info
+        document.getElementById('registrationTypeSection').style.display = 'none';
+        document.getElementById('participantSection').style.display = 'block';
+
+        // Reset age group radio buttons when going back to participant info
+        const ageGroupRadios = document.querySelectorAll('input[name="ageGroup"]');
+        ageGroupRadios.forEach(radio => radio.checked = false);
+        // Reset competitions display
+        updateCompetitionsDisplay(null);
+
+        // Show Continue button, hide Add to Cart button
+        const continueBtn = document.getElementById('continueBtn');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+
+        if (continueBtn) continueBtn.style.display = 'inline-block';
+        if (addToCartBtn) addToCartBtn.style.display = 'none';
+
+    } else {
+        switchSection('information');
+    }
+}
+
+function handleAddToCart() {
+    const addAnotherYes = document.getElementById('addAnotherYes').checked;
+    const addAnotherNo = document.getElementById('addAnotherNo').checked;
+
+    if (!addAnotherYes && !addAnotherNo) {
+        alert('Please select an option for adding another participant.');
+        return;
+    }
+
+    if (validateParticipantForm()) {
+        const participant = collectParticipantData();
+        registrationCart.push(participant);
+        saveCartToStorage();
+        updateCartDisplay();
+
+        if (addAnotherYes) {
+            // Reset only participant-specific fields and go back to participant info
+            resetParticipantSpecificFields();
+            showParticipantSection();
+        } else if (addAnotherNo) {
+            // Navigate to checkout
+            switchSection('checkout');
+        }
+    }
+}
+
+function validateParticipantForm() {
+    // Validate basic participant info
+    const name = document.getElementById('name') ? document.getElementById('name').value.trim() : '';
+    const flat = document.getElementById('flat') ? document.getElementById('flat').value.trim() : '';
+    const phone = document.getElementById('phoneNumber') ? document.getElementById('phoneNumber').value.trim() : '';
+
+    if (!name || !flat || !phone) {
+        alert('Please fill in all required participant information fields.');
+        return false;
+    }
+
+    return true;
+}
+
+function collectParticipantData() {
+    const data = {
+        name: document.getElementById('name').value.trim(),
+        flat: document.getElementById('flat').value.trim(),
+        phone: document.getElementById('phoneNumber').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        tower: document.getElementById('tower').value,
+        gender: document.querySelector('input[name="gender"]:checked').value,
+        ageGroup: document.querySelector('input[name="ageGroup"]:checked').value,
+        registrationType: currentRegistrationType,
+        timestamp: new Date().toISOString()
+    };
+
+    if (currentRegistrationType === 'competition') {
+        // Format competitions as array of objects with Category, Name, and Team Info
+        data.competitions = [];
+        const checkedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+
+        checkedCompetitions.forEach(cb => {
+            // Find the category for this competition
+            let category = '';
+            competitionsData.forEach(cat => {
+                const comp = cat.competitions.find(c => c.name === cb.value);
+                if (comp) {
+                    category = cat.category;
+                }
+            });
+
+            // Get team info if it's a team-based competition
+            let teamInfo = 'N/A';
+            const teamInputId = `team-comp-${cb.value.replace(/\s+/g, "-")}`;
+            const teamInput = document.getElementById(teamInputId);
+            if (teamInput && teamInput.value.trim()) {
+                teamInfo = teamInput.value.trim();
+            }
+
+            data.competitions.push({
+                Category: category,
+                Name: cb.value,
+                "Team Info": teamInfo
+            });
+        });
+    } else if (currentRegistrationType === 'foodstall') {
+        // Format food stalls as object with Menu and Dates
+        data.foodStalls = {
+            Menu: document.getElementById('foodMenu').value.trim(),
+            Dates: Array.from(document.querySelectorAll('input[id^="date-"]:checked')).map(cb => cb.value)
+        };
+    }
+
+    return data;
+}
+
+function saveCartToStorage() {
+    localStorage.setItem('registrationCart', JSON.stringify(registrationCart));
+}
+
+function updateCartDisplay() {
+    const cartTableBody = document.getElementById('cartTableBody');
+    if (!cartTableBody) return;
+
+    cartTableBody.innerHTML = '';
+
+    if (registrationCart.length === 0) {
+        cartTableBody.innerHTML = '<tr><td colspan="4" class="text-muted">No participants registered yet. Add participants from the Registration tab.</td></tr>';
+        document.getElementById('flatDisplay').style.display = 'none';
+        return;
+    }
+
+    // Display flat number
+    if (registrationCart.length > 0) {
+        const firstParticipant = registrationCart[0];
+        const flatDisplay = `${firstParticipant.tower} - ${firstParticipant.flat}`;
+        document.getElementById('flatNumberDisplay').textContent = flatDisplay;
+        document.getElementById('flatDisplay').style.display = 'block';
+    }
+
+    // Display cart items
+    registrationCart.forEach((participant, index) => {
+        const row = document.createElement('tr');
+
+        let details = '';
+
+        if (participant.registrationType === 'competition') {
+            details = participant.competitions.map(comp =>
+                `<div class="competition-item">
+                    <strong>${comp.Name}</strong> (${comp.Category})
+                    ${comp["Team Info"] !== 'N/A' ? `<br><small class="text-muted">Team: ${comp["Team Info"]}</small>` : ''}
+                </div>`
+            ).join('');
+        } else if (participant.registrationType === 'foodstall') {
+            details = `<div class="foodstall-item">
+                <strong>Menu:</strong> ${participant.foodStalls.Menu}
+                <br><strong>Dates:</strong> ${participant.foodStalls.Dates.map(date => `<span class="badge bg-secondary">${date}</span>`).join(' ')}
+            </div>`;
+        }
+
+        row.innerHTML = `
+            <td>${participant.name}</td>
+            <td>${participant.ageGroup}</td>
+            <td>${details}</td>
+            <td><button class="modern-btn" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button></td>
+        `;
+
+        cartTableBody.appendChild(row);
+    });
+
+    // Update total amount in payment section
+    updatePaymentTotal();
+}
+
+function updatePaymentTotal() {
+    const checkoutTotalCharge = document.getElementById('checkoutTotalCharge');
+    if (!checkoutTotalCharge) return;
+
+    let totalAmount = 0;
+    let hasCompetitions = false;
+    let foodStallDays = 0;
+
+    // Calculate totals
+    registrationCart.forEach((participant) => {
+        if (participant.registrationType === 'competition') {
+            hasCompetitions = true;
+        } else if (participant.registrationType === 'foodstall') {
+            foodStallDays += participant.foodStalls.Dates.length;
+        }
+    });
+
+    if (hasCompetitions) {
+        totalAmount += 700; // ₹700 flat fee for competitions per flat/family
+    }
+
+    if (foodStallDays > 0) {
+        totalAmount += foodStallDays * 800; // ₹800 per day for food stalls
+    }
+
+    checkoutTotalCharge.textContent = `Total Amount to be paid: INR ${totalAmount}`;
+}
+
+function removeFromCart(index) {
+    registrationCart.splice(index, 1);
+    saveCartToStorage();
+    updateCartDisplay();
+}
+
+function handleFinalSubmit() {
+    const rulesAccepted = document.getElementById('checkoutAcknowledge') ? document.getElementById('checkoutAcknowledge').checked : false;
+    const paymentMethod = document.querySelector('input[name="checkoutPaymentOption"]:checked');
+
+    if (!rulesAccepted) {
+        alert('Please accept the rules and regulations.');
+        return;
+    }
+
+    if (!paymentMethod) {
+        alert('Please select a payment method.');
+        return;
+    }
+
+    if (registrationCart.length === 0) {
+        alert('Your cart is empty. Please add participants first.');
+        return;
+    }
+
+    // Collect payment proof if required
+    const paymentData = {
+        method: paymentMethod.value,
+        proof: null
+    };
+
+    if (paymentMethod.value === 'I will pay for participation and/or food stall now.') {
+        const proofFile = document.getElementById('checkoutPaymentConfirmation');
+        if (proofFile && proofFile.files[0]) {
+            paymentData.proof = proofFile.files[0];
+        } else {
+            // COMMENTED OUT FOR TESTING - allow submission without payment proof
+            // alert('Please upload payment proof for payment.');
+            // return;
+        }
+    }
+
+    // Submit all registrations
+    submitAllRegistrations(paymentData);
+}
+
+async function submitAllRegistrations(paymentData) {
+    try {
+        // Show loading state
+        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+        if (finalSubmitBtn) {
+            finalSubmitBtn.disabled = true;
+            finalSubmitBtn.textContent = 'Submitting...';
+        }
+
+        // Handle payment proof - convert file to base64 once for all participants
+        let paymentProofBase64 = null;
+        let paymentProofType = null;
+        if (paymentData.proof) {
+            paymentProofBase64 = await fileToBase64(paymentData.proof);
+            paymentProofType = paymentData.proof.type;
+        }
+
+        // Prepare batch data with all participants
+        const batchData = {
+            participants: registrationCart,
+            paymentMethod: paymentData.method,
+            paymentProof: paymentProofBase64,
+            paymentProofType: paymentProofType
+        };
+
+        console.log('Submitting batch data:', batchData); // Debug log
+
+        const response = await fetch(backendUrl, {
+            method: 'POST',
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "text/plain",
+            },
+            redirect: "follow",
+            body: JSON.stringify(batchData)
+        });
+
+        console.log('Response status:', response.status); // Debug log
+        const result = await response.json();
+        console.log('Response data:', result); // Debug log
+
+        if (result.status === 'success' || result.status === 'partial_success') {
+            const successCount = result.results ? result.results.filter(r => r.status === 'success').length : registrationCart.length;
+            const totalCount = registrationCart.length;
+
+            if (result.status === 'success') {
+                alert('All registrations submitted successfully!');
+            } else {
+                alert(`${successCount}/${totalCount} registrations submitted successfully. Some failed - check console for details.`);
+            }
+
+            // Clear cart and redirect to dashboard regardless of partial failures
+            registrationCart = [];
+            saveCartToStorage();
+            updateCartDisplay();
+            switchSection('dashboard');
+        } else {
+            alert('Registration failed: ' + (result.error || 'Unknown error'));
+        }
+
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert('An error occurred during submission. Please try again.');
+    } finally {
+        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+        if (finalSubmitBtn) {
+            finalSubmitBtn.disabled = false;
+            finalSubmitBtn.textContent = 'Submit All Registrations';
+        }
+    }
+}
+
+// Helper function to convert file to base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+            const base64 = reader.result.split(',')[1];
+            resolve(base64);
+        };
+        reader.onerror = error => reject(error);
     });
 }
