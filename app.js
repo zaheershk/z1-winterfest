@@ -774,6 +774,16 @@ async function submitAllRegistrations(paymentData) {
             finalSubmitBtn.textContent = 'Submitting...';
         }
 
+        // Show loading overlay and spinner
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingOverlay) loadingOverlay.hidden = false;
+        if (loadingSpinner) loadingSpinner.hidden = false;
+
+        // Disable navigation buttons
+        const navButtons = document.querySelectorAll('.mobile-nav-btn');
+        navButtons.forEach(btn => btn.disabled = true);
+
         // Handle payment proof - convert file to base64 once for all participants
         let paymentProofBase64 = null;
         let paymentProofType = null;
@@ -833,8 +843,18 @@ async function submitAllRegistrations(paymentData) {
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
         if (finalSubmitBtn) {
             finalSubmitBtn.disabled = false;
-            finalSubmitBtn.textContent = 'Submit All Registrations';
+            finalSubmitBtn.textContent = 'Submit Registrations';
         }
+
+        // Hide loading overlay and spinner
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        if (loadingOverlay) loadingOverlay.hidden = true;
+        if (loadingSpinner) loadingSpinner.hidden = true;
+
+        // Re-enable navigation buttons
+        const navButtons = document.querySelectorAll('.mobile-nav-btn');
+        navButtons.forEach(btn => btn.disabled = false);
     }
 }
 
