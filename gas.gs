@@ -74,16 +74,19 @@ function processBatchSubmission(batchData) {
 
     // Process each participant
     const results = [];
+    
+    // Generate registration ID for this entire batch submission (same for all participants)
+    const registrationId = Utilities.formatDate(new Date(), 'GMT', 'yyyyMMddHHmmss') + '_' + Math.floor(Math.random() * 1000);
+    
     for (const participant of batchData.participants) {
       try {
         Logger.log('Processing participant: ' + JSON.stringify(participant));
 
-        // Generate unique ID for this participant
-        const uniqueId = Utilities.formatDate(new Date(), 'GMT', 'yyyyMMddHHmmss') + '_' + Math.floor(Math.random() * 1000);
+        // Use the same registration ID for all participants in this submission
 
         // Prepare the row data
         const rowData = [
-          uniqueId,
+          registrationId,
           participant.email || '',
           participant.name || '',
           participant.phone || '',
@@ -111,7 +114,7 @@ function processBatchSubmission(batchData) {
           Logger.log('Sheet "FormData" not found, creating it...');
           sheet = ss.insertSheet('FormData');
           const headers = [
-            'Unique ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age', 'Age Group',
+            'Registration ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age', 'Age Group',
             'Competitions', 'Food Stalls', 'Acknowledgement', 'Payment Method', 'Payment Proof URL',
             'Total Amount', 'Registration Date', 'Status'
           ];

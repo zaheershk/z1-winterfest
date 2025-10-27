@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbym2smzMABnem_IImW_iUiNgTsPZQhMRcv5MXUzyjDCxG8uf498og3_Eler2Zmhr7qn/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbwbCX1NnEqgEwGDXHs_o4EoBTSqGPkrw-q-zT7NUpJYV1brgsB4wV1yP6I-Ce-TBAeO/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
