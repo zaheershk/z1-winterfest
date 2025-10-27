@@ -1251,15 +1251,13 @@ function handleFinalSubmit() {
         totalAmount: totalAmount
     };
 
-    if (paymentMethod.value === 'I will pay for participation and/or food stall now.') {
-        const proofFile = document.getElementById('checkoutPaymentConfirmation');
-        if (proofFile && proofFile.files[0]) {
-            paymentData.proof = proofFile.files[0];
-        } else {
-            // COMMENTED OUT FOR TESTING - allow submission without payment proof
-            // alert('Please upload payment proof for payment.');
-            // return;
-        }
+    // Payment proof is required for both payment options
+    const proofFile = document.getElementById('checkoutPaymentConfirmation');
+    if (proofFile && proofFile.files[0]) {
+        paymentData.proof = proofFile.files[0];
+    } else {
+        alert('Please upload payment proof (screenshot) for verification.');
+        return;
     }
 
     // Submit all registrations
