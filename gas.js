@@ -124,12 +124,12 @@ function processBatchSubmission(batchData) {
 
         // Append the row
         sheet.appendRow(rowData);
-        Logger.log('Participant row appended successfully: ' + uniqueId);
+        Logger.log('Participant row appended successfully: ' + registrationId);
 
         results.push({
           participant: participant.name,
           status: 'success',
-          registrationId: uniqueId
+          registrationId: registrationId
         });
 
       } catch (participantError) {
@@ -166,7 +166,7 @@ function processBatchSubmission(batchData) {
   }
 }
 
-function uploadImageToDrive(base64Image, mimeType, uniqueId) {
+function uploadImageToDrive(base64Image, mimeType, registrationId) {
   try {
     // Determine file extension based on MIME type
     let extension = 'jpg';
@@ -176,7 +176,7 @@ function uploadImageToDrive(base64Image, mimeType, uniqueId) {
 
     // Decode base64 image
     const decodedBytes = Utilities.base64Decode(base64Image);
-    const blob = Utilities.newBlob(decodedBytes, mimeType, `payment_proof_${uniqueId}.${extension}`);
+    const blob = Utilities.newBlob(decodedBytes, mimeType, `payment_proof_${registrationId}.${extension}`);
 
     // Upload to Google Drive (create file in a specific folder)
     const folderId = '1epCI3H_dnfvsORby2YAt5fZfvRKrQVh9';

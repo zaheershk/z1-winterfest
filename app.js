@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbwbCX1NnEqgEwGDXHs_o4EoBTSqGPkrw-q-zT7NUpJYV1brgsB4wV1yP6I-Ce-TBAeO/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbzOyhXMFLx3yEM5bFf9UtOLx2v8qwPOp1RBZA52gALhDEWF3qaCKEJP3t2WAzu8g4lZ/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -606,7 +606,7 @@ function handleNextStep() {
 
         const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
         if (selectedCompetitions.length === 0) {
-            alert('Please select at least one competition.');
+            showAlertModal('Please select at least one competition.');
             return;
         }
 
@@ -636,13 +636,13 @@ function handleNextStep() {
         
         const selectedDates = document.querySelectorAll('input[id^="date-"]:checked');
         if (selectedDates.length === 0) {
-            alert('Please select at least one date for your food stall.');
+            showAlertModal('Please select at least one date for your food stall.');
             return;
         }
 
         const foodMenu = document.getElementById('foodMenu').value.trim();
         if (!foodMenu) {
-            alert('Please enter your food menu.');
+            showAlertModal('Please enter your food menu.');
             return;
         }
 
@@ -659,19 +659,19 @@ function validateRegistrationDetails() {
     if (currentRegistrationType === 'competition') {
         const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
         if (selectedCompetitions.length === 0) {
-            alert('Please select at least one competition.');
+            showAlertModal('Please select at least one competition.');
             return false;
         }
     } else if (currentRegistrationType === 'foodstall') {
         const selectedDates = document.querySelectorAll('input[id^="date-"]:checked');
         if (selectedDates.length === 0) {
-            alert('Please select at least one date for your food stall.');
+            showAlertModal('Please select at least one date for your food stall.');
             return false;
         }
 
         const foodMenu = document.getElementById('foodMenu').value.trim();
         if (!foodMenu) {
-            alert('Please enter your food menu.');
+            showAlertModal('Please enter your food menu.');
             return false;
         }
     }
@@ -788,7 +788,7 @@ function handleAddToCart() {
     const addAnotherNo = document.getElementById('addAnotherNo').checked;
 
     if (!addAnotherYes && !addAnotherNo) {
-        alert('Please select an option for adding another participant.');
+        showAlertModal('Please select an option for adding another participant.');
         return;
     }
 
@@ -827,17 +827,17 @@ function validateParticipantForm() {
     const gender = document.querySelector('input[name="gender"]:checked');
 
     if (!name || !flat || !phone || !email || !tower || !age) {
-        alert('Please fill in all required participant information fields.');
+        showAlertModal('Please fill in all required participant information fields.');
         return false;
     }
 
     if (!ageGroup) {
-        alert('Please select an age group.');
+        showAlertModal('Please select an age group.');
         return false;
     }
 
     if (!gender) {
-        alert('Please select a gender.');
+        showAlertModal('Please select a gender.');
         return false;
     }
 
@@ -854,25 +854,25 @@ function validateFoodStallForm() {
     const gender = document.querySelector('input[name="gender"]:checked');
 
     if (!name || !flat || !phone || !email || !tower) {
-        alert('Please fill in all required participant information fields.');
+        showAlertModal('Please fill in all required participant information fields.');
         return false;
     }
 
     if (!gender) {
-        alert('Please select a gender.');
+        showAlertModal('Please select a gender.');
         return false;
     }
 
     // Validate food stall specific fields
     const selectedDates = document.querySelectorAll('input[id^="date-"]:checked');
     if (selectedDates.length === 0) {
-        alert('Please select at least one date for your food stall.');
+        showAlertModal('Please select at least one date for your food stall.');
         return false;
     }
 
     const foodMenu = document.getElementById('foodMenu').value.trim();
     if (!foodMenu) {
-        alert('Please enter your food menu.');
+        showAlertModal('Please enter your food menu.');
         return false;
     }
 
@@ -1190,7 +1190,7 @@ function handleCheckoutNext() {
         // Moving from Acknowledgement to Payment
         const rulesAccepted = document.getElementById('checkoutAcknowledge') ? document.getElementById('checkoutAcknowledge').checked : false;
         if (!rulesAccepted) {
-            alert('Please accept the rules and regulations.');
+            showAlertModal('Please accept the rules and regulations.');
             return;
         }
         currentCheckoutStep = 3;
@@ -1215,17 +1215,17 @@ function handleFinalSubmit() {
     const paymentMethod = document.querySelector('input[name="checkoutPaymentOption"]:checked');
 
     if (!rulesAccepted) {
-        alert('Please accept the rules and regulations.');
+        showAlertModal('Please accept the rules and regulations.');
         return;
     }
 
     if (!paymentMethod) {
-        alert('Please select a payment method.');
+        showAlertModal('Please select a payment method.');
         return;
     }
 
     if (registrationCart.length === 0) {
-        alert('Your cart is empty. Please add participants first.');
+        showAlertModal('Your cart is empty. Please add participants first.');
         return;
     }
 
@@ -1234,7 +1234,7 @@ function handleFinalSubmit() {
         return !p.name || !p.email || !p.phone || !p.age;
     });
     if (invalidEntry) {
-        alert('One or more registrations in your cart are missing required participant information (name, email, phone or age). Please review the registrations before submitting.');
+        showAlertModal('One or more registrations in your cart are missing required participant information (name, email, phone or age). Please review the registrations before submitting.');
         // Optionally switch user back to registration tab for correction
         switchSection('registration');
         return;
@@ -1256,7 +1256,7 @@ function handleFinalSubmit() {
     if (proofFile && proofFile.files[0]) {
         paymentData.proof = proofFile.files[0];
     } else {
-        alert('Please upload payment proof (screenshot) for verification.');
+        showAlertModal('Please upload payment proof (screenshot) for verification.');
         return;
     }
 
@@ -1323,9 +1323,9 @@ async function submitAllRegistrations(paymentData) {
             const totalCount = registrationCart.length;
 
             if (result.status === 'success') {
-                alert('All registrations submitted successfully!');
+                showAlertModal('Registration submitted successfully!');
             } else {
-                alert(`${successCount}/${totalCount} registrations submitted successfully. Some failed - check console for details.`);
+                showAlertModal(`${successCount}/${totalCount} registrations submitted successfully. Some failed - check console for details.`);
             }
 
             // Clear cart and redirect to dashboard regardless of partial failures
@@ -1371,4 +1371,60 @@ function fileToBase64(file) {
         };
         reader.onerror = error => reject(error);
     });
+}
+
+// Custom Alert Modal Functions
+function showAlertModal(message, title = 'Alert') {
+    // Create modal HTML if it doesn't exist
+    let modal = document.getElementById('alertModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'alertModal';
+        modal.className = 'alert-modal';
+        modal.innerHTML = `
+            <div class="alert-modal-content">
+                <div class="alert-modal-header">
+                    <h3>${title}</h3>
+                    <span class="alert-modal-close" onclick="hideAlertModal()">&times;</span>
+                </div>
+                <div class="alert-modal-body">
+                    ${message}
+                </div>
+                <div class="alert-modal-footer">
+                    <button class="alert-modal-btn" onclick="hideAlertModal()">OK</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Add click outside to close
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                hideAlertModal();
+            }
+        });
+    } else {
+        // Update existing modal content
+        modal.querySelector('.alert-modal-header h3').textContent = title;
+        modal.querySelector('.alert-modal-body').innerHTML = message;
+    }
+
+    // Add click outside to close (for both static and dynamic modals)
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            hideAlertModal();
+        }
+    });
+
+    // Show modal
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+}
+
+function hideAlertModal() {
+    const modal = document.getElementById('alertModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
