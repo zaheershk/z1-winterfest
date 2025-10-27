@@ -598,7 +598,12 @@ function handleRegistrationTypeChange() {
 
 function handleNextStep() {
     if (document.getElementById('competitionsSection').style.display === 'block') {
-        // Coming from competitions - validate and go to add another
+        // Coming from competitions - validate participant info and selected competitions, then go to add another
+        // Ensure participant required fields are filled
+        if (!validateParticipantForm()) {
+            return;
+        }
+
         const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
         if (selectedCompetitions.length === 0) {
             alert('Please select at least one competition.');
@@ -1221,6 +1226,17 @@ function handleFinalSubmit() {
 
     if (registrationCart.length === 0) {
         alert('Your cart is empty. Please add participants first.');
+        return;
+    }
+
+    // Ensure all cart entries have required participant fields (extra guard before submission)
+    const invalidEntry = registrationCart.find(p => {
+        return !p.name || !p.email || !p.phone || !p.age;
+    });
+    if (invalidEntry) {
+        alert('One or more registrations in your cart are missing required participant information (name, email, phone or age). Please review the registrations before submitting.');
+        // Optionally switch user back to registration tab for correction
+        switchSection('registration');
         return;
     }
 
