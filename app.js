@@ -1032,19 +1032,29 @@ function updateCartDisplay() {
         cartTableBody.innerHTML = '<tr><td colspan="4" class="text-muted">No participants registered yet. Add participants from the Registration tab.</td></tr>';
         document.getElementById('flatDisplay').style.display = 'none';
         
-        // Hide submit button when no participants
+        // Hide submit button and register button when no participants
         const submitButtonContainer = document.getElementById('submitButtonContainer');
         if (submitButtonContainer) {
             submitButtonContainer.style.display = 'none';
         }
         
+        const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+        if (registerParticipantBtnCheckout) {
+            registerParticipantBtnCheckout.style.display = 'none';
+        }
+        
         return;
     }
 
-    // Show submit button when there are participants
+    // Show submit button and register button when there are participants
     const submitButtonContainer = document.getElementById('submitButtonContainer');
     if (submitButtonContainer) {
         submitButtonContainer.style.display = 'block';
+    }
+
+    const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+    if (registerParticipantBtnCheckout) {
+        registerParticipantBtnCheckout.style.display = 'inline-block';
     }
 
     // Display flat number
