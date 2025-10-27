@@ -74,8 +74,10 @@
                             <h1>Fees</h1>
                         </div>
                         <ul class="bullet-points">
-                            <li>Participation fee is <strong>Rs.700/- per flat.</strong> To be paid <strong>only once</strong>, irrespective of number of registrations from the flat.</li>
-                            <li>For Master Chef (18+), there is a <strong>refundable</strong> fee of <strong>Rs.1500/- per
+                            <li>Participation fee is <strong>Rs.700/- per flat.</strong> To be paid <strong>only
+                                    once</strong>, irrespective of number of registrations from the flat.</li>
+                            <li>For Master Chef (18+), there is a <strong>refundable</strong> fee of <strong>Rs.1500/-
+                                    per
                                     participant.</strong> This is to ensure commitment to the competition as it requires
                                 several provisions to be arranged.</li>
                             <li>For Food Stall, the fee is <strong>Rs. 800/- per day
@@ -376,7 +378,8 @@
                         <div class="section-header">
                             <h3>Registration Summary</h3>
                         </div>
-                        <div id="flatDisplay" class="mb-3 d-flex justify-content-between align-items-center" style="display: none;">
+                        <div id="flatDisplay" class="mb-3 d-flex justify-content-between align-items-center"
+                            style="display: none;">
                             <strong style="color: #2e8b57; text-decoration: underline;"><span
                                     id="flatNumberDisplay"></span></strong>
                             <button class="green-btn btn-sm" id="registerParticipantBtnCheckout" style="display: none;">
@@ -415,7 +418,8 @@
                                 <li>Participants must be residents of Z1.</li>
                                 <li>Participants can only play in their own age category as specified for that event.
                                 </li>
-                                <li>For age validation (if required), organizers may request for age proof of participants.</li>
+                                <li>For age validation (if required), organizers may request for age proof of
+                                    participants.</li>
                                 <li>Participants must arrive on time as per schedule.</li>
                                 <li>If an event doesn't have a minimum of 4 individual/ team participation, it will be
                                     canceled.</li>
@@ -533,7 +537,61 @@
                         <h2>Dashboard</h2>
                     </div>
 
-                    <p><strong style="color: #8B4513;">Coming soon!</strong></p>
+                    <!-- Search Form -->
+                    <section class="mb-3">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-5">
+                                <label for="dashboardApartment" class="form-label"
+                                    style="font-weight: bold;">Apartment</label>
+                                <input type="text" class="form-control" id="dashboardApartment"
+                                    placeholder="Start typing apartment (Tower - Flat)">
+                            </div>
+                            <div class="col-md-5">
+                                <label for="dashboardName" class="form-label" style="font-weight: bold;">Name</label>
+                                <input type="text" class="form-control" id="dashboardName"
+                                    placeholder="Enter name (minimum 5 characters)">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="modern-btn w-100 d-flex align-items-center justify-content-center" id="dashboardSearchBtn" style="height: 38px;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">Either Apartment or Name is required for search.</small>
+                        </div>
+                    </section>
+
+                    <!-- Search Results -->
+                    <section class="mb-3" id="dashboardResultsSection" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div id="dashboardFlatDisplay" style="display: none;">
+                                <strong style="color: #2e8b57; text-decoration: underline;">
+                                    <span id="dashboardFlatNumberDisplay"></span>
+                                </strong>
+                            </div>
+                            <button class="green-btn" id="dashboardRegisterBtn" style="display: none;">
+                                <i class="fas fa-user-plus"></i> Register
+                            </button>
+                        </div>
+                        <div id="dashboardResults" class="table-responsive">
+                            <table class="table table-striped" id="dashboardTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Age Group</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardTableBody">
+                                    <tr>
+                                        <td colspan="3" class="text-muted">No results found. Try adjusting your search
+                                            criteria.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
             </section>
 

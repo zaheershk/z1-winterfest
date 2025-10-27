@@ -2,13 +2,29 @@
 const registrationWorkbookId = '1k6k68Upe41ct_hwa-1VQbnCN6rtFiPZXSal_uPYMOfg';
 
 function doGet(e) {
-  // Simple test endpoint to verify the script is working
-  return ContentService.createTextOutput(JSON.stringify({
-    status: 'success',
-    message: 'GAS script is working',
-    timestamp: new Date().toISOString()
-  }))
-  .setMimeType(ContentService.MimeType.JSON);
+  try {
+    // Check if this is a search request
+    if (e.parameter && (e.parameter.towerFlat || e.parameter.name || e.parameter.apartments)) {
+      if (e.parameter.apartments === 'true') {
+        // Return unique tower-flat combinations for dropdown
+        return getApartmentsList();
+      } else {
+        // Perform search
+        return searchRegistrations(e.parameter);
+      }
+    }
+
+    // Default test endpoint
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success',
+      message: 'GAS script is working',
+      timestamp: new Date().toISOString()
+    }))
+    .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    Logger.log('doGet error: ' + error.toString());
+    return errorResponse('Internal server error: ' + error.toString());
+  }
 }
 
 function doPost(e) {
@@ -82,11 +98,9 @@ function processBatchSubmission(batchData) {
       try {
         Logger.log('Processing participant: ' + JSON.stringify(participant));
 
-        // Use the same registration ID for all participants in this submission
-
         // Prepare the row data
         const rowData = [
-          registrationId,
+          registrationId, // Use the same registration ID for all participants in this submission
           participant.email || '',
           participant.name || '',
           participant.phone || '',
@@ -94,7 +108,7 @@ function processBatchSubmission(batchData) {
           participant.flat || '',
           participant.gender || '',
           participant.age || '',
-          participant.ageGroup || '',
+          participant.ageGroup ? "'" + participant.ageGroup : '', // Force as text to prevent date formatting
           JSON.stringify(participant.competitions || []),
           JSON.stringify(participant.foodStalls || {}),
           participant.acknowledgement || false,
@@ -204,5 +218,125 @@ function errorResponse(msg) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function searchRegistrations(params) {
+  try {
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    const sheet = ss.getSheetByName('FormData');
+
+    if (!sheet) {
+      return errorResponse('FormData sheet not found');
+    }
+
+    const data = sheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return dataResponse({ status: 'success', data: [] });
+    }
+
+    // Get headers
+    const headers = data[0];
+    const towerIndex = headers.indexOf('Tower');
+    const flatIndex = headers.indexOf('Flat');
+    const nameIndex = headers.indexOf('Name');
+    const emailIndex = headers.indexOf('Email');
+    const phoneIndex = headers.indexOf('Phone');
+    const genderIndex = headers.indexOf('Gender');
+    const ageIndex = headers.indexOf('Age');
+    const ageGroupIndex = headers.indexOf('Age Group');
+    const competitionsIndex = headers.indexOf('Competitions');
+    const foodStallsIndex = headers.indexOf('Food Stalls');
+    const registrationDateIndex = headers.indexOf('Registration Date');
+    const statusIndex = headers.indexOf('Status');
+
+    let results = [];
+
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      let match = false;
+
+      // Check tower-flat search
+      if (params.towerFlat) {
+        const [searchTower, searchFlat] = params.towerFlat.split(' - ');
+        if (row[towerIndex] === searchTower && row[flatIndex] == searchFlat) {
+          match = true;
+        }
+      }
+
+      // Check name search (case-insensitive, minimum 5 characters)
+      if (params.name && params.name.length >= 5) {
+        const searchName = params.name.toLowerCase();
+        const rowName = (row[nameIndex] || '').toString().toLowerCase();
+        if (rowName.includes(searchName)) {
+          match = true;
+        }
+      }
+
+      if (match) {
+        results.push({
+          registrationId: row[0], // Registration ID
+          email: row[emailIndex],
+          name: row[nameIndex],
+          phone: row[phoneIndex],
+          tower: row[towerIndex],
+          flat: row[flatIndex],
+          gender: row[genderIndex],
+          age: row[ageIndex],
+          ageGroup: row[ageGroupIndex],
+          competitions: row[competitionsIndex],
+          foodStalls: row[foodStallsIndex],
+          registrationDate: row[registrationDateIndex],
+          status: row[statusIndex]
+        });
+      }
+    }
+
+    return dataResponse({ status: 'success', data: results });
+  } catch (error) {
+    Logger.log('Search error: ' + error.toString());
+    return errorResponse('Search failed: ' + error.toString());
+  }
+}
+
+function getApartmentsList() {
+  try {
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    const sheet = ss.getSheetByName('FormData');
+
+    if (!sheet) {
+      return errorResponse('FormData sheet not found');
+    }
+
+    const data = sheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return dataResponse({ status: 'success', data: [] });
+    }
+
+    // Get headers
+    const headers = data[0];
+    const towerIndex = headers.indexOf('Tower');
+    const flatIndex = headers.indexOf('Flat');
+
+    let apartments = new Set();
+
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const tower = row[towerIndex];
+      const flat = row[flatIndex];
+
+      if (tower && flat) {
+        apartments.add(`${tower} - ${flat}`);
+      }
+    }
+
+    // Convert to sorted array
+    const sortedApartments = Array.from(apartments).sort();
+
+    return dataResponse({ status: 'success', data: sortedApartments });
+  } catch (error) {
+    Logger.log('Get apartments error: ' + error.toString());
+    return errorResponse('Failed to get apartments: ' + error.toString());
+  }
+}
 
 

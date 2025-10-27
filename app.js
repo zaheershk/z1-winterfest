@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbzOyhXMFLx3yEM5bFf9UtOLx2v8qwPOp1RBZA52gALhDEWF3qaCKEJP3t2WAzu8g4lZ/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbzYk3pcRGQF5YVCuy0nze0yyOOdRalof9aPJQHIMG6uGAPRmyp0bM6WtqGuwZOCu3hQ/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -185,6 +185,9 @@ function switchSection(sectionName) {
     if (sectionName === 'registration' && document.getElementById('checkout-section').classList.contains('active')) {
         // When coming from checkout, reset the entire form
         resetRegistrationForm();
+    } else if (sectionName === 'registration') {
+        // When coming from other sections (like dashboard), prefill if needed
+        prefillRegistrationFromDashboard();
     }
 
     // Special handling for checkout section
@@ -201,6 +204,11 @@ function switchSection(sectionName) {
         paymentRadios.forEach(radio => radio.checked = false);
 
         updatePaymentTotal();
+    }
+
+    // Special handling for dashboard section
+    if (sectionName === 'dashboard') {
+        initializeDashboard();
     }
 }
 
@@ -1426,5 +1434,259 @@ function hideAlertModal() {
     const modal = document.getElementById('alertModal');
     if (modal) {
         modal.style.display = 'none';
+    }
+}
+
+// Dashboard functionality
+let dashboardApartments = [];
+
+async function initializeDashboard() {
+    // Load apartments for autocomplete
+    await loadApartmentsForDashboard();
+
+    // Setup event listeners
+    setupDashboardEventListeners();
+
+    // Clear any previous search results
+    clearDashboardResults();
+}
+
+async function loadApartmentsForDashboard() {
+    try {
+        const response = await fetch(`${backendUrl}?apartments=true`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            dashboardApartments = result.data;
+
+            // Setup autocomplete for apartment input
+            setupApartmentAutocomplete();
+        } else {
+            console.error('Failed to load apartments:', result.error);
+        }
+    } catch (error) {
+        console.error('Error loading apartments:', error);
+    }
+}
+
+function setupApartmentAutocomplete() {
+    const apartmentInput = document.getElementById('dashboardApartment');
+
+    if (apartmentInput && window.jQuery) {
+        $(apartmentInput).autocomplete({
+            source: dashboardApartments,
+            minLength: 1,
+            select: function(event, ui) {
+                apartmentInput.value = ui.item.value;
+            }
+        });
+    }
+}
+
+function setupDashboardEventListeners() {
+    const searchBtn = document.getElementById('dashboardSearchBtn');
+    const registerBtn = document.getElementById('dashboardRegisterBtn');
+    const nameInput = document.getElementById('dashboardName');
+    const apartmentInput = document.getElementById('dashboardApartment');
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', performDashboardSearch);
+    }
+
+    if (registerBtn) {
+        registerBtn.addEventListener('click', handleDashboardRegister);
+    }
+
+    // Allow Enter key to trigger search
+    if (nameInput) {
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performDashboardSearch();
+            }
+        });
+    }
+
+    if (apartmentInput) {
+        apartmentInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performDashboardSearch();
+            }
+        });
+    }
+}
+
+async function performDashboardSearch() {
+    const apartmentInput = document.getElementById('dashboardApartment');
+    const nameInput = document.getElementById('dashboardName');
+
+    const towerFlat = apartmentInput ? apartmentInput.value.trim() : '';
+    const name = nameInput ? nameInput.value.trim() : '';
+
+    // Validate input
+    if (!towerFlat && (!name || name.length < 5)) {
+        showAlertModal('Please enter either an apartment or a name (minimum 5 characters).');
+        return;
+    }
+
+    // Show loading
+    const searchBtn = document.getElementById('dashboardSearchBtn');
+    if (searchBtn) {
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+    }
+
+    try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (towerFlat) params.append('towerFlat', towerFlat);
+        if (name) params.append('name', name);
+
+        const response = await fetch(`${backendUrl}?${params.toString()}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            displayDashboardResults(result.data, towerFlat);
+        } else {
+            showAlertModal('Search failed: ' + (result.error || 'Unknown error'));
+            clearDashboardResults();
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+        showAlertModal('An error occurred during search. Please try again.');
+        clearDashboardResults();
+    } finally {
+        // Hide loading
+        if (searchBtn) {
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+        }
+    }
+}
+
+function displayDashboardResults(data, searchTowerFlat) {
+    const resultsSection = document.getElementById('dashboardResultsSection');
+    const tableBody = document.getElementById('dashboardTableBody');
+    const flatDisplay = document.getElementById('dashboardFlatDisplay');
+    const flatNumberDisplay = document.getElementById('dashboardFlatNumberDisplay');
+    const registerBtn = document.getElementById('dashboardRegisterBtn');
+
+    if (!tableBody) return;
+
+    tableBody.innerHTML = '';
+
+    if (data.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="3" class="text-muted">No results found. Try adjusting your search criteria.</td></tr>';
+        resultsSection.style.display = 'none';
+        return;
+    }
+
+    // Show results section
+    resultsSection.style.display = 'block';
+
+    // Show flat display and register button if we have tower-flat search
+    if (searchTowerFlat) {
+        flatNumberDisplay.textContent = searchTowerFlat;
+        flatDisplay.style.display = 'block';
+        registerBtn.style.display = 'inline-block';
+    } else {
+        flatDisplay.style.display = 'none';
+        registerBtn.style.display = 'none';
+    }
+
+    // Display results
+    data.forEach(registration => {
+        const row = document.createElement('tr');
+
+        let details = '';
+
+        if (registration.competitions) {
+            try {
+                const comps = JSON.parse(registration.competitions);
+                if (Array.isArray(comps)) {
+                    details = comps.map(comp =>
+                        `<div class="competition-item">
+                            <strong>${comp.Name}</strong> (${comp.Category})
+                            ${comp["Team Info"] !== 'N/A' ? `<br><small class="text-muted">Team: ${comp["Team Info"]}</small>` : ''}
+                        </div>`
+                    ).join('');
+                }
+            } catch (e) {
+                details = registration.competitions;
+            }
+        } else if (registration.foodStalls) {
+            try {
+                const foodData = JSON.parse(registration.foodStalls);
+                details = `<div class="foodstall-item">
+                    <strong>Menu:</strong> ${foodData.Menu}
+                    <br><strong>Dates:</strong> ${foodData.Dates.map(date => `<span class="badge bg-secondary">${date}</span>`).join(' ')}
+                </div>`;
+            } catch (e) {
+                details = registration.foodStalls;
+            }
+        }
+
+        const regDate = new Date(registration.registrationDate).toLocaleDateString();
+
+        row.innerHTML = `
+            <td>${registration.name}</td>
+            <td>${registration.ageGroup}</td>
+            <td>${details}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
+}
+
+function clearDashboardResults() {
+    const resultsSection = document.getElementById('dashboardResultsSection');
+    const tableBody = document.getElementById('dashboardTableBody');
+    const flatDisplay = document.getElementById('dashboardFlatDisplay');
+    const registerBtn = document.getElementById('dashboardRegisterBtn');
+
+    if (resultsSection) resultsSection.style.display = 'none';
+    if (tableBody) tableBody.innerHTML = '<tr><td colspan="3" class="text-muted">No results found. Try adjusting your search criteria.</td></tr>';
+    if (flatDisplay) flatDisplay.style.display = 'none';
+    if (registerBtn) registerBtn.style.display = 'none';
+}
+
+function handleDashboardRegister() {
+    const apartmentInput = document.getElementById('dashboardApartment');
+    if (!apartmentInput || !apartmentInput.value.trim()) {
+        showAlertModal('No apartment selected for registration.');
+        return;
+    }
+
+    const [tower, flat] = apartmentInput.value.split(' - ');
+
+    // Store the tower and flat for pre-filling
+    sessionStorage.setItem('dashboardTower', tower);
+    sessionStorage.setItem('dashboardFlat', flat);
+
+    // Switch to registration section
+    switchSection('registration');
+}
+
+// Function to pre-fill registration form from dashboard
+function prefillRegistrationFromDashboard() {
+    const tower = sessionStorage.getItem('dashboardTower');
+    const flat = sessionStorage.getItem('dashboardFlat');
+
+    if (tower && flat) {
+        const towerField = document.getElementById('tower');
+        const flatField = document.getElementById('flat');
+
+        if (towerField) {
+            towerField.value = tower;
+            towerField.disabled = true; // Lock the field
+        }
+
+        if (flatField) {
+            flatField.value = flat;
+            flatField.disabled = true; // Lock the field
+        }
+
+        // Clear the session storage
+        sessionStorage.removeItem('dashboardTower');
+        sessionStorage.removeItem('dashboardFlat');
     }
 }
