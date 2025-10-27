@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbxgDxv3yP4VJDnZkSwsxPStppQFGATZHADxUww15JIFScGOMEvtxFE4n1O7d9sf2v6S/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbym2smzMABnem_IImW_iUiNgTsPZQhMRcv5MXUzyjDCxG8uf498og3_Eler2Zmhr7qn/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -10,6 +10,7 @@ let registrationCart = [];
 
 // Registration flow state
 let currentRegistrationType = null;
+let currentCheckoutStep = 1; // 1: Summary, 2: Acknowledgement, 3: Payment
 
 const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
@@ -75,10 +76,65 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Checkout tab - Register Participant button
+    const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+    if (registerParticipantBtnCheckout) {
+        registerParticipantBtnCheckout.addEventListener('click', function () {
+            // Set tower and flat from existing cart data before resetting
+            if (registrationCart.length > 0) {
+                const firstParticipant = registrationCart[0];
+                const towerField = document.getElementById('tower');
+                const flatField = document.getElementById('flat');
+                if (towerField) towerField.value = firstParticipant.tower;
+                if (flatField) flatField.value = firstParticipant.flat;
+            }
+            
+            // Reset registration sections visibility (similar to resetRegistrationForm but keep tower/flat disabled)
+            const participantSection = document.getElementById('participantSection');
+            const actionButtonsSection = document.getElementById('actionButtonsSection');
+            const registrationTypeSection = document.getElementById('registrationTypeSection');
+            const competitionsSection = document.getElementById('competitionsSection');
+            const foodstallSection = document.getElementById('foodstallSection');
+            const nextStepSection = document.getElementById('nextStepSection');
+            const addAnotherSection = document.getElementById('addAnotherSection');
+            const foodStallQuestionSection = document.getElementById('foodStallQuestionSection');
+
+            if (participantSection) participantSection.style.display = 'block';
+            if (actionButtonsSection) actionButtonsSection.style.display = 'block';
+            if (registrationTypeSection) registrationTypeSection.style.display = 'none';
+            if (competitionsSection) competitionsSection.style.display = 'none';
+            if (foodstallSection) foodstallSection.style.display = 'none';
+            if (nextStepSection) nextStepSection.style.display = 'none';
+            if (addAnotherSection) addAnotherSection.style.display = 'none';
+            if (foodStallQuestionSection) foodStallQuestionSection.style.display = 'none';
+
+            // Reset button states
+            const continueBtn = document.getElementById('continueBtn');
+            const backBtn = document.getElementById('backBtn');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            if (continueBtn) continueBtn.style.display = 'inline-block';
+            if (backBtn) backBtn.style.display = 'none';
+            if (addToCartBtn) addToCartBtn.style.display = 'none';
+
+            // Reset flow state
+            currentRegistrationType = null;
+            updateCompetitionsDisplay(null);
+
+            switchSection('registration');
+            resetParticipantSpecificFields();
+            showParticipantSection();
+        });
+    }
+
     // Registration flow event listeners
     // Note: Registration type event listeners are attached in handleContinue when the section is shown
     document.querySelectorAll('input[name="addAnother"]').forEach(radio => {
         radio.addEventListener('change', handleAddAnotherChange);
+    });
+
+    // Food stall question event listeners
+    document.querySelectorAll('input[name="foodStallInterest"]').forEach(radio => {
+        radio.addEventListener('change', handleFoodStallInterestChange);
     });
 
     const continueBtn = document.getElementById('continueBtn');
@@ -88,7 +144,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (backBtn) backBtn.addEventListener('click', handleBack);
 
     const addToCartBtn = document.getElementById('addToCartBtn');
-    if (addToCartBtn) addToCartBtn.addEventListener('click', handleAddToCart);
+    // Removed event listener since we moved logic to radio button change
+    // if (addToCartBtn) addToCartBtn.addEventListener('click', handleAddToCart);
+
+    // Checkout navigation event listeners
+    const checkoutNextBtn = document.getElementById('checkoutNextBtn');
+    if (checkoutNextBtn) checkoutNextBtn.addEventListener('click', handleCheckoutNext);
+
+    const checkoutBackBtn = document.getElementById('checkoutBackBtn');
+    if (checkoutBackBtn) checkoutBackBtn.addEventListener('click', handleCheckoutBack);
+
+    const paymentBackBtn = document.getElementById('paymentBackBtn');
+    if (paymentBackBtn) paymentBackBtn.addEventListener('click', handleCheckoutBack);
 
     // Next Step button (appears after filling registration details)
     const nextStepBtn = document.getElementById('nextStepBtn');
@@ -116,22 +183,19 @@ function switchSection(sectionName) {
 
     // Special handling for registration section - only when coming from checkout
     if (sectionName === 'registration' && document.getElementById('checkout-section').classList.contains('active')) {
-        // When coming from checkout, show the "add another" section to continue the flow
-        document.getElementById('participantSection').style.display = 'none';
-        document.getElementById('actionButtonsSection').style.display = 'none';
-        document.getElementById('registrationTypeSection').style.display = 'none';
-        document.getElementById('competitionsSection').style.display = 'none';
-        document.getElementById('foodstallSection').style.display = 'none';
-        document.getElementById('nextStepSection').style.display = 'none';
-        document.getElementById('addAnotherSection').style.display = 'block';
-
-        // Show Add to Cart button for continuing the flow
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        if (addToCartBtn) addToCartBtn.style.display = 'inline-block';
+        // When coming from checkout, reset the entire form
+        resetRegistrationForm();
     }
 
     // Special handling for checkout section
     if (sectionName === 'checkout') {
+        // Reset to first step of checkout wizard
+        currentCheckoutStep = 1;
+        updateCheckoutStepVisibility();
+
+        // Deduplicate cart before showing checkout to prevent duplicate entries
+        deduplicateCart();
+
         // Reset payment option radio buttons when entering checkout
         const paymentRadios = document.querySelectorAll('input[name="checkoutPaymentOption"]');
         paymentRadios.forEach(radio => radio.checked = false);
@@ -266,7 +330,29 @@ function updateCompetitionsDisplay(selectedAgeGroup) {
     });
 }
 
-function loadDataAndApplyAutocomplete() {
+function handleAgeGroupChange(selectedAgeGroup) {
+    // Update competitions display
+    updateCompetitionsDisplay(selectedAgeGroup);
+
+    // Show appropriate section based on registration type
+    if (selectedAgeGroup) {
+        if (currentRegistrationType === 'foodstall') {
+            // In food stall mode - show food stall section directly
+            document.getElementById('foodstallSection').style.display = 'block';
+            document.getElementById('nextStepSection').style.display = 'block';
+            // Hide action buttons
+            document.getElementById('actionButtonsSection').style.display = 'none';
+        } else {
+            // Default competition flow
+            document.getElementById('competitionsSection').style.display = 'block';
+            document.getElementById('nextStepSection').style.display = 'block';
+            // Hide action buttons when showing competitions
+            document.getElementById('actionButtonsSection').style.display = 'none';
+            // Set registration type for competitions
+            currentRegistrationType = 'competition';
+        }
+    }
+}function loadDataAndApplyAutocomplete() {
     let allNames = localStorage.getItem('allNames');
     let allApartments = localStorage.getItem('allApartments');
 
@@ -309,22 +395,38 @@ function resetRegistrationForm() {
     const form = document.getElementById('registrationForm');
     if (form) form.reset();
 
+    // Enable Tower and Flat fields for new registration
+    const towerField = document.getElementById('tower');
+    const flatField = document.getElementById('flat');
+    if (towerField) towerField.disabled = false;
+    if (flatField) flatField.disabled = false;
+
     // Reset all sections visibility
-    document.getElementById('participantSection').style.display = 'block';
-    document.getElementById('actionButtonsSection').style.display = 'block';
-    document.getElementById('registrationTypeSection').style.display = 'none';
-    document.getElementById('competitionsSection').style.display = 'none';
-    document.getElementById('foodstallSection').style.display = 'none';
-    document.getElementById('nextStepSection').style.display = 'none';
-    document.getElementById('addAnotherSection').style.display = 'none';
+    const participantSection = document.getElementById('participantSection');
+    const actionButtonsSection = document.getElementById('actionButtonsSection');
+    const registrationTypeSection = document.getElementById('registrationTypeSection');
+    const competitionsSection = document.getElementById('competitionsSection');
+    const foodstallSection = document.getElementById('foodstallSection');
+    const nextStepSection = document.getElementById('nextStepSection');
+    const addAnotherSection = document.getElementById('addAnotherSection');
+    const foodStallQuestionSection = document.getElementById('foodStallQuestionSection');
+
+    if (participantSection) participantSection.style.display = 'block';
+    if (actionButtonsSection) actionButtonsSection.style.display = 'block';
+    if (registrationTypeSection) registrationTypeSection.style.display = 'none';
+    if (competitionsSection) competitionsSection.style.display = 'none';
+    if (foodstallSection) foodstallSection.style.display = 'none';
+    if (nextStepSection) nextStepSection.style.display = 'none';
+    if (addAnotherSection) addAnotherSection.style.display = 'none';
+    if (foodStallQuestionSection) foodStallQuestionSection.style.display = 'none';
 
     // Reset button states
     const continueBtn = document.getElementById('continueBtn');
     const backBtn = document.getElementById('backBtn');
     const addToCartBtn = document.getElementById('addToCartBtn');
 
-    if (continueBtn) continueBtn.style.display = 'inline-block';
-    if (backBtn) backBtn.style.display = 'inline-block';
+    if (continueBtn) continueBtn.style.display = 'inline-flex';
+    if (backBtn) backBtn.style.display = 'none';
     if (addToCartBtn) addToCartBtn.style.display = 'none';
 
     currentRegistrationType = null;
@@ -334,6 +436,16 @@ function resetParticipantSpecificFields() {
     // Only reset participant-specific fields, keep flat info for multiple registrations
     const nameField = document.getElementById('name');
     if (nameField) nameField.value = '';
+
+    // Reset age field
+    const ageField = document.getElementById('age');
+    if (ageField) ageField.value = '';
+
+    // Lock Tower and Flat fields to prevent changes during multi-participant registration
+    const towerField = document.getElementById('tower');
+    const flatField = document.getElementById('flat');
+    if (towerField) towerField.disabled = true;
+    if (flatField) flatField.disabled = true;
 
     // Reset gender radio buttons
     const genderRadios = document.querySelectorAll('input[name="gender"]');
@@ -346,6 +458,14 @@ function resetParticipantSpecificFields() {
     // Reset registration type radio buttons
     const registrationTypeRadios = document.querySelectorAll('input[name="registrationType"]');
     registrationTypeRadios.forEach(radio => radio.checked = false);
+
+    // Reset add another radio buttons
+    const addAnotherRadios = document.querySelectorAll('input[name="addAnother"]');
+    addAnotherRadios.forEach(radio => radio.checked = false);
+
+    // Reset food stall interest radio buttons
+    const foodStallInterestRadios = document.querySelectorAll('input[name="foodStallInterest"]');
+    foodStallInterestRadios.forEach(radio => radio.checked = false);
 
     // Reset competitions checkboxes
     const competitionCheckboxes = document.querySelectorAll('input[name="competitions"]');
@@ -365,7 +485,6 @@ function resetParticipantSpecificFields() {
     document.getElementById('registrationTypeSection').style.display = 'none';
     document.getElementById('competitionsSection').style.display = 'none';
     document.getElementById('foodstallSection').style.display = 'none';
-    document.getElementById('nextStepSection').style.display = 'none';
     document.getElementById('addAnotherSection').style.display = 'none';
 
     // Reset button states
@@ -393,8 +512,67 @@ function showParticipantSection() {
 }
 
 function handleAddAnotherChange() {
-    // This function is called when the user selects an option in the add another section
-    // The actual logic is handled in handleAddToCart when the user clicks "Add to Cart"
+    const addAnotherYes = document.getElementById('addAnotherYes').checked;
+    const addAnotherNo = document.getElementById('addAnotherNo').checked;
+
+    if (!addAnotherYes && !addAnotherNo) {
+        return; // No selection made yet
+    }
+
+    if (validateParticipantForm()) {
+        const participant = collectParticipantData();
+        addToCart(participant);
+
+        if (addAnotherYes) {
+            // Reset only participant-specific fields and go back to participant info
+            resetParticipantSpecificFields();
+            showParticipantSection();
+        } else if (addAnotherNo) {
+            // Show food stall question instead of going directly to checkout
+            document.getElementById('addAnotherSection').style.display = 'none';
+            document.getElementById('foodStallQuestionSection').style.display = 'block';
+            document.getElementById('actionButtonsSection').style.display = 'block';
+            
+            // Update button states - hide Add to Cart, show Continue
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const continueBtn = document.getElementById('continueBtn');
+            if (addToCartBtn) addToCartBtn.style.display = 'none';
+            if (continueBtn) continueBtn.style.display = 'inline-block';
+        }
+    }
+}
+
+function handleFoodStallInterestChange() {
+    const foodStallYes = document.getElementById('foodStallYes').checked;
+    const foodStallNo = document.getElementById('foodStallNo').checked;
+
+    if (!foodStallYes && !foodStallNo) {
+        return; // No selection made yet
+    }
+
+    if (foodStallYes) {
+        // Partially reset form like "add another participant" scenario
+        resetParticipantSpecificFields();
+        
+        // Unlock Tower and Flat fields for food stall registration (different person/flat might register)
+        const towerField = document.getElementById('tower');
+        const flatField = document.getElementById('flat');
+        if (towerField) towerField.disabled = false;
+        if (flatField) flatField.disabled = false;
+        
+        showParticipantSection();
+        currentRegistrationType = 'foodstall';
+
+        // Hide food stall question section since user selected yes
+        document.getElementById('foodStallQuestionSection').style.display = 'none';
+
+        // DO NOT show food stall section yet - wait until participant info is filled
+        // document.getElementById('foodstallSection').style.display = 'block';
+        // document.getElementById('nextStepSection').style.display = 'block';
+    } else if (foodStallNo) {
+        // User doesn't want food stall either - go directly to checkout
+        switchSection('checkout');
+    }
 }
 
 function handleRegistrationTypeChange() {
@@ -415,20 +593,60 @@ function handleRegistrationTypeChange() {
 
     // Show the Next Step button when registration type is selected
     const nextStepSection = document.getElementById('nextStepSection');
-    nextStepSection.style.display = 'block';
+    if (nextStepSection) nextStepSection.style.display = 'block';
 }
 
 function handleNextStep() {
-    if (validateRegistrationDetails()) {
-        document.getElementById('registrationTypeSection').style.display = 'none';
+    if (document.getElementById('competitionsSection').style.display === 'block') {
+        // Coming from competitions - validate and go to add another
+        const selectedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
+        if (selectedCompetitions.length === 0) {
+            alert('Please select at least one competition.');
+            return;
+        }
+
+        // Collect participant data and add to cart
+        const participantData = collectParticipantData();
+        addToCart(participantData);
+
+        // Hide competitions and next step sections, show add another question
         document.getElementById('competitionsSection').style.display = 'none';
-        document.getElementById('foodstallSection').style.display = 'none';
         document.getElementById('nextStepSection').style.display = 'none';
         document.getElementById('addAnotherSection').style.display = 'block';
 
-        // Show the Add to Cart button
-        const addToCartBtn = document.getElementById('addToCartBtn');
-        if (addToCartBtn) addToCartBtn.style.display = 'inline-block';
+        // Reset add another radio buttons to unchecked state
+        const addAnotherYes = document.getElementById('addAnotherYes');
+        const addAnotherNo = document.getElementById('addAnotherNo');
+        if (addAnotherYes) addAnotherYes.checked = false;
+        if (addAnotherNo) addAnotherNo.checked = false;
+
+        // Hide action buttons since radio selection will handle the logic
+        document.getElementById('actionButtonsSection').style.display = 'none';
+
+    } else if (document.getElementById('foodstallSection').style.display === 'block') {
+        // Coming from food stall details - validate participant info and food stall details, then go to checkout
+        if (!validateParticipantForm()) {
+            return;
+        }
+        
+        const selectedDates = document.querySelectorAll('input[id^="date-"]:checked');
+        if (selectedDates.length === 0) {
+            alert('Please select at least one date for your food stall.');
+            return;
+        }
+
+        const foodMenu = document.getElementById('foodMenu').value.trim();
+        if (!foodMenu) {
+            alert('Please enter your food menu.');
+            return;
+        }
+
+        // Collect food stall data and add to cart
+        const foodStallData = collectFoodStallData();
+        addToCart(foodStallData);
+
+        // Go directly to checkout
+        switchSection('checkout');
     }
 }
 
@@ -457,26 +675,43 @@ function validateRegistrationDetails() {
 }
 
 function handleContinue() {
+    // Check if we're in food stall registration mode
+    if (currentRegistrationType === 'foodstall') {
+        // Validate participant form and then show food stall section
+        if (validateParticipantForm()) {
+            // Hide participant section and action buttons
+            const participantSection = document.getElementById('participantSection');
+            const actionButtonsSection = document.getElementById('actionButtonsSection');
+
+            if (participantSection) participantSection.style.display = 'none';
+            if (actionButtonsSection) actionButtonsSection.style.display = 'none';
+
+            // Show food stall section
+            document.getElementById('foodstallSection').style.display = 'block';
+            document.getElementById('nextStepSection').style.display = 'block';
+
+            // Update button states
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) backBtn.style.display = 'inline-block';
+        }
+        return;
+    }
+
+    // Original participant form validation flow
     if (validateParticipantForm()) {
-        // Hide participant section and show registration type selection
-        document.getElementById('participantSection').style.display = 'none';
-        document.getElementById('registrationTypeSection').style.display = 'block';
-        document.getElementById('nextStepSection').style.display = 'block'; // Show initially
+        // Hide participant section and show competitions (which should already be visible)
+        const participantSection = document.getElementById('participantSection');
+        const actionButtonsSection = document.getElementById('actionButtonsSection');
 
-        // Attach event listeners to registration type radio buttons
-        const radioButtons = document.querySelectorAll('input[name="registrationType"]');
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', handleRegistrationTypeChange);
-            radio.addEventListener('click', handleRegistrationTypeChange);
-        });
+        if (participantSection) participantSection.style.display = 'none';
+        if (actionButtonsSection) actionButtonsSection.style.display = 'none';
 
-        // Also attach to labels for better UX
-        const labels = document.querySelectorAll('label[for="competitionType"], label[for="foodstallType"]');
-        labels.forEach(label => {
-            label.addEventListener('click', function () {
-                setTimeout(handleRegistrationTypeChange, 10); // Small delay to let radio button update
-            });
-        });
+        // Set registration type to competition by default (since we're streamlining to competitions first)
+        currentRegistrationType = 'competition';
+
+        // Show competitions section (should already be visible from age group selection)
+        document.getElementById('competitionsSection').style.display = 'block';
+        document.getElementById('nextStepSection').style.display = 'block';
 
         // Update button states
         const continueBtn = document.getElementById('continueBtn');
@@ -488,52 +723,55 @@ function handleContinue() {
 }
 
 function handleBack() {
-    if (document.getElementById('addAnotherSection').style.display === 'block') {
-        // Go back to registration details
-        document.getElementById('addAnotherSection').style.display = 'none';
-        document.getElementById('nextStepSection').style.display = 'block';
+    if (document.getElementById('foodstallSection').style.display === 'block') {
+        // Go back from food stall section to food stall question
+        document.getElementById('foodstallSection').style.display = 'none';
+        document.getElementById('foodStallQuestionSection').style.display = 'block';
+        document.getElementById('nextStepSection').style.display = 'none';
+        // Hide action buttons since radio selection handles the logic
+        document.getElementById('actionButtonsSection').style.display = 'none';
 
-        // Show the appropriate section based on current registration type
-        if (currentRegistrationType === 'competition') {
-            document.getElementById('competitionsSection').style.display = 'block';
-        } else if (currentRegistrationType === 'foodstall') {
-            document.getElementById('foodstallSection').style.display = 'block';
-        }
+    } else if (document.getElementById('foodStallQuestionSection').style.display === 'block') {
+        // Go back from food stall question to add another section
+        document.getElementById('foodStallQuestionSection').style.display = 'none';
+        document.getElementById('addAnotherSection').style.display = 'block';
+        
+        // Reset add another radio buttons to unchecked state
+        const addAnotherYes = document.getElementById('addAnotherYes');
+        const addAnotherNo = document.getElementById('addAnotherNo');
+        if (addAnotherYes) addAnotherYes.checked = false;
+        if (addAnotherNo) addAnotherNo.checked = false;
+        
+        // Hide action buttons since radio selection handles the logic
+        document.getElementById('actionButtonsSection').style.display = 'none';
+
+    } else if (document.getElementById('addAnotherSection').style.display === 'block') {
+        // Go back to competitions
+        document.getElementById('addAnotherSection').style.display = 'none';
+        document.getElementById('competitionsSection').style.display = 'block';
+        document.getElementById('nextStepSection').style.display = 'block';
 
         // Hide Add to Cart button
         const addToCartBtn = document.getElementById('addToCartBtn');
         if (addToCartBtn) addToCartBtn.style.display = 'none';
 
-    } else if (document.getElementById('nextStepSection').style.display === 'block' ||
-        document.getElementById('competitionsSection').style.display === 'block' ||
-        document.getElementById('foodstallSection').style.display === 'block') {
-        // Go back to registration type selection
-        document.getElementById('registrationTypeSection').style.display = 'block';
-        document.getElementById('competitionsSection').style.display = 'none';
-        document.getElementById('foodstallSection').style.display = 'none';
-        document.getElementById('nextStepSection').style.display = 'none';
-
-        // Reset registration type radio buttons when going back to registration type selection
-        const registrationTypeRadios = document.querySelectorAll('input[name="registrationType"]');
-        registrationTypeRadios.forEach(radio => radio.checked = false);
-
-    } else if (document.getElementById('registrationTypeSection').style.display === 'block') {
+    } else if (document.getElementById('competitionsSection').style.display === 'block') {
         // Go back to participant info
-        document.getElementById('registrationTypeSection').style.display = 'none';
+        document.getElementById('competitionsSection').style.display = 'none';
+        document.getElementById('nextStepSection').style.display = 'none';
         document.getElementById('participantSection').style.display = 'block';
+        document.getElementById('actionButtonsSection').style.display = 'block';
 
-        // Reset age group radio buttons when going back to participant info
+        // Reset age group radio buttons
         const ageGroupRadios = document.querySelectorAll('input[name="ageGroup"]');
         ageGroupRadios.forEach(radio => radio.checked = false);
-        // Reset competitions display
         updateCompetitionsDisplay(null);
 
-        // Show Continue button, hide Add to Cart button
+        // Update button states
         const continueBtn = document.getElementById('continueBtn');
-        const addToCartBtn = document.getElementById('addToCartBtn');
-
+        const backBtn = document.getElementById('backBtn');
         if (continueBtn) continueBtn.style.display = 'inline-block';
-        if (addToCartBtn) addToCartBtn.style.display = 'none';
+        if (backBtn) backBtn.style.display = 'none';
 
     } else {
         switchSection('information');
@@ -551,17 +789,23 @@ function handleAddToCart() {
 
     if (validateParticipantForm()) {
         const participant = collectParticipantData();
-        registrationCart.push(participant);
-        saveCartToStorage();
-        updateCartDisplay();
+        addToCart(participant);
 
         if (addAnotherYes) {
             // Reset only participant-specific fields and go back to participant info
             resetParticipantSpecificFields();
             showParticipantSection();
         } else if (addAnotherNo) {
-            // Navigate to checkout
-            switchSection('checkout');
+            // Show food stall question instead of going directly to checkout
+            document.getElementById('addAnotherSection').style.display = 'none';
+            document.getElementById('foodStallQuestionSection').style.display = 'block';
+            document.getElementById('actionButtonsSection').style.display = 'block';
+            
+            // Update button states - hide Add to Cart, show Continue
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const continueBtn = document.getElementById('continueBtn');
+            if (addToCartBtn) addToCartBtn.style.display = 'none';
+            if (continueBtn) continueBtn.style.display = 'inline-block';
         }
     }
 }
@@ -571,9 +815,59 @@ function validateParticipantForm() {
     const name = document.getElementById('name') ? document.getElementById('name').value.trim() : '';
     const flat = document.getElementById('flat') ? document.getElementById('flat').value.trim() : '';
     const phone = document.getElementById('phoneNumber') ? document.getElementById('phoneNumber').value.trim() : '';
+    const email = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
+    const tower = document.getElementById('tower') ? document.getElementById('tower').value : '';
+    const age = document.getElementById('age') ? document.getElementById('age').value.trim() : '';
+    const ageGroup = document.querySelector('input[name="ageGroup"]:checked');
+    const gender = document.querySelector('input[name="gender"]:checked');
 
-    if (!name || !flat || !phone) {
+    if (!name || !flat || !phone || !email || !tower || !age) {
         alert('Please fill in all required participant information fields.');
+        return false;
+    }
+
+    if (!ageGroup) {
+        alert('Please select an age group.');
+        return false;
+    }
+
+    if (!gender) {
+        alert('Please select a gender.');
+        return false;
+    }
+
+    return true;
+}
+
+function validateFoodStallForm() {
+    // Validate basic participant info
+    const name = document.getElementById('name') ? document.getElementById('name').value.trim() : '';
+    const flat = document.getElementById('flat') ? document.getElementById('flat').value.trim() : '';
+    const phone = document.getElementById('phoneNumber') ? document.getElementById('phoneNumber').value.trim() : '';
+    const email = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
+    const tower = document.getElementById('tower') ? document.getElementById('tower').value : '';
+    const gender = document.querySelector('input[name="gender"]:checked');
+
+    if (!name || !flat || !phone || !email || !tower) {
+        alert('Please fill in all required participant information fields.');
+        return false;
+    }
+
+    if (!gender) {
+        alert('Please select a gender.');
+        return false;
+    }
+
+    // Validate food stall specific fields
+    const selectedDates = document.querySelectorAll('input[id^="date-"]:checked');
+    if (selectedDates.length === 0) {
+        alert('Please select at least one date for your food stall.');
+        return false;
+    }
+
+    const foodMenu = document.getElementById('foodMenu').value.trim();
+    if (!foodMenu) {
+        alert('Please enter your food menu.');
         return false;
     }
 
@@ -588,6 +882,7 @@ function collectParticipantData() {
         email: document.getElementById('email').value.trim(),
         tower: document.getElementById('tower').value,
         gender: document.querySelector('input[name="gender"]:checked').value,
+        age: parseInt(document.getElementById('age').value.trim()),
         ageGroup: document.querySelector('input[name="ageGroup"]:checked').value,
         registrationType: currentRegistrationType,
         timestamp: new Date().toISOString()
@@ -633,6 +928,96 @@ function collectParticipantData() {
     return data;
 }
 
+function collectFoodStallData() {
+    const data = {
+        name: document.getElementById('name').value.trim(),
+        flat: document.getElementById('flat').value.trim(),
+        phone: document.getElementById('phoneNumber').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        tower: document.getElementById('tower').value,
+        gender: document.querySelector('input[name="gender"]:checked').value,
+        age: parseInt(document.getElementById('age').value.trim()),
+        ageGroup: document.querySelector('input[name="ageGroup"]:checked').value,
+        registrationType: 'foodstall',
+        foodStalls: {
+            Menu: document.getElementById('foodMenu').value.trim(),
+            Dates: Array.from(document.querySelectorAll('input[id^="date-"]:checked')).map(cb => cb.value)
+        },
+        timestamp: new Date().toISOString()
+    };
+
+    return data;
+}
+
+function addToCart(participantData) {
+    // First, deduplicate existing cart to clean up any previous duplicates
+    deduplicateCart();
+
+    // Create a unique identifier for deduplication
+    let uniqueId;
+    if (participantData.registrationType === 'competition') {
+        uniqueId = `${participantData.name}-${participantData.email}-${JSON.stringify(participantData.competitions)}`;
+    } else if (participantData.registrationType === 'foodstall') {
+        uniqueId = `${participantData.name}-${participantData.email}-${JSON.stringify(participantData.foodStalls)}`;
+    } else {
+        // Fallback for other types
+        uniqueId = `${participantData.name}-${participantData.email}-${participantData.registrationType}`;
+    }
+
+    // Check if this participant data already exists in the cart
+    const existingIndex = registrationCart.findIndex(item => {
+        let itemId;
+        if (item.registrationType === 'competition') {
+            itemId = `${item.name}-${item.email}-${JSON.stringify(item.competitions)}`;
+        } else if (item.registrationType === 'foodstall') {
+            itemId = `${item.name}-${item.email}-${JSON.stringify(item.foodStalls)}`;
+        } else {
+            itemId = `${item.name}-${item.email}-${item.registrationType}`;
+        }
+        return itemId === uniqueId;
+    });
+
+    // Only add if not already in cart
+    if (existingIndex === -1) {
+        registrationCart.push(participantData);
+        saveCartToStorage();
+        updateCartDisplay();
+    } else {
+        // Update existing entry with new timestamp
+        registrationCart[existingIndex] = participantData;
+        saveCartToStorage();
+        updateCartDisplay();
+    }
+}
+
+function deduplicateCart() {
+    const seen = new Set();
+    const deduplicated = [];
+
+    for (const item of registrationCart) {
+        let uniqueId;
+        if (item.registrationType === 'competition') {
+            uniqueId = `${item.name}-${item.email}-${JSON.stringify(item.competitions)}`;
+        } else if (item.registrationType === 'foodstall') {
+            uniqueId = `${item.name}-${item.email}-${JSON.stringify(item.foodStalls)}`;
+        } else {
+            uniqueId = `${item.name}-${item.email}-${item.registrationType}`;
+        }
+
+        if (!seen.has(uniqueId)) {
+            seen.add(uniqueId);
+            deduplicated.push(item);
+        }
+    }
+
+    // Update cart if duplicates were found
+    if (deduplicated.length !== registrationCart.length) {
+        registrationCart = deduplicated;
+        saveCartToStorage();
+        updateCartDisplay();
+    }
+}
+
 function saveCartToStorage() {
     localStorage.setItem('registrationCart', JSON.stringify(registrationCart));
 }
@@ -646,7 +1031,20 @@ function updateCartDisplay() {
     if (registrationCart.length === 0) {
         cartTableBody.innerHTML = '<tr><td colspan="4" class="text-muted">No participants registered yet. Add participants from the Registration tab.</td></tr>';
         document.getElementById('flatDisplay').style.display = 'none';
+        
+        // Hide submit button when no participants
+        const submitButtonContainer = document.getElementById('submitButtonContainer');
+        if (submitButtonContainer) {
+            submitButtonContainer.style.display = 'none';
+        }
+        
         return;
+    }
+
+    // Show submit button when there are participants
+    const submitButtonContainer = document.getElementById('submitButtonContainer');
+    if (submitButtonContainer) {
+        submitButtonContainer.style.display = 'block';
     }
 
     // Display flat number
@@ -681,7 +1079,7 @@ function updateCartDisplay() {
             <td>${participant.name}</td>
             <td>${participant.ageGroup}</td>
             <td>${details}</td>
-            <td><button class="modern-btn" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button></td>
+            <td><i class="fas fa-times" onclick="removeFromCart(${index})" style="color: red; cursor: pointer; font-size: 18px;"></i></td>
         `;
 
         cartTableBody.appendChild(row);
@@ -691,18 +1089,24 @@ function updateCartDisplay() {
     updatePaymentTotal();
 }
 
-function updatePaymentTotal() {
-    const checkoutTotalCharge = document.getElementById('checkoutTotalCharge');
-    if (!checkoutTotalCharge) return;
-
+function calculateTotalAmount() {
+    console.log('Registration cart for total calculation:', registrationCart); // Debug log
     let totalAmount = 0;
     let hasCompetitions = false;
     let foodStallDays = 0;
+    let masterChefCount = 0;
 
     // Calculate totals
     registrationCart.forEach((participant) => {
         if (participant.registrationType === 'competition') {
             hasCompetitions = true;
+            // Check for Master Chef selection in 18+ age groups
+            if (participant.competitions && participant.competitions.some(comp => comp.Name === 'Master Chef')) {
+                const ageGroup18Plus = ['18-35', '36-55', '56+'];
+                if (ageGroup18Plus.includes(participant.ageGroup)) {
+                    masterChefCount++;
+                }
+            }
         } else if (participant.registrationType === 'foodstall') {
             foodStallDays += participant.foodStalls.Dates.length;
         }
@@ -716,6 +1120,18 @@ function updatePaymentTotal() {
         totalAmount += foodStallDays * 800; // ₹800 per day for food stalls
     }
 
+    if (masterChefCount > 0) {
+        totalAmount += masterChefCount * 1500; // ₹1500 per participant for Master Chef (18+)
+    }
+
+    return totalAmount;
+}
+
+function updatePaymentTotal() {
+    const checkoutTotalCharge = document.getElementById('checkoutTotalCharge');
+    if (!checkoutTotalCharge) return;
+
+    const totalAmount = calculateTotalAmount();
     checkoutTotalCharge.textContent = `Total Amount to be paid: INR ${totalAmount}`;
 }
 
@@ -723,6 +1139,60 @@ function removeFromCart(index) {
     registrationCart.splice(index, 1);
     saveCartToStorage();
     updateCartDisplay();
+}
+
+function updateCheckoutStepVisibility() {
+    // Hide all checkout sections
+    document.getElementById('cartSection').style.display = 'none';
+    document.getElementById('checkoutRulesSection').style.display = 'none';
+    document.getElementById('checkoutPaymentSection').style.display = 'none';
+    document.getElementById('checkoutNavigationSection').style.display = 'none';
+
+    // Show current step
+    if (currentCheckoutStep === 1) {
+        document.getElementById('cartSection').style.display = 'block';
+        document.getElementById('checkoutNavigationSection').style.display = 'block';
+        document.getElementById('checkoutBackBtn').style.display = 'none';
+        document.getElementById('checkoutNextBtn').style.display = 'inline-block';
+        document.getElementById('checkoutNextBtn').innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+    } else if (currentCheckoutStep === 2) {
+        document.getElementById('checkoutRulesSection').style.display = 'block';
+        document.getElementById('checkoutNavigationSection').style.display = 'block';
+        document.getElementById('checkoutBackBtn').style.display = 'inline-block';
+        document.getElementById('checkoutNextBtn').style.display = 'inline-block';
+        document.getElementById('checkoutNextBtn').innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+    } else if (currentCheckoutStep === 3) {
+        document.getElementById('checkoutPaymentSection').style.display = 'block';
+    }
+}
+
+function handleCheckoutNext() {
+    if (currentCheckoutStep === 1) {
+        // Moving from Summary to Acknowledgement
+        currentCheckoutStep = 2;
+        updateCheckoutStepVisibility();
+    } else if (currentCheckoutStep === 2) {
+        // Moving from Acknowledgement to Payment
+        const rulesAccepted = document.getElementById('checkoutAcknowledge') ? document.getElementById('checkoutAcknowledge').checked : false;
+        if (!rulesAccepted) {
+            alert('Please accept the rules and regulations.');
+            return;
+        }
+        currentCheckoutStep = 3;
+        updateCheckoutStepVisibility();
+    }
+}
+
+function handleCheckoutBack() {
+    if (currentCheckoutStep === 2) {
+        // Moving back from Acknowledgement to Summary
+        currentCheckoutStep = 1;
+        updateCheckoutStepVisibility();
+    } else if (currentCheckoutStep === 3) {
+        // Moving back from Payment to Acknowledgement
+        currentCheckoutStep = 2;
+        updateCheckoutStepVisibility();
+    }
 }
 
 function handleFinalSubmit() {
@@ -744,10 +1214,15 @@ function handleFinalSubmit() {
         return;
     }
 
+    // Calculate total amount
+    const totalAmount = calculateTotalAmount();
+    console.log('Calculated total amount:', totalAmount); // Debug log
+
     // Collect payment proof if required
     const paymentData = {
         method: paymentMethod.value,
-        proof: null
+        proof: null,
+        totalAmount: totalAmount
     };
 
     if (paymentMethod.value === 'I will pay for participation and/or food stall now.') {
@@ -797,10 +1272,12 @@ async function submitAllRegistrations(paymentData) {
             participants: registrationCart,
             paymentMethod: paymentData.method,
             paymentProof: paymentProofBase64,
-            paymentProofType: paymentProofType
+            paymentProofType: paymentProofType,
+            totalAmount: paymentData.totalAmount
         };
 
         console.log('Submitting batch data:', batchData); // Debug log
+        console.log('Total amount in batch data:', batchData.totalAmount); // Debug log
 
         const response = await fetch(backendUrl, {
             method: 'POST',

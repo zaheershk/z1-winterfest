@@ -90,12 +90,14 @@ function processBatchSubmission(batchData) {
           participant.tower || '',
           participant.flat || '',
           participant.gender || '',
+          participant.age || '',
           participant.ageGroup || '',
           JSON.stringify(participant.competitions || []),
           JSON.stringify(participant.foodStalls || {}),
           participant.acknowledgement || false,
           batchData.paymentMethod || '',
           paymentProofUrl, // Same URL for all participants in batch
+          batchData.totalAmount || 0, // Total amount calculated on frontend
           new Date().toISOString(), // Registration Date
           'Received' // Status
         ];
@@ -109,9 +111,9 @@ function processBatchSubmission(batchData) {
           Logger.log('Sheet "FormData" not found, creating it...');
           sheet = ss.insertSheet('FormData');
           const headers = [
-            'Unique ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age Group',
+            'Unique ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age', 'Age Group',
             'Competitions', 'Food Stalls', 'Acknowledgement', 'Payment Method', 'Payment Proof URL',
-            'Registration Date', 'Status'
+            'Total Amount', 'Registration Date', 'Status'
           ];
           sheet.appendRow(headers);
           Logger.log('Sheet created with headers');
