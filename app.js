@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const navRegistration = document.getElementById("nav-registration");
     const navCheckout = document.getElementById("nav-checkout");
     const navDashboard = document.getElementById("nav-dashboard");
-    const navSupport = document.getElementById("nav-support");
+    const navAdmin = document.getElementById("nav-admin");
 
     if (navInformation) {
         navInformation.addEventListener("click", function () {
@@ -60,9 +60,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    if (navSupport) {
-        navSupport.addEventListener("click", function () {
-            switchSection("support");
+    if (navAdmin) {
+        navAdmin.addEventListener("click", function () {
+            switchSection("admin");
         });
     }
 
@@ -1583,10 +1583,21 @@ function displayDashboardResults(data, searchTowerFlat) {
     // Show results section
     resultsSection.style.display = 'block';
 
-    // Show flat display and register button if we have tower-flat search
-    if (searchTowerFlat) {
-        flatNumberDisplay.textContent = searchTowerFlat;
-        flatDisplay.style.display = 'block';
+    // Show flat display and register button if we have results
+    if (data.length > 0) {
+        if (searchTowerFlat) {
+            flatNumberDisplay.textContent = searchTowerFlat;
+            flatDisplay.style.display = 'block';
+        } else {
+            // For name searches, show apartment from first result
+            const firstResult = data[0];
+            if (firstResult && firstResult.tower && firstResult.flat) {
+                flatNumberDisplay.textContent = `${firstResult.tower} - ${firstResult.flat}`;
+                flatDisplay.style.display = 'block';
+            } else {
+                flatDisplay.style.display = 'none';
+            }
+        }
         registerBtn.style.display = 'inline-block';
     } else {
         flatDisplay.style.display = 'none';
@@ -1650,13 +1661,25 @@ function clearDashboardResults() {
 }
 
 function handleDashboardRegister() {
+    // Try to get apartment from the input field first (apartment search)
     const apartmentInput = document.getElementById('dashboardApartment');
-    if (!apartmentInput || !apartmentInput.value.trim()) {
-        showAlertModal('No apartment selected for registration.');
-        return;
+    let tower = null;
+    let flat = null;
+
+    if (apartmentInput && apartmentInput.value.trim()) {
+        [tower, flat] = apartmentInput.value.split(' - ');
+    } else {
+        // For name searches, get from the displayed flat info
+        const flatNumberDisplay = document.getElementById('dashboardFlatNumberDisplay');
+        if (flatNumberDisplay && flatNumberDisplay.textContent) {
+            [tower, flat] = flatNumberDisplay.textContent.split(' - ');
+        }
     }
 
-    const [tower, flat] = apartmentInput.value.split(' - ');
+    if (!tower || !flat) {
+        showAlertModal('No apartment information available for registration.');
+        return;
+    }
 
     // Store the tower and flat for pre-filling
     sessionStorage.setItem('dashboardTower', tower);
