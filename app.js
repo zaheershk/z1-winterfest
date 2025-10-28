@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbzYk3pcRGQF5YVCuy0nze0yyOOdRalof9aPJQHIMG6uGAPRmyp0bM6WtqGuwZOCu3hQ/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbyVNN5NoYMQyKctRUGQkJ2RFg_S_LIJaPRhHyBKOmpRniV8OQ8lwPtbwVrUU6FNXB4/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -1269,10 +1269,10 @@ function handleFinalSubmit() {
     }
 
     // Submit all registrations
-    submitAllRegistrations(paymentData);
+    submitAllRegistrations(paymentData, rulesAccepted);
 }
 
-async function submitAllRegistrations(paymentData) {
+async function submitAllRegistrations(paymentData, rulesAccepted) {
     try {
         // Show loading state
         const finalSubmitBtn = document.getElementById('finalSubmitBtn');
@@ -1305,7 +1305,8 @@ async function submitAllRegistrations(paymentData) {
             paymentMethod: paymentData.method,
             paymentProof: paymentProofBase64,
             paymentProofType: paymentProofType,
-            totalAmount: paymentData.totalAmount
+            totalAmount: paymentData.totalAmount,
+            acknowledgement: rulesAccepted
         };
 
         console.log('Submitting batch data:', batchData); // Debug log

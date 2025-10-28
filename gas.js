@@ -111,7 +111,7 @@ function processBatchSubmission(batchData) {
           participant.ageGroup ? "'" + participant.ageGroup : '', // Force as text to prevent date formatting
           JSON.stringify(participant.competitions || []),
           JSON.stringify(participant.foodStalls || {}),
-          participant.acknowledgement || false,
+          batchData.acknowledgement || false,
           batchData.paymentMethod || '',
           paymentProofUrl, // Same URL for all participants in batch
           batchData.totalAmount || 0, // Total amount calculated on frontend
