@@ -1611,30 +1611,48 @@ function displayDashboardResults(data, searchTowerFlat) {
 
         let details = '';
 
-        if (registration.competitions) {
+        // Handle competitions
+        if (registration.competitions && registration.competitions.trim()) {
             try {
                 const comps = JSON.parse(registration.competitions);
-                if (Array.isArray(comps)) {
-                    details = comps.map(comp =>
+                if (Array.isArray(comps) && comps.length > 0) {
+                    const compDetails = comps.map(comp =>
                         `<div class="competition-item">
                             <strong>${comp.Name}</strong> (${comp.Category})
                             ${comp["Team Info"] !== 'N/A' ? `<br><small class="text-muted">Team: ${comp["Team Info"]}</small>` : ''}
                         </div>`
                     ).join('');
+                    if (details) details += '<br>';
+                    details += compDetails;
                 }
             } catch (e) {
-                details = registration.competitions;
+                if (details) details += '<br>';
+                details += registration.competitions;
             }
-        } else if (registration.foodStalls) {
+        }
+
+        // Handle food stalls
+        if (registration.foodStalls && registration.foodStalls.trim()) {
             try {
                 const foodData = JSON.parse(registration.foodStalls);
-                details = `<div class="foodstall-item">
-                    <strong>Menu:</strong> ${foodData.Menu}
-                    <br><strong>Dates:</strong> ${foodData.Dates.map(date => `<span class="badge bg-secondary">${date}</span>`).join(' ')}
-                </div>`;
+                if (foodData && (foodData.Menu || (foodData.Dates && foodData.Dates.length > 0))) {
+                    const foodDetails = `<div class="foodstall-item">
+                        ${foodData.Menu ? `<strong>Menu:</strong> ${foodData.Menu}` : ''}
+                        ${foodData.Menu && foodData.Dates && foodData.Dates.length > 0 ? '<br>' : ''}
+                        ${foodData.Dates && foodData.Dates.length > 0 ? `<strong>Dates:</strong> ${foodData.Dates.map(date => `<span class="badge bg-secondary">${date}</span>`).join(' ')}` : ''}
+                    </div>`;
+                    if (details) details += '<br>';
+                    details += foodDetails;
+                }
             } catch (e) {
-                details = registration.foodStalls;
+                if (details) details += '<br>';
+                details += registration.foodStalls;
             }
+        }
+
+        // If no details found, show a placeholder
+        if (!details) {
+            details = '<em class="text-muted">No details available</em>';
         }
 
         const regDate = new Date(registration.registrationDate).toLocaleDateString();
