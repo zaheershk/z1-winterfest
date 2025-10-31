@@ -1,5 +1,6 @@
 // ---- CODE FOR UI BACKEND ----
 const registrationWorkbookId = '1k6k68Upe41ct_hwa-1VQbnCN6rtFiPZXSal_uPYMOfg';
+const formDataSheetName = 'FormData';
 
 function doGet(e) {
   try {
@@ -104,9 +105,23 @@ function processBatchSubmission(batchData) {
       try {
         Logger.log('Processing participant: ' + JSON.stringify(participant));
 
+        // Generate unique record ID for this participant
+        const uniqueRecordId = Utilities.getUuid();
+        
+        // Determine registration type
+        let registrationType = 'competition'; // Default to competition
+        const hasFoodStalls = participant.foodStalls && 
+          ((participant.foodStalls.Menu && participant.foodStalls.Menu.trim()) || 
+           (participant.foodStalls.Dates && Array.isArray(participant.foodStalls.Dates) && participant.foodStalls.Dates.length > 0));
+        
+        if (hasFoodStalls) {
+          registrationType = 'foodstall';
+        }
+
         // Prepare the row data
         const rowData = [
           registrationId, // Use the same registration ID for all participants in this submission
+          uniqueRecordId, // Unique ID for this specific record
           participant.email || '',
           participant.name || '',
           participant.phone || '',
@@ -117,6 +132,7 @@ function processBatchSubmission(batchData) {
           participant.ageGroup ? "'" + participant.ageGroup : '', // Force as text to prevent date formatting
           JSON.stringify(participant.competitions || []),
           JSON.stringify(participant.foodStalls || {}),
+          registrationType, // Type of registration
           batchData.acknowledgement || false,
           batchData.paymentMethod || '',
           paymentProofUrl, // Same URL for all participants in batch
@@ -127,19 +143,32 @@ function processBatchSubmission(batchData) {
 
         // Open the Google Sheet and append
         const ss = SpreadsheetApp.openById(registrationWorkbookId);
-        let sheet = ss.getSheetByName('FormData');
+        let sheet = ss.getSheetByName(formDataSheetName);
 
         // Check if sheet exists, create it if not
         if (!sheet) {
-          Logger.log('Sheet "FormData" not found, creating it...');
-          sheet = ss.insertSheet('FormData');
+          Logger.log('Sheet "' + formDataSheetName + '" not found, creating it...');
+          sheet = ss.insertSheet(formDataSheetName);
           const headers = [
-            'Registration ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age', 'Age Group',
-            'Competitions', 'Food Stalls', 'Acknowledgement', 'Payment Method', 'Payment Proof URL',
+            'Registration ID', 'Unique Record ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age', 'Age Group',
+            'Competitions', 'Food Stalls', 'Registration Type', 'Acknowledgement', 'Payment Method', 'Payment Proof URL',
             'Total Amount', 'Registration Date', 'Status'
           ];
           sheet.appendRow(headers);
           Logger.log('Sheet created with headers');
+        } else {
+          // Check if headers are up to date (should have 19 columns now)
+          const existingHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+          if (existingHeaders.length < 19) {
+            Logger.log('Sheet headers are outdated, updating...');
+            // Clear existing headers and add new ones
+            sheet.getRange(1, 1, 1, 19).setValues([[
+              'Registration ID', 'Unique Record ID', 'Email', 'Name', 'Phone', 'Tower', 'Flat', 'Gender', 'Age', 'Age Group',
+              'Competitions', 'Food Stalls', 'Registration Type', 'Acknowledgement', 'Payment Method', 'Payment Proof URL',
+              'Total Amount', 'Registration Date', 'Status'
+            ]]);
+            Logger.log('Headers updated');
+          }
         }
 
         // Append the row
@@ -227,10 +256,10 @@ function errorResponse(msg) {
 function searchRegistrations(params) {
   try {
     const ss = SpreadsheetApp.openById(registrationWorkbookId);
-    const sheet = ss.getSheetByName('FormData');
+    const sheet = ss.getSheetByName(formDataSheetName);
 
     if (!sheet) {
-      return errorResponse('FormData sheet not found');
+      return errorResponse(formDataSheetName + ' sheet not found');
     }
 
     const data = sheet.getDataRange().getValues();
@@ -250,6 +279,7 @@ function searchRegistrations(params) {
     const ageGroupIndex = headers.indexOf('Age Group');
     const competitionsIndex = headers.indexOf('Competitions');
     const foodStallsIndex = headers.indexOf('Food Stalls');
+    const registrationTypeIndex = headers.indexOf('Registration Type');
     const registrationDateIndex = headers.indexOf('Registration Date');
     const statusIndex = headers.indexOf('Status');
 
@@ -280,6 +310,7 @@ function searchRegistrations(params) {
       if (match) {
         results.push({
           registrationId: row[0], // Registration ID
+          uniqueRecordId: row[1], // Unique Record ID
           email: row[emailIndex],
           name: row[nameIndex],
           phone: row[phoneIndex],
@@ -290,6 +321,7 @@ function searchRegistrations(params) {
           ageGroup: row[ageGroupIndex],
           competitions: row[competitionsIndex],
           foodStalls: row[foodStallsIndex],
+          registrationType: row[registrationTypeIndex],
           registrationDate: row[registrationDateIndex],
           status: row[statusIndex]
         });
@@ -306,10 +338,10 @@ function searchRegistrations(params) {
 function getApartmentsList() {
   try {
     const ss = SpreadsheetApp.openById(registrationWorkbookId);
-    const sheet = ss.getSheetByName('FormData');
+    const sheet = ss.getSheetByName(formDataSheetName);
 
     if (!sheet) {
-      return errorResponse('FormData sheet not found');
+      return errorResponse(formDataSheetName + ' sheet not found');
     }
 
     const data = sheet.getDataRange().getValues();
@@ -350,10 +382,10 @@ function updateParticipantRegistration(updateData) {
     Logger.log('Updating participant registration: ' + JSON.stringify(updateData));
 
     const ss = SpreadsheetApp.openById(registrationWorkbookId);
-    const sheet = ss.getSheetByName('FormData');
+    const sheet = ss.getSheetByName(formDataSheetName);
 
     if (!sheet) {
-      return errorResponse('FormData sheet not found');
+      return errorResponse(formDataSheetName + ' sheet not found');
     }
 
     const data = sheet.getDataRange().getValues();
@@ -363,27 +395,25 @@ function updateParticipantRegistration(updateData) {
 
     // Get headers
     const headers = data[0];
-    const registrationIdIndex = headers.indexOf('Registration ID');
-    const nameIndex = headers.indexOf('Name');
+    const uniqueRecordIdIndex = headers.indexOf('Unique Record ID');
     const competitionsIndex = headers.indexOf('Competitions');
 
-    if (registrationIdIndex === -1 || nameIndex === -1 || competitionsIndex === -1) {
+    if (uniqueRecordIdIndex === -1 || competitionsIndex === -1) {
       return errorResponse('Required columns not found in sheet');
     }
 
-    // Find the specific row to update
+    // Find the specific row to update by uniqueRecordId
     let targetRowIndex = -1;
     for (let i = 1; i < data.length; i++) { // Skip header row
       const row = data[i];
-      if (row[registrationIdIndex] === updateData.registrationId &&
-          row[nameIndex] === updateData.participantName) {
+      if (row[uniqueRecordIdIndex] === updateData.uniqueRecordId) {
         targetRowIndex = i + 1; // +1 because sheet rows are 1-indexed
         break;
       }
     }
 
     if (targetRowIndex === -1) {
-      return errorResponse('Participant not found: ' + updateData.registrationId + ' - ' + updateData.participantName);
+      return errorResponse('Participant not found with uniqueRecordId: ' + updateData.uniqueRecordId);
     }
 
     // Update only the competitions column

@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbyGZ_MnOS4zVJL5AVTCuggu6rVqt6XAWkCx6KZnuGETkX6a2ssmLa8nzbZJS4Pb-uVR/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbyOy96OP0BmBRu0h5r5hwiT1JLZTWc9ZI7Cofo8IfXP1iu4mMEvi0RHTqbJnqiBEUJO/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -1657,14 +1657,17 @@ function displayDashboardResults(data, searchTowerFlat) {
 
         const regDate = new Date(registration.registrationDate).toLocaleDateString();
 
+        // Only show EDIT button for competition registrations
+        const showEditButton = registration.registrationType === 'competition';
+
         row.innerHTML = `
             <td>${registration.name}</td>
             <td>${registration.ageGroup}</td>
             <td>${details}</td>
             <td>
-                <button class="btn btn-outline-primary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;" onclick="openEditModal('${registration.registrationId}', '${registration.name.replace(/'/g, "\\'")}', '${registration.ageGroup}', '${registration.competitions.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                ${showEditButton ? `<button class="btn btn-outline-primary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;" onclick="openEditModal('${registration.uniqueRecordId}', '${registration.name.replace(/'/g, "\\'")}', '${registration.ageGroup}', '${registration.competitions.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
                     <i class="fas fa-edit"></i> Edit
-                </button>
+                </button>` : ''}
             </td>
         `;
 
@@ -1741,9 +1744,9 @@ function prefillRegistrationFromDashboard() {
 // Edit Modal Functions
 let currentEditData = null;
 
-function openEditModal(registrationId, participantName, ageGroup, competitionsJson) {
+function openEditModal(uniqueRecordId, participantName, ageGroup, competitionsJson) {
     currentEditData = {
-        registrationId: registrationId,
+        uniqueRecordId: uniqueRecordId,
         participantName: participantName,
         ageGroup: ageGroup,
         originalCompetitions: competitionsJson
@@ -1883,8 +1886,7 @@ function saveEditCompetitions() {
     // Prepare update data
     const updateData = {
         updateParticipant: {
-            registrationId: currentEditData.registrationId,
-            participantName: currentEditData.participantName,
+            uniqueRecordId: currentEditData.uniqueRecordId,
             competitions: selectedCompetitions
         }
     };
