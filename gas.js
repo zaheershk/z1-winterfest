@@ -54,6 +54,12 @@ function doPost(e) {
 
     Logger.log('Final requestData: ' + JSON.stringify(requestData)); // Debug log
 
+    // Check if this is an update request
+    if (requestData.updateParticipant) {
+      Logger.log('Processing participant update');
+      return updateParticipantRegistration(requestData.updateParticipant);
+    }
+
     // Check if this is a batch submission (has participants array)
     if (requestData.participants && Array.isArray(requestData.participants)) {
       Logger.log('Processing batch submission with ' + requestData.participants.length + ' participants');
@@ -336,6 +342,65 @@ function getApartmentsList() {
   } catch (error) {
     Logger.log('Get apartments error: ' + error.toString());
     return errorResponse('Failed to get apartments: ' + error.toString());
+  }
+}
+
+function updateParticipantRegistration(updateData) {
+  try {
+    Logger.log('Updating participant registration: ' + JSON.stringify(updateData));
+
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    const sheet = ss.getSheetByName('FormData');
+
+    if (!sheet) {
+      return errorResponse('FormData sheet not found');
+    }
+
+    const data = sheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return errorResponse('No data found in sheet');
+    }
+
+    // Get headers
+    const headers = data[0];
+    const registrationIdIndex = headers.indexOf('Registration ID');
+    const nameIndex = headers.indexOf('Name');
+    const competitionsIndex = headers.indexOf('Competitions');
+
+    if (registrationIdIndex === -1 || nameIndex === -1 || competitionsIndex === -1) {
+      return errorResponse('Required columns not found in sheet');
+    }
+
+    // Find the specific row to update
+    let targetRowIndex = -1;
+    for (let i = 1; i < data.length; i++) { // Skip header row
+      const row = data[i];
+      if (row[registrationIdIndex] === updateData.registrationId &&
+          row[nameIndex] === updateData.participantName) {
+        targetRowIndex = i + 1; // +1 because sheet rows are 1-indexed
+        break;
+      }
+    }
+
+    if (targetRowIndex === -1) {
+      return errorResponse('Participant not found: ' + updateData.registrationId + ' - ' + updateData.participantName);
+    }
+
+    // Update only the competitions column
+    const competitionsJson = JSON.stringify(updateData.competitions || []);
+    sheet.getRange(targetRowIndex, competitionsIndex + 1).setValue(competitionsJson); // +1 because ranges are 1-indexed
+
+    Logger.log('Successfully updated competitions for participant: ' + updateData.participantName);
+
+    return dataResponse({
+      status: 'success',
+      message: 'Participant competitions updated successfully',
+      participant: updateData.participantName
+    });
+
+  } catch (error) {
+    Logger.log('Error updating participant: ' + error.toString());
+    return errorResponse('Failed to update participant: ' + error.toString());
   }
 }
 

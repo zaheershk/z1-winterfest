@@ -578,11 +578,12 @@
                                         <th>Name</th>
                                         <th>Age Group</th>
                                         <th>Details</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dashboardTableBody">
                                     <tr>
-                                        <td colspan="3" class="text-muted">No results found. Try adjusting your search
+                                        <td colspan="4" class="text-muted">No results found. Try adjusting your search
                                             criteria.</td>
                                     </tr>
                                 </tbody>
@@ -617,6 +618,34 @@
             </div>
             <div class="alert-modal-footer">
                 <button id="alertModalOkBtn" class="alert-modal-btn" onclick="hideAlertModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Competitions Modal -->
+    <div id="editModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Competitions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Participant:</label>
+                        <p id="editParticipantName" class="mb-1"></p>
+                        <small class="text-muted">Age Group: <span id="editAgeGroup"></span></small>
+                    </div>
+                    <div id="editCompetitionsContainer">
+                        <!-- Competitions will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbyVNN5NoYMQyKctRUGQkJ2RFg_S_LIJaPRhHyBKOmpRniV8OQ8lwPtbwVrUU6FNXB4/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbyGZ_MnOS4zVJL5AVTCuggu6rVqt6XAWkCx6KZnuGETkX6a2ssmLa8nzbZJS4Pb-uVR/exec";
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -1661,6 +1661,11 @@ function displayDashboardResults(data, searchTowerFlat) {
             <td>${registration.name}</td>
             <td>${registration.ageGroup}</td>
             <td>${details}</td>
+            <td>
+                <button class="btn btn-outline-primary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem;" onclick="openEditModal('${registration.registrationId}', '${registration.name.replace(/'/g, "\\'")}', '${registration.ageGroup}', '${registration.competitions.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </td>
         `;
 
         tableBody.appendChild(row);
@@ -1674,7 +1679,7 @@ function clearDashboardResults() {
     const registerBtn = document.getElementById('dashboardRegisterBtn');
 
     if (resultsSection) resultsSection.style.display = 'none';
-    if (tableBody) tableBody.innerHTML = '<tr><td colspan="3" class="text-muted">No results found. Try adjusting your search criteria.</td></tr>';
+    if (tableBody) tableBody.innerHTML = '<tr><td colspan="4" class="text-muted">No results found. Try adjusting your search criteria.</td></tr>';
     if (flatDisplay) flatDisplay.style.display = 'none';
     if (registerBtn) registerBtn.style.display = 'none';
 }
@@ -1732,3 +1737,211 @@ function prefillRegistrationFromDashboard() {
         sessionStorage.removeItem('dashboardFlat');
     }
 }
+
+// Edit Modal Functions
+let currentEditData = null;
+
+function openEditModal(registrationId, participantName, ageGroup, competitionsJson) {
+    currentEditData = {
+        registrationId: registrationId,
+        participantName: participantName,
+        ageGroup: ageGroup,
+        originalCompetitions: competitionsJson
+    };
+
+    // Set participant info
+    document.getElementById('editParticipantName').textContent = participantName;
+    document.getElementById('editAgeGroup').textContent = ageGroup;
+
+    // Populate competitions based on age group
+    populateEditCompetitions(ageGroup, competitionsJson);
+
+    // Show modal
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    editModal.show();
+}
+
+function populateEditCompetitions(ageGroup, competitionsJson) {
+    const container = document.getElementById('editCompetitionsContainer');
+    if (!container) return;
+
+    // Parse existing competitions
+    let existingCompetitions = [];
+    try {
+        existingCompetitions = JSON.parse(competitionsJson) || [];
+    } catch (e) {
+        existingCompetitions = [];
+    }
+
+    // Create competitions HTML similar to registration but filtered by age group
+    let html = '<div class="section-header"><h5>Select Competitions</h5></div>';
+
+    competitionsData.forEach(category => {
+        // Check if this category has competitions for the participant's age group
+        const hasCompetitionsForAgeGroup = category.competitions.some(comp => {
+            return comp.ageGroups && comp.ageGroups.includes(ageGroup);
+        });
+
+        if (hasCompetitionsForAgeGroup) {
+            html += `<div class="mb-3">
+                <h6 class="text-primary">${category.category}</h6>`;
+
+            category.competitions.forEach(comp => {
+                if (comp.ageGroups && comp.ageGroups.includes(ageGroup)) {
+                    // Check if this competition was previously selected
+                    const existingComp = existingCompetitions.find(ec => ec.Name === comp.name);
+                    const isChecked = existingComp ? 'checked' : '';
+                    const teamInfo = existingComp && existingComp["Team Info"] && existingComp["Team Info"] !== 'N/A' ? existingComp["Team Info"] : '';
+                    const showTeamInfo = isChecked && comp.teamBased;
+
+                    html += `
+                        <div class="form-check">
+                            <input class="form-check-input edit-competition-checkbox" type="checkbox"
+                                   id="edit-${comp.name.replace(/\s+/g, '-')}" value="${comp.name}" ${isChecked}>
+                            <label class="form-check-label" for="edit-${comp.name.replace(/\s+/g, '-')}" data-team-based="${comp.teamBased}">
+                                ${comp.name}
+                            </label>
+                        </div>`;
+                    
+                    if (comp.teamBased) {
+                        html += `
+                        <div class="mb-2 ms-4 edit-team-info" id="edit-team-${comp.name.replace(/\s+/g, '-')}" style="display: ${showTeamInfo ? 'block' : 'none'}">
+                            <input type="text" class="form-control form-control-sm"
+                                   placeholder="Team name (if applicable)" value="${teamInfo}">
+                        </div>`;
+                    }
+                }
+            });
+
+            html += '</div>';
+        }
+    });
+
+    container.innerHTML = html;
+
+    // Add event listeners for team info visibility
+    document.querySelectorAll('.edit-competition-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const teamDiv = document.getElementById('edit-team-' + this.id.replace('edit-', ''));
+            if (teamDiv) {
+                teamDiv.style.display = this.checked ? 'block' : 'none';
+            }
+        });
+    });
+
+    // Add event listeners for team info toggling
+    document.querySelectorAll('.edit-competition-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const teamDiv = document.getElementById('edit-team-' + this.id.replace('edit-', ''));
+            const label = this.nextElementSibling;
+            const isTeamBased = label && label.getAttribute('data-team-based') === 'true';
+            if (teamDiv && isTeamBased) {
+                teamDiv.style.display = this.checked ? 'block' : 'none';
+                if (!this.checked) {
+                    // Clear the input when unchecked
+                    const input = teamDiv.querySelector('input');
+                    if (input) input.value = '';
+                }
+            }
+        });
+    });
+}
+
+function saveEditCompetitions() {
+    if (!currentEditData) return;
+
+    // Collect selected competitions
+    const selectedCompetitions = [];
+    document.querySelectorAll('.edit-competition-checkbox:checked').forEach(checkbox => {
+        const compName = checkbox.value;
+        const teamInput = document.querySelector(`[id="edit-team-${checkbox.id.replace('edit-', '')}"] input`);
+        const teamInfo = teamInput && teamInput.value ? teamInput.value.trim() : 'N/A';
+
+        // console.log('Processing competition:', compName);
+        // console.log('teamInput element:', teamInput);
+        // if (teamInput) console.log('teamInput.value:', teamInput.value);
+        // console.log('teamInfo:', teamInfo);
+
+        // Find the category for this competition
+        let category = '';
+        competitionsData.forEach(cat => {
+            const comp = cat.competitions.find(c => c.name === compName);
+            if (comp) {
+                category = cat.category;
+            }
+        });
+
+        selectedCompetitions.push({
+            Category: category,
+            Name: compName,
+            "Team Info": teamInfo
+        });
+    });
+
+    // console.log('selectedCompetitions:', selectedCompetitions);
+
+    // Prepare update data
+    const updateData = {
+        updateParticipant: {
+            registrationId: currentEditData.registrationId,
+            participantName: currentEditData.participantName,
+            competitions: selectedCompetitions
+        }
+    };
+
+    // console.log('updateData being sent:', updateData);
+
+    // Show loading state
+    const saveBtn = document.getElementById('saveEditBtn');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+
+    // Send update request
+    fetch(backendUrl, {
+        method: 'POST',
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+            "Content-Type": "text/plain",
+        },
+        redirect: "follow",
+        body: JSON.stringify(updateData)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.status === 'success') {
+            showAlertModal('Competitions updated successfully!');
+            // Close modal
+            const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            if (editModal) editModal.hide();
+            // Refresh dashboard if we're on dashboard tab
+            if (document.getElementById('dashboard-section').classList.contains('active')) {
+                // Re-run the last search to refresh results
+                performDashboardSearch();
+            }
+        } else {
+            showAlertModal('Failed to update competitions: ' + (result.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Update error:', error);
+        showAlertModal('An error occurred while updating. Please try again.');
+    })
+    .finally(() => {
+        // Reset button state
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+        }
+    });
+}
+
+// Add event listener for save button
+document.addEventListener('DOMContentLoaded', function() {
+    const saveEditBtn = document.getElementById('saveEditBtn');
+    if (saveEditBtn) {
+        saveEditBtn.addEventListener('click', saveEditCompetitions);
+    }
+});
