@@ -49,5 +49,11 @@ const competitionsData = [
             { name: "Tambola", ageGroups: ["3-5", "6-9", "10-13", "14-17", "18-35", "36-55", "56+"], teamBased: false, displayAgeGroups: "", numberOfWinners: 1 },
             { name: "Bollywood Quiz (Teams of 3)", ageGroups: ["3-5", "6-9", "10-13", "14-17", "18-35", "36-55", "56+"], teamBased: true, displayAgeGroups: "No age category specification", numberOfWinners: 3 },
         ],
+    },
+    {
+        category: "Skip Competitions",
+        competitions: [
+            { name: "None", ageGroups: ["3-5", "6-9", "10-13", "14-17", "18-35", "36-55", "56+"], teamBased: false, displayAgeGroups: "", numberOfWinners: 0 },
+        ],
     }
 ];

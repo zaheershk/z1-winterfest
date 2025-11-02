@@ -244,29 +244,6 @@ function resetAllInputFields() {
     });
 }
 
-function updateTotalAmountDisplay() {
-    const option1Selected = document.getElementById("option1").checked;
-    const totalContainer = document.getElementById("totalCharge");
-
-    totalContainer.style.display = "none";
-    if (option1Selected) {
-        const total = calculateFoodStallCount() * 800 + 700;
-        totalContainer.textContent = `Total Amount to be paid: INR ${total}`;
-        totalContainer.style.display = "block";
-    }
-}
-
-function calculateFoodStallCount() {
-    const checkboxes = document.querySelectorAll(foodStallCheckboxSelector);
-    let count = 0;
-    checkboxes.forEach((cb) => {
-        if (cb.checked) {
-            count++;
-        }
-    });
-    return count;
-}
-
 function updateCompetitionsDisplay(selectedAgeGroup) {
     const container = document.getElementById("competitionsContainer");
     container.innerHTML = ""; // Clear current contents
@@ -906,7 +883,15 @@ function collectParticipantData() {
         data.competitions = [];
         const checkedCompetitions = document.querySelectorAll('input[name="competitions"]:checked');
 
+        // Check if "None" is selected - if so, only include "None" and ignore others
+        const noneSelected = Array.from(checkedCompetitions).some(cb => cb.value === 'None');
+        
         checkedCompetitions.forEach(cb => {
+            // If "None" is selected, only include "None". Otherwise include all selected competitions.
+            if (noneSelected && cb.value !== 'None') {
+                return; // Skip other competitions if "None" is selected
+            }
+
             // Find the category for this competition
             let category = '';
             competitionsData.forEach(cat => {
@@ -1122,12 +1107,19 @@ function calculateTotalAmount() {
     // Calculate totals
     registrationCart.forEach((participant) => {
         if (participant.registrationType === 'competition') {
-            hasCompetitions = true;
-            // Check for Master Chef selection in 18+ age groups
-            if (participant.competitions && participant.competitions.some(comp => comp.Name === 'Master Chef')) {
-                const ageGroup18Plus = ['18-35', '36-55', '56+'];
-                if (ageGroup18Plus.includes(participant.ageGroup)) {
-                    masterChefCount++;
+            // Check if participant has real competitions (not just "None")
+            const hasRealCompetitions = participant.competitions && 
+                participant.competitions.length > 0 && 
+                !participant.competitions.some(comp => comp.Name === 'None');
+            
+            if (hasRealCompetitions) {
+                hasCompetitions = true;
+                // Check for Master Chef selection in 18+ age groups
+                if (participant.competitions.some(comp => comp.Name === 'Master Chef')) {
+                    const ageGroup18Plus = ['18-35', '36-55', '56+'];
+                    if (ageGroup18Plus.includes(participant.ageGroup)) {
+                        masterChefCount++;
+                    }
                 }
             }
         } else if (participant.registrationType === 'foodstall') {
@@ -1191,6 +1183,28 @@ function updateCheckoutStepVisibility() {
 
 function handleCheckoutNext() {
     if (currentCheckoutStep === 1) {
+        // Validate that user has selected something to participate in
+        const hasValidParticipation = registrationCart.some(participant => {
+            // Check if participant has real competitions (not just "None")
+            const hasRealCompetitions = participant.registrationType === 'competition' && 
+                participant.competitions && 
+                participant.competitions.length > 0 && 
+                !participant.competitions.some(comp => comp.Name === 'None');
+            
+            // Check if participant has food stalls
+            const hasFoodStalls = participant.registrationType === 'foodstall' && 
+                participant.foodStalls && 
+                participant.foodStalls.Dates && 
+                participant.foodStalls.Dates.length > 0;
+            
+            return hasRealCompetitions || hasFoodStalls;
+        });
+        
+        if (!hasValidParticipation) {
+            showResetModal();
+            return;
+        }
+        
         // Moving from Summary to Acknowledgement
         currentCheckoutStep = 2;
         updateCheckoutStepVisibility();
@@ -1436,6 +1450,83 @@ function hideAlertModal() {
     if (modal) {
         modal.style.display = 'none';
     }
+}
+
+function showResetModal() {
+    const modal = document.createElement('div');
+    modal.id = 'resetModal';
+    modal.className = 'alert-modal';
+    modal.innerHTML = `
+        <div class="alert-modal-content">
+            <div class="alert-modal-header">
+                <h3>Start Over</h3>
+                <span class="alert-modal-close" onclick="hideResetModal()">&times;</span>
+            </div>
+            <div class="alert-modal-body">
+                You must select at least one competition or food stall to participate in the event. Do you want to start over?
+            </div>
+            <div class="alert-modal-footer">
+                <button class="alert-modal-btn" onclick="resetRegistrationFlow()">OK</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+
+    // Add click outside to close (but don't reset)
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            hideResetModal();
+        }
+    });
+}
+
+function hideResetModal() {
+    const modal = document.getElementById('resetModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function resetRegistrationFlow() {
+    // Keep tower and flat number
+    const towerValue = document.getElementById('tower').value;
+    const flatValue = document.getElementById('flat').value;
+    
+    // Clear registration cart and state
+    registrationCart = [];
+    currentRegistrationType = null;
+    currentCheckoutStep = 1;
+    
+    // Reset the form (this will clear everything)
+    const form = document.getElementById('registrationForm');
+    if (form) form.reset();
+    
+    // Restore tower and flat values
+    document.getElementById('tower').value = towerValue;
+    document.getElementById('flat').value = flatValue;
+    
+    // Reset UI state to show participant section
+    document.getElementById('participantSection').style.display = 'block';
+    document.getElementById('registrationTypeSection').style.display = 'none';
+    document.getElementById('competitionsSection').style.display = 'none';
+    document.getElementById('foodstallSection').style.display = 'none';
+    document.getElementById('addAnotherSection').style.display = 'none';
+    document.getElementById('foodStallQuestionSection').style.display = 'none';
+    document.getElementById('actionButtonsSection').style.display = 'block';
+    document.getElementById('nextStepSection').style.display = 'none';
+    
+    // Update cart display
+    updateCartDisplay();
+    updatePaymentTotal();
+    
+    // Navigate back to registration section
+    switchSection("registration");
+    
+    // Hide the modal
+    hideResetModal();
 }
 
 // Dashboard functionality
@@ -1855,15 +1946,21 @@ function saveEditCompetitions() {
 
     // Collect selected competitions
     const selectedCompetitions = [];
-    document.querySelectorAll('.edit-competition-checkbox:checked').forEach(checkbox => {
+    const checkedBoxes = document.querySelectorAll('.edit-competition-checkbox:checked');
+    
+    // Check if "None" is selected - if so, only include "None" and ignore others
+    const noneSelected = Array.from(checkedBoxes).some(cb => cb.value === 'None');
+    
+    checkedBoxes.forEach(checkbox => {
         const compName = checkbox.value;
+        
+        // If "None" is selected, only include "None". Otherwise include all selected competitions.
+        if (noneSelected && compName !== 'None') {
+            return; // Skip other competitions if "None" is selected
+        }
+
         const teamInput = document.querySelector(`[id="edit-team-${checkbox.id.replace('edit-', '')}"] input`);
         const teamInfo = teamInput && teamInput.value ? teamInput.value.trim() : 'N/A';
-
-        // console.log('Processing competition:', compName);
-        // console.log('teamInput element:', teamInput);
-        // if (teamInput) console.log('teamInput.value:', teamInput.value);
-        // console.log('teamInfo:', teamInfo);
 
         // Find the category for this competition
         let category = '';
