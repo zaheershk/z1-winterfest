@@ -769,6 +769,7 @@
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 .alert-modal-content {
@@ -780,11 +781,15 @@
     max-height: 80vh;
     overflow-y: auto;
     animation: modalFadeIn 0.3s ease-out;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 .alert-modal-header {
@@ -854,7 +859,6 @@
 @media (max-width: 576px) {
     .alert-modal-content {
         width: 95%;
-        margin: 20px;
     }
 
     .alert-modal-header {
@@ -1008,6 +1012,40 @@
     .registration-closed-banner .running-text {
         animation-duration: 12s;
     }
+}
+
+.admin-panel {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.admin-panel-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+
+.admin-panel-content {
+    text-align: left;
+    padding-right: 80px; /* Make room for the button */
+}
+
+.admin-panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.admin-panel-text {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 12px;
 }
 
 @media (max-width: 576px) {

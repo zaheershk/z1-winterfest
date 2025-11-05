@@ -1,5 +1,5 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbwHE0hngzURiAu5ov48xzdMIxSEgar6HnEEu3PRE1arIDYBd5YK7Cm0ILjwSurwp_cV/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbzssWh1mVgMflWvsBvSLBoOTVkW0ZbiluXmq3r6b4zgVdLrhA3xCgqOE7EP92T2DPOY/exec";
 
 // Global flag to control registration status
 let REGISTRATION_CLOSED = true; 
@@ -22,6 +22,13 @@ let currentCheckoutStep = 1; // 1: Summary, 2: Acknowledgement, 3: Payment
 const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Check if we're on index.html (has dashboard nav)
+    const isIndexPage = document.getElementById('nav-dashboard') !== null;
+    if (!isIndexPage) {
+        // On other pages (reimbursement, winner, refund), skip index-specific logic
+        return;
+    }
+
     // Clear cart data on page refresh
     localStorage.removeItem('registrationCart');
     registrationCart = [];
@@ -39,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Check for access code in URL (async validation)
     checkAccessCode();
 
-    // Set default section based on registration status
+    // Set default section
     if (REGISTRATION_CLOSED && !hasValidAccessCode) {
         switchSection('dashboard');
     }
@@ -95,9 +102,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (navAdmin) {
         navAdmin.addEventListener("click", function () {
-            switchSection("admin");
+            showEmailModal();
         });
     }
+
+    // Initially hide volunteer-only admin panels
+    const reimbursementPanel = document.getElementById('reimbursement-panel');
+    const winnerPanel = document.getElementById('winner-panel');
+    if (reimbursementPanel) reimbursementPanel.style.display = 'none';
+    if (winnerPanel) winnerPanel.style.display = 'none';
 
     // Information tab - Register Participant button
     const registerParticipantBtn = document.getElementById('registerParticipantBtn');
@@ -276,12 +289,19 @@ function switchSection(sectionName) {
         btn.classList.remove('active');
     });
     // Show selected section
-    document.getElementById(sectionName + '-section').classList.add('active');
+    const targetSection = document.getElementById(sectionName + '-section');
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
     // Add active to clicked button
-    document.getElementById('nav-' + sectionName).classList.add('active');
+    const targetNav = document.getElementById('nav-' + sectionName);
+    if (targetNav) {
+        targetNav.classList.add('active');
+    }
 
     // Special handling for registration section - only when coming from checkout
-    if (sectionName === 'registration' && document.getElementById('checkout-section').classList.contains('active')) {
+    const checkoutSection = document.getElementById('checkout-section');
+    if (sectionName === 'registration' && checkoutSection && checkoutSection.classList.contains('active')) {
         // When coming from checkout, reset the entire form
         resetRegistrationForm();
     } else if (sectionName === 'registration') {
@@ -345,6 +365,8 @@ function resetAllInputFields() {
 
 function updateCompetitionsDisplay(selectedAgeGroup) {
     const container = document.getElementById("competitionsContainer");
+    if (!container) return; // Skip if element doesn't exist (not on index.html)
+
     container.innerHTML = ""; // Clear current contents
 
     if (!selectedAgeGroup) {
@@ -1662,6 +1684,9 @@ async function loadApartmentsForDashboard() {
         }
     } catch (error) {
         console.error('Error loading apartments:', error);
+        // Fallback: don't break the dashboard if apartments can't be loaded
+        dashboardApartments = [];
+        setupApartmentAutocomplete();
     }
 }
 
@@ -2385,5 +2410,208 @@ function showSpecialAccessMessage() {
     const mainContent = document.querySelector('.container');
     if (mainContent && mainContent.firstChild) {
         mainContent.insertBefore(banner, mainContent.firstChild);
+    }
+}
+
+// Check volunteer authorization for protected forms
+function checkVolunteerAuthorization(formType) {
+    // Show loading
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('content-section').style.display = 'none';
+
+    // Call backend to check volunteer status
+    $.getJSON(backendUrl + "?action=checkVolunteerStatus", function (data) {
+        if (data.authorized) {
+            // Show content
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('content-section').style.display = 'block';
+        } else {
+            // Show access denied modal
+            showAlertModal('You are not authorized to access this form. Only volunteers can access this feature.');
+        }
+    }).fail(function () {
+        // On error, show access denied
+        showAlertModal('Unable to verify authorization. Please try again later.');
+    });
+}
+
+// Email modal functions for admin authorization
+function showEmailModal() {
+    const modal = document.getElementById('emailModal');
+    if (modal) {
+        // Reset modal content to original state
+        const emailModalBody = document.querySelector('#emailModal .alert-modal-body');
+        if (emailModalBody) {
+            emailModalBody.innerHTML = `
+                <p>Please enter your email address to access admin features:</p>
+                <input type="email" id="volunteerEmail" class="form-control" placeholder="Enter your email" required>
+            `;
+        }
+
+        // Reset submit button
+        const submitBtn = document.getElementById('emailSubmitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit';
+        }
+
+        // Reset cancel button
+        const cancelBtn = document.getElementById('emailCancelBtn');
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+        }
+
+        modal.style.display = 'flex';
+    }
+}
+
+function hideEmailModal() {
+    const modal = document.getElementById('emailModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function checkVolunteerByEmail() {
+    const email = document.getElementById('volunteerEmail').value.trim();
+    if (!email) {
+        alert('Please enter your email address.');
+        return;
+    }
+
+    // Reset modal content if it's showing an error
+    const emailModalBody = document.querySelector('#emailModal .alert-modal-body');
+    if (emailModalBody && emailModalBody.innerHTML.includes('fa-exclamation-triangle')) {
+        emailModalBody.innerHTML = `
+            <p>Please enter your email address to access admin features:</p>
+            <input type="email" id="volunteerEmail" class="form-control" placeholder="Enter your email" required>
+        `;
+        // Restore original email value
+        setTimeout(() => {
+            document.getElementById('volunteerEmail').value = email;
+        }, 0);
+    }
+
+    // Show loading state
+    const submitBtn = document.getElementById('emailSubmitBtn');
+    const cancelBtn = document.getElementById('emailCancelBtn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    }
+    if (cancelBtn) {
+        cancelBtn.disabled = true;
+    }
+
+    try {
+        // Call backend to check volunteer status
+        const response = await fetch(backendUrl, {
+            method: 'POST',
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "text/plain",
+            },
+            redirect: "follow",
+            body: JSON.stringify({
+                action: 'checkVolunteerByEmail',
+                email: email
+            })
+        });
+
+        const data = await response.json();
+
+        // Show appropriate message based on authorization result
+        const emailModalBody = document.querySelector('#emailModal .alert-modal-body');
+        if (emailModalBody) {
+            if (data.authorized) {
+                emailModalBody.innerHTML = `
+                    <div style="color: #28a745; text-align: center;">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                        <p style="margin-top: 10px;">Volunteer check passed, displaying options..</p>
+                    </div>
+                `;
+            } else {
+                emailModalBody.innerHTML = `
+                    <div style="color: #dc3545; text-align: center;">
+                        <i class="fas fa-times-circle fa-2x"></i>
+                        <p style="margin-top: 10px;">Volunteer check failed, displaying options..</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Re-enable buttons
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Continue';
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+        }
+
+        // Wait a moment for user to see the message, then close modal and show admin section
+        setTimeout(() => {
+            hideEmailModal();
+            switchSection("admin");
+            
+            if (data.authorized) {
+                // Show all panels for volunteers
+                document.getElementById('reimbursement-panel').style.display = 'block';
+                document.getElementById('winner-panel').style.display = 'block';
+            } else {
+                // Hide volunteer-only panels for non-volunteers
+                document.getElementById('reimbursement-panel').style.display = 'none';
+                document.getElementById('winner-panel').style.display = 'none';
+            }
+        }, 1500);
+    } catch (error) {
+        console.error('Error checking volunteer status:', error);
+
+        // Show failure message in modal
+        const emailModalBody = document.querySelector('#emailModal .alert-modal-body');
+        if (emailModalBody) {
+            emailModalBody.innerHTML = `
+                <div style="color: #dc3545; text-align: center;">
+                    <i class="fas fa-times-circle fa-2x"></i>
+                    <p style="margin-top: 10px;">Volunteer check failed, displaying options..</p>
+                </div>
+            `;
+        }
+
+        // Re-enable buttons
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Continue';
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+        }
+
+        // Wait a moment for user to see the message, then close modal and show admin section
+        setTimeout(() => {
+            hideEmailModal();
+            switchSection("admin");
+            document.getElementById('reimbursement-panel').style.display = 'none';
+            document.getElementById('winner-panel').style.display = 'none';
+        }, 1500);
+    }
+}// Alert modal functions
+function showAlertModal(message, title = 'Notification') {
+    const modal = document.getElementById('alertModal');
+    const titleEl = document.getElementById('alertModalTitle');
+    const messageEl = document.getElementById('alertModalMessage');
+    
+    if (modal && titleEl && messageEl) {
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        modal.style.display = 'flex';
+    }
+}
+
+function hideAlertModal() {
+    const modal = document.getElementById('alertModal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 }

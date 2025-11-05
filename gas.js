@@ -2,6 +2,15 @@
 const registrationWorkbookId = '1k6k68Upe41ct_hwa-1VQbnCN6rtFiPZXSal_uPYMOfg';
 const formDataSheetName = 'FormData';
 
+// Hardcoded list of volunteer email addresses
+const VOLUNTEER_EMAILS = [
+  'zaheer.azad@gmail.com',
+  'prateekagr1988@gmail.com',
+  'Sudeep00890@gmail.com',
+  'sunitasatpathy@gmail.com',
+  // Add other volunteer emails here
+];
+
 function doGet(e) {
   try {
     // Check if this is an access code validation request
@@ -14,6 +23,11 @@ function doGet(e) {
         reason: validation.reason || null
       }))
         .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Check if this is a volunteer status check
+    if (e.parameter && e.parameter.action === 'checkVolunteerStatus') {
+      return checkVolunteerStatus();
     }
 
     // Check if this is a search request
@@ -66,6 +80,30 @@ function doPost(e) {
     }
 
     Logger.log('Final requestData: ' + JSON.stringify(requestData)); // Debug log
+
+    // Check if this is an action request (like volunteer check)
+    if (requestData.action) {
+      switch (requestData.action) {
+        case 'checkVolunteerByEmail':
+          return checkVolunteerByEmail(requestData.email);
+        default:
+          return errorResponse('Unknown action: ' + requestData.action);
+      }
+    }
+
+    // Check if this is a form submission (refund, reimbursement, winner)
+    if (requestData.formType) {
+      switch (requestData.formType) {
+        case 'refund':
+          return submitRefund(requestData);
+        case 'reimbursement':
+          return submitReimbursement(requestData);
+        case 'winner':
+          return submitWinner(requestData);
+        default:
+          return errorResponse('Unknown form type: ' + requestData.formType);
+      }
+    }
 
     // Check if this is an update request
     if (requestData.updateParticipant) {
@@ -1332,6 +1370,82 @@ function analyzePaymentScreenshot(imageBlob) {
   } catch (error) {
     Logger.log('Error in analyzePaymentScreenshot: ' + error.toString());
     return null;
+  }
+}
+
+// Check if current user is a volunteer
+function checkVolunteerStatus() {
+  try {
+    const userEmail = Session.getActiveUser().getEmail();
+    const isVolunteer = VOLUNTEER_EMAILS.includes(userEmail);
+
+    return dataResponse({
+      authorized: isVolunteer,
+      userEmail: userEmail
+    });
+  } catch (error) {
+    Logger.log('Error in checkVolunteerStatus: ' + error.toString());
+    return errorResponse('Unable to verify volunteer status');
+  }
+}
+
+function checkVolunteerByEmail(email) {
+  try {
+    const isVolunteer = VOLUNTEER_EMAILS.includes(email.toLowerCase().trim());
+
+    return dataResponse({
+      authorized: isVolunteer,
+      userEmail: email
+    });
+  } catch (error) {
+    Logger.log('Error in checkVolunteerByEmail: ' + error.toString());
+    return errorResponse('Unable to verify volunteer status');
+  }
+}
+
+// Placeholder functions for admin forms
+function submitRefund(data) {
+  try {
+    Logger.log('Refund submission received: ' + JSON.stringify(data));
+    // TODO: Implement refund processing logic
+    return dataResponse({
+      status: 'success',
+      message: 'Refund request submitted successfully (placeholder)',
+      requestId: 'REF-' + new Date().getTime()
+    });
+  } catch (error) {
+    Logger.log('Error in submitRefund: ' + error.toString());
+    return errorResponse('Failed to submit refund request');
+  }
+}
+
+function submitReimbursement(data) {
+  try {
+    Logger.log('Reimbursement submission received: ' + JSON.stringify(data));
+    // TODO: Implement reimbursement processing logic
+    return dataResponse({
+      status: 'success',
+      message: 'Reimbursement request submitted successfully (placeholder)',
+      requestId: 'REIMB-' + new Date().getTime()
+    });
+  } catch (error) {
+    Logger.log('Error in submitReimbursement: ' + error.toString());
+    return errorResponse('Failed to submit reimbursement request');
+  }
+}
+
+function submitWinner(data) {
+  try {
+    Logger.log('Winner submission received: ' + JSON.stringify(data));
+    // TODO: Implement winner processing logic
+    return dataResponse({
+      status: 'success',
+      message: 'Winner entry submitted successfully (placeholder)',
+      requestId: 'WIN-' + new Date().getTime()
+    });
+  } catch (error) {
+    Logger.log('Error in submitWinner: ' + error.toString());
+    return errorResponse('Failed to submit winner entry');
   }
 }
 
