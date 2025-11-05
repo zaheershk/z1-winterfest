@@ -967,3 +967,56 @@
         font-size: 13px;
     }
 }
+
+/* Registration Closed Banner */
+.registration-closed-banner {
+    background-color: #FFFF00 !important; /* Bright yellow background */
+    color: #800080 !important; /* Purple text */
+    padding: 12px 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    border-top: 3px solid #4b0082;
+    border-bottom: 3px solid #4b0082;
+    overflow: hidden;
+    position: relative;
+    display: none; /* Hidden by default, shown only when REGISTRATION_CLOSED = true */
+}
+
+.registration-closed-banner .running-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 15s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Mobile responsiveness for banner */
+@media (max-width: 768px) {
+    .registration-closed-banner {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+    
+    .registration-closed-banner .running-text {
+        animation-duration: 12s;
+    }
+}
+
+@media (max-width: 576px) {
+    .registration-closed-banner {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    
+    .registration-closed-banner .running-text {
+        animation-duration: 10s;
+    }
+}

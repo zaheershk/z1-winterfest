@@ -1,6 +1,9 @@
 
 const backendUrl = "https://script.google.com/macros/s/AKfycbyOy96OP0BmBRu0h5r5hwiT1JLZTWc9ZI7Cofo8IfXP1iu4mMEvi0RHTqbJnqiBEUJO/exec";
 
+// Global flag to control registration status
+const REGISTRATION_CLOSED = true; 
+
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
 var reportTabClicked = null;
@@ -37,6 +40,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (navRegistration) {
         navRegistration.addEventListener("click", function () {
+            if (REGISTRATION_CLOSED) {
+                showRegistrationClosedMessage();
+                return;
+            }
             switchSection("registration");
             // If clicking registration tab directly, show participant section if not already shown
             const participantSection = document.getElementById('participantSection');
@@ -50,6 +57,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (navCheckout) {
         navCheckout.addEventListener("click", function () {
+            if (REGISTRATION_CLOSED) {
+                showRegistrationClosedMessage();
+                return;
+            }
             switchSection("checkout");
         });
     }
@@ -70,6 +81,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerParticipantBtn = document.getElementById('registerParticipantBtn');
     if (registerParticipantBtn) {
         registerParticipantBtn.addEventListener('click', function () {
+            if (REGISTRATION_CLOSED) {
+                showRegistrationClosedMessage();
+                return;
+            }
             switchSection('registration');
             resetRegistrationForm();
             showParticipantSection();
@@ -80,6 +95,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
     if (registerParticipantBtnCheckout) {
         registerParticipantBtnCheckout.addEventListener('click', function () {
+            if (REGISTRATION_CLOSED) {
+                showRegistrationClosedMessage();
+                return;
+            }
+
             // Set tower and flat from existing cart data before resetting
             if (registrationCart.length > 0) {
                 const firstParticipant = registrationCart[0];
@@ -164,10 +184,60 @@ document.addEventListener("DOMContentLoaded", function () {
     // Checkout event listeners
     const finalSubmitBtn = document.getElementById('finalSubmitBtn');
     if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', handleFinalSubmit);
+
+    // Disable registration and checkout navigation when registration is closed
+    if (REGISTRATION_CLOSED) {
+        const navRegistration = document.getElementById('nav-registration');
+        const navCheckout = document.getElementById('nav-checkout');
+        const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+        const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+
+        if (navRegistration) {
+            navRegistration.style.opacity = '0.5';
+            navRegistration.style.pointerEvents = 'none';
+            navRegistration.title = 'Registration is closed';
+        }
+
+        if (navCheckout) {
+            navCheckout.style.opacity = '0.5';
+            navCheckout.style.pointerEvents = 'none';
+            navCheckout.title = 'Registration is closed';
+        }
+
+        if (registerParticipantBtn) {
+            registerParticipantBtn.style.opacity = '0.5';
+            registerParticipantBtn.style.pointerEvents = 'none';
+            registerParticipantBtn.title = 'Registration is closed';
+        }
+
+        if (registerParticipantBtnCheckout) {
+            registerParticipantBtnCheckout.style.opacity = '0.5';
+            registerParticipantBtnCheckout.style.pointerEvents = 'none';
+            registerParticipantBtnCheckout.title = 'Registration is closed';
+        }
+
+        // Show registration closed banner
+        const registrationBanner = document.querySelector('.registration-closed-banner');
+        if (registrationBanner) {
+            registrationBanner.style.display = 'block';
+        }
+    } else {
+        // Hide banner when registration is open
+        const registrationBanner = document.querySelector('.registration-closed-banner');
+        if (registrationBanner) {
+            registrationBanner.style.display = 'none';
+        }
+    }
 });
 
 // Navigation function
 function switchSection(sectionName) {
+    // Prevent switching to registration or checkout sections when registration is closed
+    if (REGISTRATION_CLOSED && (sectionName === 'registration' || sectionName === 'checkout')) {
+        showRegistrationClosedMessage();
+        return;
+    }
+
     // Hide all sections
     document.querySelectorAll('.mobile-section').forEach(section => {
         section.classList.remove('active');
@@ -1690,7 +1760,10 @@ function displayDashboardResults(data, searchTowerFlat) {
                 flatDisplay.style.display = 'none';
             }
         }
-        registerBtn.style.display = 'inline-block';
+        // Only show register button if registration is not closed
+        if (!REGISTRATION_CLOSED) {
+            registerBtn.style.display = 'inline-block';
+        }
     } else {
         flatDisplay.style.display = 'none';
         registerBtn.style.display = 'none';
@@ -1748,8 +1821,8 @@ function displayDashboardResults(data, searchTowerFlat) {
 
         const regDate = new Date(registration.registrationDate).toLocaleDateString();
 
-        // Only show EDIT button for competition registrations
-        const showEditButton = registration.registrationType === 'competition';
+        // Only show EDIT button for competition registrations and when registration is not closed
+        const showEditButton = registration.registrationType === 'competition' && !REGISTRATION_CLOSED;
 
         row.innerHTML = `
             <td>${registration.name}</td>
@@ -1779,6 +1852,11 @@ function clearDashboardResults() {
 }
 
 function handleDashboardRegister() {
+    if (REGISTRATION_CLOSED) {
+        showRegistrationClosedMessage();
+        return;
+    }
+
     // Try to get apartment from the input field first (apartment search)
     const apartmentInput = document.getElementById('dashboardApartment');
     let tower = null;
@@ -1836,6 +1914,11 @@ function prefillRegistrationFromDashboard() {
 let currentEditData = null;
 
 function openEditModal(uniqueRecordId, participantName, ageGroup, competitionsJson) {
+    if (REGISTRATION_CLOSED) {
+        showRegistrationClosedMessage();
+        return;
+    }
+
     currentEditData = {
         uniqueRecordId: uniqueRecordId,
         participantName: participantName,
@@ -2044,3 +2127,56 @@ document.addEventListener('DOMContentLoaded', function() {
         saveEditBtn.addEventListener('click', saveEditCompetitions);
     }
 });
+
+// Function to show registration closed message
+function showRegistrationClosedMessage() {
+    const modalHtml = `
+        <div class="modal fade" id="registrationClosedModal" tabindex="-1" aria-labelledby="registrationClosedModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="registrationClosedModalLabel">
+                            <i class="fas fa-info-circle text-info"></i> Registration Closed
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-calendar-times fa-3x text-warning mb-3"></i>
+                        </div>
+                        <h6 class="fw-bold">Z1 Winterfest 2025 Registration is Now Closed</h6>
+                        <p class="text-muted mb-3">
+                            Thank you for your interest! Our enrollment window has ended.
+                        </p>
+                        <p class="mb-0">
+                            You can still view your existing registrations using the <strong>Dashboard</strong> tab.
+                        </p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                            <i class="fas fa-check"></i> OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing modal if present
+    const existingModal = document.getElementById('registrationClosedModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('registrationClosedModal'));
+    modal.show();
+
+    // Clean up modal after it's hidden
+    document.getElementById('registrationClosedModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
