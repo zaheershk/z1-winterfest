@@ -21,7 +21,7 @@ function doGet(e) {
       message: 'GAS script is working',
       timestamp: new Date().toISOString()
     }))
-    .setMimeType(ContentService.MimeType.JSON);
+      .setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
     Logger.log('doGet error: ' + error.toString());
     return errorResponse('Internal server error: ' + error.toString());
@@ -97,23 +97,23 @@ function processBatchSubmission(batchData) {
 
     // Process each participant
     const results = [];
-    
+
     // Generate registration ID for this entire batch submission (same for all participants)
     const registrationId = Utilities.formatDate(new Date(), 'GMT', 'yyyyMMddHHmmss') + '_' + Math.floor(Math.random() * 1000);
-    
+
     for (const participant of batchData.participants) {
       try {
         Logger.log('Processing participant: ' + JSON.stringify(participant));
 
         // Generate unique record ID for this participant
         const uniqueRecordId = Utilities.getUuid();
-        
+
         // Determine registration type
         let registrationType = 'competition'; // Default to competition
-        const hasFoodStalls = participant.foodStalls && 
-          ((participant.foodStalls.Menu && participant.foodStalls.Menu.trim()) || 
-           (participant.foodStalls.Dates && Array.isArray(participant.foodStalls.Dates) && participant.foodStalls.Dates.length > 0));
-        
+        const hasFoodStalls = participant.foodStalls &&
+          ((participant.foodStalls.Menu && participant.foodStalls.Menu.trim()) ||
+            (participant.foodStalls.Dates && Array.isArray(participant.foodStalls.Dates) && participant.foodStalls.Dates.length > 0));
+
         if (hasFoodStalls) {
           registrationType = 'foodstall';
         }
@@ -434,4 +434,496 @@ function updateParticipantRegistration(updateData) {
   }
 }
 
+// ---- NEW FUNCTIONS FOR DATA EXTRACTION ----
+
+// Helper function to clear all data rows in a sheet except the header
+function clearSheetData(sheetName) {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName(sheetName);
+  if (!sheet) {
+    throw new Error(`Sheet "${sheetName}" not found`);
+  }
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+  if (lastRow > 1) {
+    // Clear content and formatting for data rows
+    const dataRange = sheet.getRange(2, 1, lastRow - 1, lastCol);
+    dataRange.clearContent();
+    dataRange.clearFormat();
+  }
+}
+
+// Helper function to derive Apartment from Tower and Flat
+function deriveApartment(tower, flat) {
+  return `${tower}-${flat}`.toUpperCase();
+}
+
+// Helper function to parse Competitions JSON
+function parseCompetitionsJson(jsonString) {
+  try {
+    return JSON.parse(jsonString || '[]');
+  } catch (e) {
+    Logger.log('Error parsing competitions JSON: ' + e.toString());
+    return [];
+  }
+}
+
+// Helper function to parse Food Stalls JSON
+function parseFoodStallsJson(jsonString) {
+  try {
+    const parsed = JSON.parse(jsonString || '{}');
+    return {
+      menu: (parsed.Menu || '').toUpperCase(),
+      dates: Array.isArray(parsed.Dates) ? parsed.Dates.join(', ') : ''
+    };
+  } catch (e) {
+    Logger.log('Error parsing food stalls JSON: ' + e.toString());
+    return { menu: '', dates: '' };
+  }
+}
+
+// Function to process and load data into CompetitionData sheet
+function processCompetitionData() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const formDataSheet = spreadsheet.getSheetByName(formDataSheetName);
+  const competitionSheet = spreadsheet.getSheetByName('CompetitionData');
+
+  if (!formDataSheet || !competitionSheet) {
+    throw new Error('Required sheets not found');
+  }
+
+  const data = formDataSheet.getDataRange().getValues();
+  if (data.length < 2) return; // No data
+
+  const headers = data[0];
+  const colIndices = {
+    uniqueId: headers.indexOf('Unique Record ID'),
+    email: headers.indexOf('Email'),
+    name: headers.indexOf('Name'),
+    phone: headers.indexOf('Phone'),
+    tower: headers.indexOf('Tower'),
+    flat: headers.indexOf('Flat'),
+    gender: headers.indexOf('Gender'),
+    age: headers.indexOf('Age'),
+    ageGroup: headers.indexOf('Age Group'),
+    competitions: headers.indexOf('Competitions')
+  };
+
+  // Group by Apartment and Name
+  const groupedData = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const apartment = deriveApartment(row[colIndices.tower], row[colIndices.flat]);
+    const name = row[colIndices.name].toUpperCase(); // Convert name to uppercase
+    const key = `${apartment}|${name}`;
+
+    if (!groupedData[key]) {
+      groupedData[key] = {
+        apartment,
+        name: name,
+        email: row[colIndices.email],
+        phone: row[colIndices.phone],
+        gender: row[colIndices.gender],
+        age: row[colIndices.age],
+        ageGroup: row[colIndices.ageGroup],
+        competitions: {}
+      };
+    }
+
+    // Parse competitions
+    const comps = parseCompetitionsJson(row[colIndices.competitions]);
+    comps.forEach(comp => {
+      const compKey = `${comp.Category}|${comp.Name}`;
+      if (!groupedData[key].competitions[compKey]) {
+        groupedData[key].competitions[compKey] = {
+          category: comp.Category,
+          name: comp.Name,
+          teamInfos: []
+        };
+      }
+      if (comp['Team Info']) {
+        groupedData[key].competitions[compKey].teamInfos.push(comp['Team Info']);
+      }
+    });
+  }
+
+  // Prepare output rows
+  const outputRows = [];
+  Object.values(groupedData).forEach(group => {
+    Object.values(group.competitions).forEach(comp => {
+      const filteredTeamInfos = comp.teamInfos.filter(t => t !== 'N/A');
+      const teamInfo = filteredTeamInfos.length > 0 ? filteredTeamInfos.join(', ').toUpperCase() : '';
+      outputRows.push([
+        group.apartment,
+        group.name,
+        group.email,
+        group.phone,
+        group.gender,
+        group.age,
+        "'" + group.ageGroup, // Force Age Group as string
+        comp.category,
+        comp.name,
+        teamInfo
+      ]);
+    });
+  });
+
+  // Sort output rows alphabetically by Apartment (first column)
+  outputRows.sort((a, b) => a[0].localeCompare(b[0]));
+
+  // Write to CompetitionData
+  if (outputRows.length > 0) {
+    competitionSheet.getRange(2, 1, outputRows.length, 10).setValues(outputRows);
+  }
+}
+
+// Function to process and load data into PaymentData sheet
+function processPaymentData() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const formDataSheet = spreadsheet.getSheetByName(formDataSheetName);
+  const paymentSheet = spreadsheet.getSheetByName('PaymentData');
+
+  if (!formDataSheet || !paymentSheet) {
+    throw new Error('Required sheets not found');
+  }
+
+  const data = formDataSheet.getDataRange().getValues();
+  if (data.length < 2) return; // No data
+
+  const headers = data[0];
+  const colIndices = {
+    tower: headers.indexOf('Tower'),
+    flat: headers.indexOf('Flat'),
+    paymentProof: headers.indexOf('Payment Proof URL'),
+    totalAmount: headers.indexOf('Total Amount')
+  };
+
+  // Group by Apartment and Amount (to handle separate payments)
+  const groupedData = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const apartment = deriveApartment(row[colIndices.tower], row[colIndices.flat]);
+    const amount = parseFloat(row[colIndices.totalAmount]) || 0;
+    const paymentProof = row[colIndices.paymentProof] || '';
+
+    // Create unique key for apartment + amount combination
+    const key = `${apartment}|${amount}`;
+
+    if (!groupedData[key]) {
+      groupedData[key] = {
+        apartment,
+        amount,
+        paymentProofs: new Set() // Use Set to avoid duplicates
+      };
+    }
+
+    if (paymentProof) {
+      groupedData[key].paymentProofs.add(paymentProof);
+    }
+  }
+
+  // Prepare output rows - one row per unique apartment-amount combination
+  const outputRows = [];
+  Object.values(groupedData).forEach(group => {
+    const paymentProof = group.paymentProofs.size > 0 ? Array.from(group.paymentProofs)[0] : ''; // Take first unique payment proof
+
+    // Logger.log(`Apartment ${group.apartment}: amount ${group.amount}, payment proofs: ${group.paymentProofs.size}`);
+
+    outputRows.push([
+      group.apartment,
+      paymentProof,
+      group.amount,
+      '', // Paid Amount blank
+      ''  // Discrepancy blank
+    ]);
+  });
+
+  // Sort output rows alphabetically by Apartment (first column)
+  outputRows.sort((a, b) => a[0].localeCompare(b[0]));
+
+  // Write to PaymentData
+  if (outputRows.length > 0) {
+    paymentSheet.getRange(2, 1, outputRows.length, 5).setValues(outputRows);
+  }
+}
+
+// Function to process and load data into FoodStallData sheet
+function processFoodStallData() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const formDataSheet = spreadsheet.getSheetByName(formDataSheetName);
+  const foodStallSheet = spreadsheet.getSheetByName('FoodStallData');
+
+  if (!formDataSheet || !foodStallSheet) {
+    throw new Error('Required sheets not found');
+  }
+
+  const data = formDataSheet.getDataRange().getValues();
+  if (data.length < 2) return; // No data
+
+  const headers = data[0];
+  const colIndices = {
+    email: headers.indexOf('Email'),
+    name: headers.indexOf('Name'),
+    phone: headers.indexOf('Phone'),
+    tower: headers.indexOf('Tower'),
+    flat: headers.indexOf('Flat'),
+    foodStalls: headers.indexOf('Food Stalls')
+  };
+
+  // Group by Apartment and Name
+  const groupedData = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const apartment = deriveApartment(row[colIndices.tower], row[colIndices.flat]);
+    const name = row[colIndices.name].toUpperCase(); // Convert name to uppercase
+    const key = `${apartment}|${name}`;
+
+    if (!groupedData[key]) {
+      groupedData[key] = {
+        apartment,
+        name: name,
+        email: row[colIndices.email],
+        phone: row[colIndices.phone],
+        foodStalls: new Set()
+      };
+    }
+
+    // Parse food stalls
+    const foodStall = parseFoodStallsJson(row[colIndices.foodStalls]);
+    if (foodStall.menu) {
+      groupedData[key].foodStalls.add(JSON.stringify(foodStall)); // Store as JSON string for uniqueness
+    }
+  }
+
+  // Prepare output rows
+  const outputRows = [];
+  Object.values(groupedData).forEach(group => {
+    group.foodStalls.forEach(stallJson => {
+      const stall = JSON.parse(stallJson);
+      outputRows.push([
+        group.apartment,
+        group.name,
+        group.email,
+        group.phone,
+        stall.menu,
+        stall.dates
+      ]);
+    });
+  });
+
+  // Sort output rows alphabetically by Apartment (first column)
+  outputRows.sort((a, b) => a[0].localeCompare(b[0]));
+
+  // Write to FoodStallData
+  if (outputRows.length > 0) {
+    foodStallSheet.getRange(2, 1, outputRows.length, 6).setValues(outputRows);
+  }
+}
+
+// Main function to load data into both sheets
+function loadDataToSheets() {
+  try {
+    Logger.log('Starting data load process...');
+
+    // Clear and load CompetitionData
+    clearSheetData('CompetitionData');
+    processCompetitionData();
+    Logger.log('CompetitionData loaded successfully');
+
+    // Clear and load PaymentData
+    clearSheetData('PaymentData');
+    processPaymentData();
+    Logger.log('PaymentData loaded successfully');
+
+    // Clear and load FoodStallData
+    clearSheetData('FoodStallData');
+    processFoodStallData();
+    Logger.log('FoodStallData loaded successfully');
+
+    Logger.log('Data load process completed');
+  } catch (error) {
+    Logger.log('Error in loadDataToSheets: ' + error.toString());
+    throw error;
+  }
+}
+
+// ---- PAYMENT VERIFICATION USING GOOGLE CLOUD VISION AI ----
+
+// Function to verify payments by analyzing screenshots with Google Cloud Vision AI
+// NOTE: Ensure PaymentData sheet has headers: Apartment, Payment Proof URL, Due Amount, Paid Amount, Discrepancy
+function verifyPayments() {
+  try {
+    // Logger.log('Starting payment verification process...');
+
+    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const paymentSheet = spreadsheet.getSheetByName('PaymentData');
+
+    if (!paymentSheet) {
+      throw new Error('PaymentData sheet not found');
+    }
+
+    const data = paymentSheet.getDataRange().getValues();
+    if (data.length < 2) {
+      Logger.log('No data in PaymentData sheet');
+      return;
+    }
+
+    const headers = data[0];
+    const colIndices = {
+      apartment: headers.indexOf('Apartment'),
+      paymentProofUrl: headers.indexOf('Payment Proof URL'),
+      dueAmount: headers.indexOf('Due Amount'),
+      paidAmount: headers.indexOf('Paid Amount'),
+      discrepancy: headers.indexOf('Discrepancy')
+    };
+
+    // Process each row (skip header)
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const paymentProofUrl = row[colIndices.paymentProofUrl];
+      const paidAmount = row[colIndices.paidAmount];
+      const discrepancy = row[colIndices.discrepancy];
+
+      // Skip if no payment proof URL
+      if (!paymentProofUrl) {
+        continue;
+      }
+
+      try {
+        // Logger.log(`Processing payment for apartment: ${row[colIndices.apartment]}`);
+
+        // Extract file ID from Google Drive URL
+        const fileId = extractFileIdFromUrl(paymentProofUrl);
+        if (!fileId) {
+          // Logger.log(`Invalid payment proof URL for apartment ${row[colIndices.apartment]}`);
+          continue;
+        }
+
+        // Get image blob from Drive
+        const imageBlob = DriveApp.getFileById(fileId).getBlob();
+
+        // Analyze image with Vision AI
+        const extractedAmount = analyzePaymentScreenshot(imageBlob);
+
+        if (extractedAmount !== null) {
+          const dueAmount = parseFloat(row[colIndices.dueAmount]) || 0;
+          const amountsMatch = Math.abs(extractedAmount - dueAmount) <= 0.01; // Allow small floating point differences
+
+          // Update the Paid Amount column
+          paymentSheet.getRange(i + 1, colIndices.paidAmount + 1).setValue(extractedAmount);
+
+          // Update the Discrepancy column - NO if amounts match (no discrepancy), YES if they don't (discrepancy)
+          paymentSheet.getRange(i + 1, colIndices.discrepancy + 1).setValue(amountsMatch ? 'NO' : 'YES');
+
+          // Logger.log(`Apartment ${row[colIndices.apartment]}: extracted ₹${extractedAmount}, due ₹${dueAmount}, discrepancy: ${amountsMatch ? 'NO' : 'YES'}`);
+        } else {
+          Logger.log(`Could not extract amount for apartment ${row[colIndices.apartment]}`);
+        }
+
+        // Add delay to avoid rate limits
+        Utilities.sleep(1000);
+
+      } catch (rowError) {
+        Logger.log(`Error processing row for apartment ${row[colIndices.apartment]}: ${rowError.toString()}`);
+      }
+    }
+
+    // Logger.log('Payment verification process completed');
+
+  } catch (error) {
+    Logger.log('Error in verifyPayments: ' + error.toString());
+    throw error;
+  }
+}
+
+// Helper function to extract file ID from Google Drive URL
+function extractFileIdFromUrl(url) {
+  const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  return match ? match[1] : null;
+}
+
+// Function to analyze payment screenshot using Google Gemini AI
+function analyzePaymentScreenshot(imageBlob) {
+  try {
+    const base64Image = Utilities.base64Encode(imageBlob.getBytes());
+    const payload = {
+      contents: [{
+        parts: [
+          {
+            text: "What is the payment amount shown in this image? Return only the number."
+          },
+          {
+            inline_data: {
+              mime_type: "image/jpeg", // or "image/png" as per your input
+              data: base64Image
+            }
+          }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 200
+      }
+    };
+
+    // Use the correct vision-enabled model endpoint
+    const geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+
+    const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+    if (!apiKey) throw new Error('Gemini API key not found.');
+
+    const response = UrlFetchApp.fetch(geminiApiUrl + '?key=' + apiKey, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload)
+    });
+
+    const result = JSON.parse(response.getContentText());
+
+    // Logger.log('API Response: ' + JSON.stringify(result));
+
+    // Log finish reason if available
+    if (result.candidates && result.candidates[0] && result.candidates[0].finishReason) {
+      // Logger.log('Response finish reason: ' + result.candidates[0].finishReason);
+    }
+
+    // Check if the response contains an error
+    if (result.error) {
+      Logger.log('API Error: ' + JSON.stringify(result.error));
+      return null;
+    }
+
+    if (result.candidates && result.candidates[0]) {
+      const candidate = result.candidates[0];
+
+      // Check if response was truncated due to token limits
+      if (candidate.finishReason === 'MAX_TOKENS') {
+        Logger.log('Response was truncated due to token limit - consider increasing maxOutputTokens');
+        return null;
+      }
+
+      // Check if content and parts exist
+      if (candidate.content && candidate.content.parts && candidate.content.parts[0]) {
+        const extractedText = candidate.content.parts[0].text.trim();
+        // Logger.log('Gemini extracted text: ' + extractedText);
+
+        const amount = parseFloat(extractedText.replace(/,/g, ''));
+        if (!isNaN(amount) && amount > 0) return amount;
+
+        if (extractedText.toLowerCase() === 'null') return null;
+      } else {
+        Logger.log('No content parts found in response');
+      }
+    } else {
+      Logger.log('No candidates found in response');
+    }
+    return null;
+  } catch (error) {
+    Logger.log('Error in analyzePaymentScreenshot: ' + error.toString());
+    return null;
+  }
+}
 
