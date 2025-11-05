@@ -1,8 +1,12 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbyOy96OP0BmBRu0h5r5hwiT1JLZTWc9ZI7Cofo8IfXP1iu4mMEvi0RHTqbJnqiBEUJO/exec";
+const backendUrl = "https://script.google.com/macros/s/AKfycbwHE0hngzURiAu5ov48xzdMIxSEgar6HnEEu3PRE1arIDYBd5YK7Cm0ILjwSurwp_cV/exec";
 
 // Global flag to control registration status
 const REGISTRATION_CLOSED = true; 
+
+// Global access code state
+let hasValidAccessCode = false;
+let accessCode = null; 
 
 var paymentScreenshotBytes = null;
 var paymentScreenshotMimeType = null;
@@ -22,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem('registrationCart');
     registrationCart = [];
 
+    // Check for access code in URL
+    checkAccessCode();
+
     // Initialize competitions display with no selection
     updateCompetitionsDisplay(null);
 
@@ -40,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (navRegistration) {
         navRegistration.addEventListener("click", function () {
-            if (REGISTRATION_CLOSED) {
+            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
                 showRegistrationClosedMessage();
                 return;
             }
@@ -57,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (navCheckout) {
         navCheckout.addEventListener("click", function () {
-            if (REGISTRATION_CLOSED) {
+            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
                 showRegistrationClosedMessage();
                 return;
             }
@@ -81,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerParticipantBtn = document.getElementById('registerParticipantBtn');
     if (registerParticipantBtn) {
         registerParticipantBtn.addEventListener('click', function () {
-            if (REGISTRATION_CLOSED) {
+            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
                 showRegistrationClosedMessage();
                 return;
             }
@@ -95,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
     if (registerParticipantBtnCheckout) {
         registerParticipantBtnCheckout.addEventListener('click', function () {
-            if (REGISTRATION_CLOSED) {
+            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
                 showRegistrationClosedMessage();
                 return;
             }
@@ -186,7 +193,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', handleFinalSubmit);
 
     // Disable registration and checkout navigation when registration is closed
-    if (REGISTRATION_CLOSED) {
+    // (but allow if valid access code is present)
+    if (REGISTRATION_CLOSED && !hasValidAccessCode) {
         const navRegistration = document.getElementById('nav-registration');
         const navCheckout = document.getElementById('nav-checkout');
         const registerParticipantBtn = document.getElementById('registerParticipantBtn');
@@ -222,10 +230,15 @@ document.addEventListener("DOMContentLoaded", function () {
             registrationBanner.style.display = 'block';
         }
     } else {
-        // Hide banner when registration is open
+        // Hide banner when registration is open or valid access code is present
         const registrationBanner = document.querySelector('.registration-closed-banner');
         if (registrationBanner) {
             registrationBanner.style.display = 'none';
+        }
+
+        // Show special access message if using access code
+        if (hasValidAccessCode) {
+            showSpecialAccessMessage();
         }
     }
 });
@@ -233,7 +246,8 @@ document.addEventListener("DOMContentLoaded", function () {
 // Navigation function
 function switchSection(sectionName) {
     // Prevent switching to registration or checkout sections when registration is closed
-    if (REGISTRATION_CLOSED && (sectionName === 'registration' || sectionName === 'checkout')) {
+    // (unless valid access code is present)
+    if (REGISTRATION_CLOSED && !hasValidAccessCode && (sectionName === 'registration' || sectionName === 'checkout')) {
         showRegistrationClosedMessage();
         return;
     }
@@ -1393,6 +1407,11 @@ async function submitAllRegistrations(paymentData, rulesAccepted) {
             acknowledgement: rulesAccepted
         };
 
+        // Include access code if present
+        if (hasValidAccessCode && window.accessCode) {
+            batchData.accessCode = window.accessCode;
+        }
+
         console.log('Submitting batch data:', batchData); // Debug log
         console.log('Total amount in batch data:', batchData.totalAmount); // Debug log
 
@@ -2179,4 +2198,51 @@ function showRegistrationClosedMessage() {
     document.getElementById('registrationClosedModal').addEventListener('hidden.bs.modal', function() {
         this.remove();
     });
+}
+
+// ---- ACCESS CODE FUNCTIONS ----
+
+// Function to check for access code in URL and validate it
+function checkAccessCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessCode = urlParams.get('access_code');
+
+    if (!accessCode) {
+        return; // No access code in URL
+    }
+
+    // Validate the access code with backend
+    $.getJSON(backendUrl + '?validate_access_code=' + encodeURIComponent(accessCode), function(response) {
+        if (response.valid) {
+            hasValidAccessCode = true;
+            window.accessCode = accessCode;
+            console.log('Valid access code detected:', accessCode);
+        } else {
+            console.log('Invalid access code:', accessCode, 'Reason:', response.reason);
+            showAlertModal('Invalid or expired access code. Registration access denied.');
+        }
+    }).fail(function() {
+        console.log('Error validating access code');
+        showAlertModal('Error validating access code. Please try again.');
+    });
+}
+
+// Function to show special access message when using access code
+function showSpecialAccessMessage() {
+    const banner = document.createElement('div');
+    banner.className = 'alert alert-success text-center';
+    banner.style.backgroundColor = '#d4edda';
+    banner.style.borderColor = '#c3e6cb';
+    banner.style.color = '#155724';
+    banner.style.marginBottom = '20px';
+    banner.innerHTML = `
+        <i class="fas fa-key"></i> <strong>Special Access Granted!</strong><br>
+        You have been granted special access to register despite registration being closed.
+    `;
+
+    // Insert at the top of the main content area
+    const mainContent = document.querySelector('.container');
+    if (mainContent && mainContent.firstChild) {
+        mainContent.insertBefore(banner, mainContent.firstChild);
+    }
 }

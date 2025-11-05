@@ -4,6 +4,18 @@ const formDataSheetName = 'FormData';
 
 function doGet(e) {
   try {
+    // Check if this is an access code validation request
+    if (e.parameter && e.parameter.validate_access_code) {
+      const code = e.parameter.validate_access_code;
+      const validation = validateAccessCode(code);
+
+      return ContentService.createTextOutput(JSON.stringify({
+        valid: validation.valid,
+        reason: validation.reason || null
+      }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // Check if this is a search request
     if (e.parameter && (e.parameter.towerFlat || e.parameter.name || e.parameter.apartments)) {
       if (e.parameter.apartments === 'true') {
@@ -64,7 +76,32 @@ function doPost(e) {
     // Check if this is a batch submission (has participants array)
     if (requestData.participants && Array.isArray(requestData.participants)) {
       Logger.log('Processing batch submission with ' + requestData.participants.length + ' participants');
-      return processBatchSubmission(requestData);
+
+      // Validate access code if provided
+      if (requestData.accessCode) {
+        const validation = validateAccessCode(requestData.accessCode);
+        if (!validation.valid) {
+          return errorResponse('Invalid or expired access code: ' + validation.reason);
+        }
+        Logger.log('Access code validated: ' + requestData.accessCode);
+      }
+
+      const result = processBatchSubmission(requestData);
+
+      // Mark access code as used if registration was successful and access code was provided
+      if (requestData.accessCode && result.getContent().includes('"status":"success"')) {
+        try {
+          const firstParticipant = requestData.participants[0];
+          const userInfo = firstParticipant ? `${firstParticipant.name} (${firstParticipant.email})` : 'Unknown';
+          markAccessCodeUsed(requestData.accessCode, userInfo);
+          Logger.log('Marked access code as used: ' + requestData.accessCode);
+        } catch (codeError) {
+          Logger.log('Error marking access code as used: ' + codeError.toString());
+          // Don't fail the registration if code marking fails
+        }
+      }
+
+      return result;
     } else {
       Logger.log('Invalid request format - expected batch submission');
       return errorResponse('Invalid request format. Expected batch submission with participants array.');
@@ -555,22 +592,62 @@ function processCompetitionData() {
       const filteredTeamInfos = comp.teamInfos.filter(t => t !== 'N/A');
       const teamInfo = filteredTeamInfos.length > 0 ? filteredTeamInfos.join(', ').toUpperCase() : '';
       outputRows.push([
-        group.apartment,
-        group.name,
-        group.email,
-        group.phone,
-        group.gender,
-        group.age,
-        "'" + group.ageGroup, // Force Age Group as string
-        comp.category,
-        comp.name,
-        teamInfo
+        comp.category,        // Competition Category
+        comp.name,           // Competition Name
+        "'" + group.ageGroup, // Age Group (forced as string)
+        group.age,           // Age
+        group.gender,        // Gender
+        group.name,          // Name
+        group.apartment,     // Apartment
+        group.email,         // Email
+        group.phone,         // Phone
+        teamInfo             // Team Info
       ]);
     });
   });
 
-  // Sort output rows alphabetically by Apartment (first column)
-  outputRows.sort((a, b) => a[0].localeCompare(b[0]));
+  // Sort output rows by: Competition Category, Competition Name, Age Group (custom order), Age, Gender, Name
+  const ageGroupOrder = ["3-5", "6-9", "10-13", "14-17", "18-35", "36-55", "56+"];
+  outputRows.sort((a, b) => {
+    // First sort by Competition Category
+    const categoryCompare = (a[0] || '').localeCompare(b[0] || '');
+    if (categoryCompare !== 0) return categoryCompare;
+
+    // Then by Competition Name
+    const nameCompare = (a[1] || '').localeCompare(b[1] || '');
+    if (nameCompare !== 0) return nameCompare;
+
+    // Then by Age Group (custom order)
+    const ageGroupA = (a[2] || '').replace("'", ''); // Remove the ' prefix for comparison
+    const ageGroupB = (b[2] || '').replace("'", ''); // Remove the ' prefix for comparison
+    const indexA = ageGroupOrder.indexOf(ageGroupA);
+    const indexB = ageGroupOrder.indexOf(ageGroupB);
+    
+    // If both age groups are in the order array, use their indices
+    if (indexA !== -1 && indexB !== -1) {
+      if (indexA !== indexB) return indexA - indexB;
+    } else if (indexA !== -1) {
+      return -1; // a comes first if it's in the order
+    } else if (indexB !== -1) {
+      return 1; // b comes first if it's in the order
+    } else {
+      // Neither is in the order, use string comparison
+      const ageGroupCompare = ageGroupA.localeCompare(ageGroupB);
+      if (ageGroupCompare !== 0) return ageGroupCompare;
+    }
+
+    // Then by Age (numeric)
+    const ageA = parseInt(a[3]) || 0;
+    const ageB = parseInt(b[3]) || 0;
+    if (ageA !== ageB) return ageA - ageB;
+
+    // Then by Gender
+    const genderCompare = (a[4] || '').localeCompare(b[4] || '');
+    if (genderCompare !== 0) return genderCompare;
+
+    // Finally by Name
+    return (a[5] || '').localeCompare(b[5] || '');
+  });
 
   // Write to CompetitionData
   if (outputRows.length > 0) {
@@ -672,6 +749,23 @@ function processFoodStallData() {
     foodStalls: headers.indexOf('Food Stalls')
   };
 
+  // Define date headers
+  const dateHeaders = [
+    "Sunday, 9 Nov",
+    "Saturday, 15 Nov",
+    "Sunday, 16 Nov",
+    "Saturday, 22 Nov",
+    "Sunday, 23 Nov",
+    "Saturday, 29 Nov",
+    "Sunday, 30 Nov",
+    "Saturday, 6 Dec",
+    "Sunday, 7 Dec"
+  ];
+
+  // Set headers in FoodStallData sheet
+  const sheetHeaders = dateHeaders.concat(['Name', 'Contact Info']);
+  foodStallSheet.getRange(1, 1, 1, sheetHeaders.length).setValues([sheetHeaders]);
+
   // Group by Apartment and Name
   const groupedData = {};
 
@@ -698,28 +792,41 @@ function processFoodStallData() {
     }
   }
 
+  // Helper function to format menu
+  function formatMenu(menu) {
+    if (!menu) return '';
+    const items = menu.split(',').map(item => item.trim()).filter(item => item);
+    if (items.length <= 1) return menu;
+    return items.map(item => '• ' + item).join('\n');
+  }
+
   // Prepare output rows
   const outputRows = [];
   Object.values(groupedData).forEach(group => {
     group.foodStalls.forEach(stallJson => {
       const stall = JSON.parse(stallJson);
-      outputRows.push([
-        group.apartment,
-        group.name,
-        group.email,
-        group.phone,
-        stall.menu,
-        stall.dates
-      ]);
+      const formattedMenu = formatMenu(stall.menu);
+      const contactInfo = `• Apartment: ${group.apartment}\n• Phone: ${group.phone}\n• Email: ${group.email}`;
+      
+      // Create row with date columns
+      const row = [];
+      dateHeaders.forEach(date => {
+        row.push(stall.dates && stall.dates.includes(date) ? formattedMenu : '');
+      });
+      
+      // Add remaining columns
+      row.push(group.name, contactInfo);
+      
+      outputRows.push(row);
     });
   });
 
-  // Sort output rows alphabetically by Apartment (first column)
-  outputRows.sort((a, b) => a[0].localeCompare(b[0]));
+  // Sort output rows alphabetically by Contact Info (11th column, index 10)
+  outputRows.sort((a, b) => a[10].localeCompare(b[10]));
 
   // Write to FoodStallData
   if (outputRows.length > 0) {
-    foodStallSheet.getRange(2, 1, outputRows.length, 6).setValues(outputRows);
+    foodStallSheet.getRange(2, 1, outputRows.length, 11).setValues(outputRows);
   }
 }
 
@@ -750,7 +857,308 @@ function loadDataToSheets() {
   }
 }
 
-// ---- PAYMENT VERIFICATION USING GOOGLE CLOUD VISION AI ----
+// ---- AGE OUTLIER DETECTION ----
+
+// Function to identify age outliers in CompetitionData and log to AgeOutlierData sheet
+function identifyAgeOutliers() {
+  try {
+    Logger.log('Starting age outlier detection process...');
+
+    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const competitionSheet = spreadsheet.getSheetByName('CompetitionData');
+
+    if (!competitionSheet) {
+      throw new Error('CompetitionData sheet not found');
+    }
+
+    const data = competitionSheet.getDataRange().getValues();
+    if (data.length < 2) {
+      Logger.log('No data found in CompetitionData sheet');
+      return;
+    }
+
+    const headers = data[0];
+    const colIndices = {
+      competitionCategory: headers.indexOf('Competition Category'),
+      competitionName: headers.indexOf('Competition Name'),
+      ageGroup: headers.indexOf('Age Group'),
+      age: headers.indexOf('Age'),
+      gender: headers.indexOf('Gender'),
+      name: headers.indexOf('Name'),
+      apartment: headers.indexOf('Apartment'),
+      email: headers.indexOf('Email'),
+      phone: headers.indexOf('Phone'),
+      teamInfo: headers.indexOf('Team Info')
+    };
+
+    // Helper function to parse age group range
+    function parseAgeGroup(ageGroupStr) {
+      if (!ageGroupStr || typeof ageGroupStr !== 'string') return { min: 0, max: Infinity };
+
+      const cleanStr = ageGroupStr.replace("'", ''); // Remove any leading quote
+      if (cleanStr.endsWith('+')) {
+        const min = parseInt(cleanStr.replace('+', ''));
+        return { min: min, max: Infinity };
+      } else if (cleanStr.includes('-')) {
+        const [minStr, maxStr] = cleanStr.split('-');
+        const min = parseInt(minStr);
+        const max = parseInt(maxStr);
+        return { min: min, max: max };
+      }
+      return { min: 0, max: Infinity };
+    }
+
+    // Collect outliers (use Set to ensure uniqueness)
+    const outliersSet = new Set();
+    const outliers = [];
+
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const ageGroupStr = row[colIndices.ageGroup];
+      const age = parseInt(row[colIndices.age]);
+
+      if (isNaN(age)) continue; // Skip if age is not a number
+
+      const { min, max } = parseAgeGroup(ageGroupStr);
+
+      // Check if age is within range
+      if (age < min || age > max) {
+        // Create unique key for deduplication
+        const uniqueKey = `${row[colIndices.name]}|${row[colIndices.apartment]}|${ageGroupStr}`;
+        
+        if (!outliersSet.has(uniqueKey)) {
+          outliersSet.add(uniqueKey);
+          outliers.push({
+            ageGroup: ageGroupStr,
+            age: age,
+            gender: row[colIndices.gender],
+            name: row[colIndices.name],
+            apartment: row[colIndices.apartment],
+            email: row[colIndices.email],
+            phone: row[colIndices.phone]
+          });
+        }
+      }
+    }
+
+    Logger.log(`Found ${outliers.length} age outliers`);
+
+    // Prepare AgeOutlierData sheet
+    let outlierSheet = spreadsheet.getSheetByName('AgeOutlierData');
+    if (!outlierSheet) {
+      Logger.log('Creating AgeOutlierData sheet');
+      outlierSheet = spreadsheet.insertSheet('AgeOutlierData');
+    } else {
+      // Clear existing data rows (excluding header)
+      const lastRow = outlierSheet.getLastRow();
+      if (lastRow > 1) {
+        outlierSheet.getRange(2, 1, lastRow - 1, outlierSheet.getLastColumn()).clearContent();
+      }
+      Logger.log('Cleared existing data in AgeOutlierData sheet');
+    }
+
+    // Set headers
+    const outlierHeaders = ['Age Group', 'Age', 'Gender', 'Name', 'Apartment', 'Email', 'Phone'];
+    outlierSheet.getRange(1, 1, 1, outlierHeaders.length).setValues([outlierHeaders]);
+
+    // Write outlier data
+    if (outliers.length > 0) {
+      const outputRows = outliers.map(outlier => [
+        "'" + outlier.ageGroup, // Age Group (forced as string)
+        outlier.age,
+        outlier.gender,
+        outlier.name,
+        outlier.apartment,
+        outlier.email,
+        outlier.phone
+      ]);
+
+      // Sort by Name alphabetically
+      outputRows.sort((a, b) => (a[3] || '').localeCompare(b[3] || ''));
+
+      outlierSheet.getRange(2, 1, outputRows.length, 7).setValues(outputRows);
+      Logger.log(`Wrote ${outputRows.length} outlier records to AgeOutlierData sheet`);
+    } else {
+      Logger.log('No outliers found');
+    }
+
+    Logger.log('Age outlier detection process completed');
+
+  } catch (error) {
+    Logger.log('Error in identifyAgeOutliers: ' + error.toString());
+    throw error;
+  }
+}
+
+// ---- ACCESS CODE MANAGEMENT ----
+
+// Function to generate a new access code and return the complete shareable URL
+function generateAccessCode() {
+  try {
+    Logger.log('Generating new access code...');
+
+    // Generate a random 8-character code (alphanumeric)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    // Set expiration to 24 hours from now
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+    // Get existing codes or initialize empty object
+    const scriptProperties = PropertiesService.getScriptProperties();
+    let accessCodes = {};
+    const existingCodes = scriptProperties.getProperty('access_codes');
+
+    if (existingCodes) {
+      try {
+        accessCodes = JSON.parse(existingCodes);
+      } catch (e) {
+        Logger.log('Error parsing existing codes, starting fresh: ' + e.toString());
+        accessCodes = {};
+      }
+    }
+
+    // Add the new code
+    accessCodes[code] = {
+      created: new Date().toISOString(),
+      expires: expiresAt,
+      used: false,
+      usedBy: null,
+      usedAt: null
+    };
+
+    // Save back to properties
+    scriptProperties.setProperty('access_codes', JSON.stringify(accessCodes));
+
+    // Generate the complete shareable URL
+    const baseUrl = 'https://tinyurl.com/z1wf25';
+    const shareableUrl = baseUrl + '?access_code=' + code;
+
+    Logger.log('Generated access code: ' + code + ', URL: ' + shareableUrl);
+
+    return {
+      code: code,
+      url: shareableUrl,
+      expires: expiresAt
+    };
+
+  } catch (error) {
+    Logger.log('Error generating access code: ' + error.toString());
+    throw error;
+  }
+}
+
+// Function to validate an access code
+function validateAccessCode(code) {
+  try {
+    if (!code) {
+      return { valid: false, reason: 'No code provided' };
+    }
+
+    const scriptProperties = PropertiesService.getScriptProperties();
+    const existingCodes = scriptProperties.getProperty('access_codes');
+
+    if (!existingCodes) {
+      return { valid: false, reason: 'No codes found' };
+    }
+
+    let accessCodes;
+    try {
+      accessCodes = JSON.parse(existingCodes);
+    } catch (e) {
+      Logger.log('Error parsing access codes: ' + e.toString());
+      return { valid: false, reason: 'Invalid code storage' };
+    }
+
+    const codeData = accessCodes[code];
+    if (!codeData) {
+      return { valid: false, reason: 'Code not found' };
+    }
+
+    // Check if expired
+    if (new Date() > new Date(codeData.expires)) {
+      return { valid: false, reason: 'Code expired' };
+    }
+
+    // Check if already used
+    if (codeData.used) {
+      return { valid: false, reason: 'Code already used' };
+    }
+
+    return { valid: true, codeData: codeData };
+
+  } catch (error) {
+    Logger.log('Error validating access code: ' + error.toString());
+    return { valid: false, reason: 'Validation error: ' + error.toString() };
+  }
+}
+
+// Function to mark an access code as used
+function markAccessCodeUsed(code, userInfo) {
+  try {
+    const scriptProperties = PropertiesService.getScriptProperties();
+    const existingCodes = scriptProperties.getProperty('access_codes');
+
+    if (!existingCodes) {
+      throw new Error('No codes found');
+    }
+
+    let accessCodes = JSON.parse(existingCodes);
+    if (!accessCodes[code]) {
+      throw new Error('Code not found');
+    }
+
+    // Mark as used
+    accessCodes[code].used = true;
+    accessCodes[code].usedBy = userInfo || 'Unknown';
+    accessCodes[code].usedAt = new Date().toISOString();
+
+    // Save back
+    scriptProperties.setProperty('access_codes', JSON.stringify(accessCodes));
+
+    Logger.log('Marked access code ' + code + ' as used by: ' + userInfo);
+
+  } catch (error) {
+    Logger.log('Error marking access code as used: ' + error.toString());
+    throw error;
+  }
+}
+
+// Function to list all active access codes (for admin purposes)
+function listActiveAccessCodes() {
+  try {
+    const scriptProperties = PropertiesService.getScriptProperties();
+    const existingCodes = scriptProperties.getProperty('access_codes');
+
+    if (!existingCodes) {
+      return [];
+    }
+
+    const accessCodes = JSON.parse(existingCodes);
+    const activeCodes = [];
+
+    for (const [code, data] of Object.entries(accessCodes)) {
+      if (!data.used && new Date() <= new Date(data.expires)) {
+        activeCodes.push({
+          code: code,
+          created: data.created,
+          expires: data.expires,
+          url: 'https://tinyurl.com/z1wf25?access_code=' + code
+        });
+      }
+    }
+
+    return activeCodes;
+
+  } catch (error) {
+    Logger.log('Error listing active codes: ' + error.toString());
+    return [];
+  }
+}
 
 // Function to verify payments by analyzing screenshots with Google Cloud Vision AI
 // NOTE: Ensure PaymentData sheet has headers: Apartment, Payment Proof URL, Due Amount, Paid Amount, Discrepancy
