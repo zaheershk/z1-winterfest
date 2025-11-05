@@ -2,7 +2,7 @@
 const backendUrl = "https://script.google.com/macros/s/AKfycbwHE0hngzURiAu5ov48xzdMIxSEgar6HnEEu3PRE1arIDYBd5YK7Cm0ILjwSurwp_cV/exec";
 
 // Global flag to control registration status
-const REGISTRATION_CLOSED = true; 
+let REGISTRATION_CLOSED = true; 
 
 // Global access code state
 let hasValidAccessCode = false;
