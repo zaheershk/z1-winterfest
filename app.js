@@ -39,6 +39,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Check for access code in URL (async validation)
     checkAccessCode();
 
+    // Set default section based on registration status
+    if (REGISTRATION_CLOSED && !hasValidAccessCode) {
+        switchSection('dashboard');
+    }
+
     // Initialize competitions display with no selection
     updateCompetitionsDisplay(null);
 
