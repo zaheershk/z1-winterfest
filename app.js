@@ -2360,15 +2360,20 @@ function checkAccessCode() {
 
 // Function to show special access message when using access code
 function showSpecialAccessMessage() {
+    // Check if banner already exists to prevent duplicates
+    if (document.querySelector('.special-access-banner')) {
+        return;
+    }
+
     const banner = document.createElement('div');
-    banner.className = 'alert alert-success text-center';
+    banner.className = 'alert alert-success text-center special-access-banner';
     banner.style.backgroundColor = '#d4edda';
     banner.style.borderColor = '#c3e6cb';
     banner.style.color = '#155724';
     banner.style.marginBottom = '20px';
     banner.innerHTML = `
-        <i class="fas fa-key"></i> <strong>Special Access Granted!</strong><br>
-        You have been granted special access to register despite registration being closed.
+        <i class="fas fa-key"></i> <strong>Temporary Access Granted!</strong><br>
+        You have been granted temporary access to register for Winterfest 2025.
     `;
 
     // Insert at the top of the main content area
