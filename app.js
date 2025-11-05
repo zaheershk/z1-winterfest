@@ -2216,7 +2216,46 @@ function checkAccessCode() {
         if (response.valid) {
             hasValidAccessCode = true;
             window.accessCode = accessCode;
-            console.log('Valid access code detected:', accessCode);
+            REGISTRATION_CLOSED = false; // Override for this session
+            console.log('Valid access code detected:', accessCode, '- Registration reopened for this session');
+            
+            // Re-enable the UI since registration is now open
+            const navRegistration = document.getElementById('nav-registration');
+            const navCheckout = document.getElementById('nav-checkout');
+            const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+            const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+
+            if (navRegistration) {
+                navRegistration.style.opacity = '1';
+                navRegistration.style.pointerEvents = 'auto';
+                navRegistration.title = '';
+            }
+
+            if (navCheckout) {
+                navCheckout.style.opacity = '1';
+                navCheckout.style.pointerEvents = 'auto';
+                navCheckout.title = '';
+            }
+
+            if (registerParticipantBtn) {
+                registerParticipantBtn.style.opacity = '1';
+                registerParticipantBtn.style.pointerEvents = 'auto';
+                registerParticipantBtn.title = '';
+            }
+
+            if (registerParticipantBtnCheckout) {
+                registerParticipantBtnCheckout.style.opacity = '1';
+                registerParticipantBtnCheckout.style.pointerEvents = 'auto';
+                registerParticipantBtnCheckout.title = '';
+            }
+
+            // Hide registration closed banner
+            const registrationBanner = document.querySelector('.registration-closed-banner');
+            if (registrationBanner) {
+                registrationBanner.style.display = 'none';
+            }
+
+            showSpecialAccessMessage();
         } else {
             console.log('Invalid access code:', accessCode, 'Reason:', response.reason);
             showAlertModal('Invalid or expired access code. Registration access denied.');
