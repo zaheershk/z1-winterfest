@@ -26,7 +26,17 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.removeItem('registrationCart');
     registrationCart = [];
 
-    // Check for access code in URL
+    // Check for access code in URL synchronously first
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessCodeFromUrl = urlParams.get('access_code');
+    if (accessCodeFromUrl) {
+        // Temporarily assume valid and enable registration
+        hasValidAccessCode = true;
+        accessCode = accessCodeFromUrl;
+        REGISTRATION_CLOSED = false;
+    }
+
+    // Check for access code in URL (async validation)
     checkAccessCode();
 
     // Initialize competitions display with no selection
@@ -2257,11 +2267,93 @@ function checkAccessCode() {
 
             showSpecialAccessMessage();
         } else {
+            // Invalid access code - revert to closed state
+            hasValidAccessCode = false;
+            accessCode = null;
+            REGISTRATION_CLOSED = true;
             console.log('Invalid access code:', accessCode, 'Reason:', response.reason);
+            
+            // Disable the UI
+            const navRegistration = document.getElementById('nav-registration');
+            const navCheckout = document.getElementById('nav-checkout');
+            const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+            const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+
+            if (navRegistration) {
+                navRegistration.style.opacity = '0.5';
+                navRegistration.style.pointerEvents = 'none';
+                navRegistration.title = 'Registration is closed';
+            }
+
+            if (navCheckout) {
+                navCheckout.style.opacity = '0.5';
+                navCheckout.style.pointerEvents = 'none';
+                navCheckout.title = 'Registration is closed';
+            }
+
+            if (registerParticipantBtn) {
+                registerParticipantBtn.style.opacity = '0.5';
+                registerParticipantBtn.style.pointerEvents = 'none';
+                registerParticipantBtn.title = 'Registration is closed';
+            }
+
+            if (registerParticipantBtnCheckout) {
+                registerParticipantBtnCheckout.style.opacity = '0.5';
+                registerParticipantBtnCheckout.style.pointerEvents = 'none';
+                registerParticipantBtnCheckout.title = 'Registration is closed';
+            }
+
+            // Show registration closed banner
+            const registrationBanner = document.querySelector('.registration-closed-banner');
+            if (registrationBanner) {
+                registrationBanner.style.display = 'block';
+            }
+
             showAlertModal('Invalid or expired access code. Registration access denied.');
         }
     }).fail(function() {
+        // Error validating - revert to closed state
+        hasValidAccessCode = false;
+        accessCode = null;
+        REGISTRATION_CLOSED = true;
         console.log('Error validating access code');
+        
+        // Disable the UI
+        const navRegistration = document.getElementById('nav-registration');
+        const navCheckout = document.getElementById('nav-checkout');
+        const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+        const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+
+        if (navRegistration) {
+            navRegistration.style.opacity = '0.5';
+            navRegistration.style.pointerEvents = 'none';
+            navRegistration.title = 'Registration is closed';
+        }
+
+        if (navCheckout) {
+            navCheckout.style.opacity = '0.5';
+            navCheckout.style.pointerEvents = 'none';
+            navCheckout.title = 'Registration is closed';
+        }
+
+        if (registerParticipantBtn) {
+            registerParticipantBtn.style.opacity = '0.5';
+            registerParticipantBtn.style.pointerEvents = 'none';
+            registerParticipantBtn.title = 'Registration is closed';
+        }
+
+        if (registerParticipantBtnCheckout) {
+            registerParticipantBtnCheckout.style.opacity = '0.5';
+            registerParticipantBtnCheckout.style.pointerEvents = 'none';
+            registerParticipantBtnCheckout.title = 'Registration is closed';
+        }
+
+        // Show registration closed banner
+        const registrationBanner = document.querySelector('.registration-closed-banner');
+        if (registrationBanner) {
+            registrationBanner.style.display = 'block';
+        }
+
         showAlertModal('Error validating access code. Please try again.');
     });
 }
