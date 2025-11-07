@@ -1,8 +1,6 @@
 
-const backendUrl = "https://script.google.com/macros/s/AKfycbzssWh1mVgMflWvsBvSLBoOTVkW0ZbiluXmq3r6b4zgVdLrhA3xCgqOE7EP92T2DPOY/exec";
-
 // Global flag to control registration status
-let REGISTRATION_CLOSED = true; 
+let REGISTRATION_CLOSED = true;
 
 // Global access code state
 let hasValidAccessCode = false;
@@ -464,14 +462,14 @@ function handleAgeGroupChange(selectedAgeGroup) {
 
     if (!allNames || !allApartments) {
         // Fetch Names if not already in local storage
-        $.getJSON(backendUrl + "?type=registrationData&property=name", function (data) {
+        $.getJSON(CONFIG.BACKEND_URL + "?type=registrationData&property=name", function (data) {
             allNames = JSON.stringify(data);
             localStorage.setItem('allNames', allNames);
             applyAutocompleteNames(JSON.parse(allNames));
         });
 
         // Fetch Apartments if not already in local storage
-        $.getJSON(backendUrl + "?type=registrationData&property=apartment", function (data) {
+        $.getJSON(CONFIG.BACKEND_URL + "?type=registrationData&property=apartment", function (data) {
             allApartments = JSON.stringify(data);
             localStorage.setItem('allApartments', allApartments);
             applyAutocompleteApartments(JSON.parse(allApartments));
@@ -1452,7 +1450,7 @@ async function submitAllRegistrations(paymentData, rulesAccepted) {
         console.log('Submitting batch data:', batchData); // Debug log
         console.log('Total amount in batch data:', batchData.totalAmount); // Debug log
 
-        const response = await fetch(backendUrl, {
+        const response = await fetch(CONFIG.BACKEND_URL, {
             method: 'POST',
             mode: "cors",
             cache: "no-cache",
@@ -1671,7 +1669,7 @@ async function initializeDashboard() {
 
 async function loadApartmentsForDashboard() {
     try {
-        const response = await fetch(`${backendUrl}?apartments=true`);
+        const response = await fetch(`${CONFIG.BACKEND_URL}?apartments=true`);
         const result = await response.json();
 
         if (result.status === 'success') {
@@ -1762,7 +1760,7 @@ async function performDashboardSearch() {
         if (towerFlat) params.append('towerFlat', towerFlat);
         if (name) params.append('name', name);
 
-        const response = await fetch(`${backendUrl}?${params.toString()}`);
+        const response = await fetch(`${CONFIG.BACKEND_URL}?${params.toString()}`);
         const result = await response.json();
 
         if (result.status === 'success') {
@@ -2140,7 +2138,7 @@ function saveEditCompetitions() {
     }
 
     // Send update request
-    fetch(backendUrl, {
+    fetch(CONFIG.BACKEND_URL, {
         method: 'POST',
         mode: "cors",
         cache: "no-cache",
@@ -2252,7 +2250,7 @@ function checkAccessCode() {
     }
 
     // Validate the access code with backend
-    $.getJSON(backendUrl + '?validate_access_code=' + encodeURIComponent(accessCode), function(response) {
+    $.getJSON(CONFIG.BACKEND_URL + '?validate_access_code=' + encodeURIComponent(accessCode), function(response) {
         if (response.valid) {
             hasValidAccessCode = true;
             window.accessCode = accessCode;
@@ -2420,7 +2418,7 @@ function checkVolunteerAuthorization(formType) {
     document.getElementById('content-section').style.display = 'none';
 
     // Call backend to check volunteer status
-    $.getJSON(backendUrl + "?action=checkVolunteerStatus", function (data) {
+    $.getJSON(CONFIG.BACKEND_URL + "?action=checkVolunteerStatus", function (data) {
         if (data.authorized) {
             // Show content
             document.getElementById('auth-section').style.display = 'none';
@@ -2505,7 +2503,7 @@ async function checkVolunteerByEmail() {
 
     try {
         // Call backend to check volunteer status
-        const response = await fetch(backendUrl, {
+        const response = await fetch(CONFIG.BACKEND_URL, {
             method: 'POST',
             mode: "cors",
             cache: "no-cache",
@@ -2525,6 +2523,9 @@ async function checkVolunteerByEmail() {
         const emailModalBody = document.querySelector('#emailModal .alert-modal-body');
         if (emailModalBody) {
             if (data.authorized) {
+                // Store the authenticated volunteer email in localStorage
+                localStorage.setItem('volunteerEmail', email);
+                
                 emailModalBody.innerHTML = `
                     <div style="color: #28a745; text-align: center;">
                         <i class="fas fa-check-circle fa-2x"></i>

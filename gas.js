@@ -5,9 +5,13 @@ const formDataSheetName = 'FormData';
 // Hardcoded list of volunteer email addresses
 const VOLUNTEER_EMAILS = [
   'zaheer.azad@gmail.com',
+  'simi.nazeem@gmail.com',
+  'mail2mamatamanjaribehera@gmail.com',
   'prateekagr1988@gmail.com',
-  'Sudeep00890@gmail.com',
+  'sudeep00890@gmail.com',
   'sunitasatpathy@gmail.com',
+  'mvedullapalli@gmail.com',
+  'swetabinani@gmail.com',
   // Add other volunteer emails here
 ];
 
@@ -38,6 +42,15 @@ function doGet(e) {
       } else {
         // Perform search
         return searchRegistrations(e.parameter);
+      }
+    }
+
+    // Check if this is a registration data request for autocomplete
+    if (e.parameter && e.parameter.type === 'registrationData') {
+      if (e.parameter.property === 'name') {
+        return getNamesList();
+      } else if (e.parameter.property === 'apartment') {
+        return getApartmentsList();
       }
     }
 
@@ -449,6 +462,46 @@ function getApartmentsList() {
   } catch (error) {
     Logger.log('Get apartments error: ' + error.toString());
     return errorResponse('Failed to get apartments: ' + error.toString());
+  }
+}
+
+function getNamesList() {
+  try {
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    const sheet = ss.getSheetByName(formDataSheetName);
+
+    if (!sheet) {
+      return errorResponse(formDataSheetName + ' sheet not found');
+    }
+
+    const data = sheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return dataResponse({ status: 'success', data: [] });
+    }
+
+    // Get headers
+    const headers = data[0];
+    const nameIndex = headers.indexOf('Name');
+
+    let names = new Set();
+
+    // Skip header row
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const name = row[nameIndex];
+
+      if (name && name.trim()) {
+        names.add(name.trim().toUpperCase());
+      }
+    }
+
+    // Convert to sorted array
+    const sortedNames = Array.from(names).sort();
+
+    return dataResponse({ status: 'success', data: sortedNames });
+  } catch (error) {
+    Logger.log('Get names error: ' + error.toString());
+    return errorResponse('Failed to get names: ' + error.toString());
   }
 }
 
@@ -1437,15 +1490,98 @@ function submitReimbursement(data) {
 function submitWinner(data) {
   try {
     Logger.log('Winner submission received: ' + JSON.stringify(data));
-    // TODO: Implement winner processing logic
+
+    // We'll need a separate sheet for winner entries
+    // For now, let's use the existing formDataSheetName but we should create a separate sheet
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    let winnerSheet = ss.getSheetByName('WinnerEntries');
+
+    // Create the sheet if it doesn't exist
+    if (!winnerSheet) {
+      winnerSheet = ss.insertSheet('WinnerEntries');
+
+      // Add headers - separate sections for winners and runner-ups
+      const headers = [
+        'Submission ID',
+        'Competition Category',
+        'Competition Name',
+        'Age Group',
+        'Had Tie',
+        'Submission Date',
+        'Submitted By'
+      ];
+
+      // Add winner columns (up to 10 winners to be safe)
+      for (let i = 1; i <= 10; i++) {
+        headers.push(`Winner ${i} Name`);
+        headers.push(`Winner ${i} Apartment`);
+      }
+
+      // Add runner-up columns (up to 10 runner-ups to be safe)
+      for (let i = 1; i <= 10; i++) {
+        headers.push(`Runner-up ${i} Name`);
+        headers.push(`Runner-up ${i} Apartment`);
+      }
+
+      winnerSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      winnerSheet.setFrozenRows(1); // Freeze header row
+    }
+
+    // Generate submission ID
+    const submissionId = 'WIN-' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000);
+
+    // Prepare the row data
+    const rowData = [
+      submissionId,
+      data.competitionCategory || '',
+      data.competitionName || '',
+      data.ageGroup || '',
+      data.hadTie ? 'Yes' : 'No',
+      new Date().toISOString(),
+      data.submittedBy || Session.getActiveUser().getEmail() || 'Unknown'
+    ];
+
+    // Add winner data
+    if (data.winners && Array.isArray(data.winners)) {
+      data.winners.forEach(winner => {
+        rowData.push(winner.name || '');
+        rowData.push(winner.apartment || '');
+      });
+    }
+
+    // Fill remaining winner columns with empty strings if needed (10 winners × 2 columns = 20)
+    const winnersNeeded = 20 - ((data.winners && data.winners.length * 2) || 0);
+    for (let i = 0; i < winnersNeeded; i++) {
+      rowData.push('');
+    }
+
+    // Add runner-up data
+    if (data.runnerUps && Array.isArray(data.runnerUps)) {
+      data.runnerUps.forEach(runnerUp => {
+        rowData.push(runnerUp.name || '');
+        rowData.push(runnerUp.apartment || '');
+      });
+    }
+
+    // Fill remaining runner-up columns with empty strings if needed (10 runner-ups × 2 columns = 20)
+    const runnerUpsNeeded = 20 - ((data.runnerUps && data.runnerUps.length * 2) || 0);
+    for (let i = 0; i < runnerUpsNeeded; i++) {
+      rowData.push('');
+    }
+
+    // Append the row
+    winnerSheet.appendRow(rowData);
+
+    Logger.log('Winner entry saved successfully: ' + submissionId);
+
     return dataResponse({
       status: 'success',
-      message: 'Winner entry submitted successfully (placeholder)',
-      requestId: 'WIN-' + new Date().getTime()
+      message: 'Winner entry submitted successfully',
+      requestId: submissionId
     });
   } catch (error) {
     Logger.log('Error in submitWinner: ' + error.toString());
-    return errorResponse('Failed to submit winner entry');
+    return errorResponse('Failed to submit winner entry: ' + error.toString());
   }
 }
 

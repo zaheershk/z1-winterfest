@@ -26,15 +26,114 @@
                 <div class="container py-3">
                     <div class="section-header">
                         <h2>Winner Entry Form</h2>
+                        <p class="text-muted">Enter competition winners and runner-ups</p>
                     </div>
-                    <div class="text-center">
-                        <i class="fas fa-tools fa-4x text-muted mb-4"></i>
-                        <h3 class="text-muted">Coming Soon!</h3>
-                        <p class="text-muted">This feature is under development.</p>
-                        <button class="btn btn-secondary" onclick="window.close()">
-                            <i class="fas fa-times"></i> Close
-                        </button>
-                    </div>
+
+                    <form id="winnerForm" class="needs-validation" novalidate>
+                        <!-- Competition Category -->
+                        <div class="mb-3">
+                            <label for="competitionCategory" class="form-label">Competition Category <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="competitionCategory" required>
+                                <option value="">Select Category</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a competition category.</div>
+                        </div>
+
+                        <!-- Competition Name -->
+                        <div class="mb-3">
+                            <label for="competitionName" class="form-label">Competition Name <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="competitionName" required disabled>
+                                <option value="">Select Competition</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a competition name.</div>
+                        </div>
+
+                        <!-- Age Group -->
+                        <div class="mb-3">
+                            <label for="ageGroup" class="form-label">Age Group <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="ageGroup" required disabled>
+                                <option value="">Select Age Group</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an age group.</div>
+                        </div>
+
+                        <!-- Winner Fields Container -->
+                        <div id="winnerFieldsContainer">
+                            <!-- Winner fields will be dynamically added here -->
+                        </div>
+
+                        <!-- Tie Question -->
+                        <div class="mb-3" id="tieQuestion" style="display: none;">
+                            <label class="form-label">Was there a tie in this competition?</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="hadTie" id="tieNo" value="false"
+                                    checked onchange="handleTieChange()">
+                                <label class="form-check-label" for="tieNo">
+                                    No
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="hadTie" id="tieYes" value="true"
+                                    onchange="handleTieChange()">
+                                <label class="form-check-label" for="tieYes">
+                                    Yes
+                                </label>
+                            </div>
+                            <div id="tieInstructions" class="alert alert-info mt-3 border border-info"
+                                style="display: none;">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3">
+                                        <i class="fas fa-exclamation-triangle text-primary" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-2 text-primary fw-bold">
+                                            Tie Handling Required
+                                        </h6>
+                                        <p class="mb-0">
+                                            Please submit <strong>separate entries</strong> for each additional
+                                            <strong>winner</strong> OR <strong>runner-up</strong> resulting from the
+                                            tie.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gender Separation Notice -->
+                        <div class="mb-3" id="genderNotice" style="display: none;">
+                            <div class="alert alert-warning border border-warning">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3">
+                                        <i class="fas fa-exclamation-triangle text-danger"
+                                            style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-2 text-danger fw-bold">
+                                            </i> Gender Separation Required
+                                        </h6>
+                                        <p class="mb-0">
+                                            This competition has <strong>separate male & female categories</strong>.
+                                            <br>
+                                            <br>
+                                            Please submit <strong>separate entries</strong> for male and female
+                                            winners & runners-up.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-start">
+                            <button type="submit" class="green-btn btn-lg" id="submitWinnerBtn"
+                                style="width: 180px; padding: 8px 16px;">
+                                <i class="fas fa-trophy"></i> Submit Entry
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </section>
         </main>
@@ -48,7 +147,8 @@
                 <span class="alert-modal-close" onclick="hideAlertModal()">&times;</span>
             </div>
             <div class="alert-modal-body">
-                <p id="alertModalMessage">You are not authorized to access this form. Only volunteers can enter winner information.</p>
+                <p id="alertModalMessage">You are not authorized to access this form. Only volunteers can enter winner
+                    information.</p>
             </div>
             <div class="alert-modal-footer">
                 <button id="alertModalOkBtn" class="alert-modal-btn" onclick="hideAlertModal()">OK</button>
@@ -59,7 +159,552 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script src="competitions.js"></script>
     <script src="app.js"></script>
+
+    <script>
+        // Winner form specific JavaScript
+        let allNames = [];
+        let allApartments = [];
+        let namesLoaded = false;
+        let apartmentsLoaded = false;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            initializeWinnerForm();
+            loadAutocompleteData();
+        });
+
+        function initializeWinnerForm() {
+            // Populate competition categories
+            populateCategories();
+
+            // Set up event listeners
+            document.getElementById('competitionCategory').addEventListener('change', handleCategoryChange);
+            document.getElementById('competitionName').addEventListener('change', handleCompetitionChange);
+            document.getElementById('ageGroup').addEventListener('change', handleAgeGroupChange);
+            document.getElementById('winnerForm').addEventListener('submit', handleWinnerSubmit);
+
+            // Initially disable dependent dropdowns
+            document.getElementById('competitionName').disabled = true;
+            document.getElementById('ageGroup').disabled = true;
+        }
+
+        function populateCategories() {
+            const categorySelect = document.getElementById('competitionCategory');
+            const categories = [...new Set(competitionsData.map(cat => cat.category))].sort();
+
+            // Filter out "Skip Competitions" category
+            const filteredCategories = categories.filter(category => category !== 'Skip Competitions');
+
+            filteredCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        function handleCategoryChange() {
+            const category = this.value;
+            const competitionSelect = document.getElementById('competitionName');
+            const ageGroupSelect = document.getElementById('ageGroup');
+
+            // Clear and disable dependent dropdowns
+            competitionSelect.innerHTML = '<option value="">Select Competition</option>';
+            competitionSelect.disabled = true;
+            ageGroupSelect.innerHTML = '<option value="">Select Age Group</option>';
+            ageGroupSelect.disabled = true;
+
+            if (category) {
+                // Find competitions for this category
+                const categoryData = competitionsData.find(cat => cat.category === category);
+                if (categoryData) {
+                    categoryData.competitions.forEach(comp => {
+                        const option = document.createElement('option');
+                        option.value = comp.name;
+                        option.textContent = comp.name;
+                        competitionSelect.appendChild(option);
+                    });
+                    competitionSelect.disabled = false;
+                }
+            }
+
+            // Clear winner fields
+            clearWinnerFields();
+        }
+
+        function handleTieChange() {
+            const tieInstructions = document.getElementById('tieInstructions');
+            const hadTie = document.querySelector('input[name="hadTie"]:checked').value === 'true';
+
+            if (hadTie) {
+                tieInstructions.style.display = 'block';
+            } else {
+                tieInstructions.style.display = 'none';
+            }
+        }
+
+        function handleCompetitionChange() {
+            const competitionName = this.value;
+            const category = document.getElementById('competitionCategory').value;
+            const ageGroupSelect = document.getElementById('ageGroup');
+
+            // Clear and disable age group dropdown
+            ageGroupSelect.innerHTML = '<option value="">Select Age Group</option>';
+            ageGroupSelect.disabled = true;
+
+            if (competitionName && category) {
+                // Find the competition data
+                const categoryData = competitionsData.find(cat => cat.category === category);
+                const competition = categoryData.competitions.find(comp => comp.name === competitionName);
+
+                if (competition) {
+                    // Use displayAgeGroups if teamBased is true, otherwise use ageGroups
+                    const ageGroups = competition.teamBased ? competition.displayAgeGroups.split(', ') : competition.ageGroups;
+
+                    ageGroups.forEach(ageGroup => {
+                        const option = document.createElement('option');
+                        option.value = ageGroup;
+                        option.textContent = ageGroup;
+                        ageGroupSelect.appendChild(option);
+                    });
+                    ageGroupSelect.disabled = false;
+                }
+            }
+
+            // Clear winner fields
+            clearWinnerFields();
+        }
+
+        function handleAgeGroupChange() {
+            const category = document.getElementById('competitionCategory').value;
+            const competitionName = document.getElementById('competitionName').value;
+            const ageGroup = this.value;
+
+            if (category && competitionName && ageGroup) {
+                // Find the competition data to get numberOfWinners
+                const categoryData = competitionsData.find(cat => cat.category === category);
+                const competition = categoryData.competitions.find(comp => comp.name === competitionName);
+
+                if (competition) {
+                    generateWinnerFields(competition.numberOfWinners);
+                    document.getElementById('tieQuestion').style.display = 'block';
+
+                    // Show gender notice for gender-separated competitions
+                    if (competition.genderSeparated) {
+                        document.getElementById('genderNotice').style.display = 'block';
+                    } else {
+                        document.getElementById('genderNotice').style.display = 'none';
+                    }
+                }
+            } else {
+                clearWinnerFields();
+                document.getElementById('tieQuestion').style.display = 'none';
+                document.getElementById('genderNotice').style.display = 'none';
+            }
+        }
+
+        function generateWinnerFields(numberOfWinners) {
+            const container = document.getElementById('winnerFieldsContainer');
+            container.innerHTML = '';
+
+            // Create Winners section
+            const winnersSection = document.createElement('div');
+            winnersSection.className = 'mb-4';
+            winnersSection.innerHTML = `
+                <h4 class="mb-3 text-primary">🏆 Winners</h4>
+            `;
+
+            for (let i = 1; i <= numberOfWinners; i++) {
+                const winnerDiv = document.createElement('div');
+                winnerDiv.className = 'winner-entry mb-3 p-3 border rounded bg-light';
+                winnerDiv.innerHTML = `
+                    <h6 class="mb-3">Winner ${i}</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Winner Name</label>
+                            <input type="text" class="form-control winner-name" id="winner${i}Name">
+                            <div class="invalid-feedback">Please enter the winner's name.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Winner Apartment</label>
+                            <input type="text" class="form-control winner-apartment" id="winner${i}Apartment" placeholder="Tower X - Y (e.g., Tower 1 - 101)">
+                            <div class="invalid-feedback">Please enter apartment in format "Tower X - Y".</div>
+                        </div>
+                    </div>
+                `;
+                winnersSection.appendChild(winnerDiv);
+            }
+            container.appendChild(winnersSection);
+
+            // Create Runner-ups section
+            const runnerUpsSection = document.createElement('div');
+            runnerUpsSection.className = 'mb-4';
+            runnerUpsSection.innerHTML = `
+                <h4 class="mb-3 text-warning">🥈 Runner-ups</h4>
+            `;
+
+            for (let i = 1; i <= numberOfWinners; i++) {
+                const runnerUpDiv = document.createElement('div');
+                runnerUpDiv.className = 'runner-up-entry mb-3 p-3 border rounded bg-light';
+                runnerUpDiv.innerHTML = `
+                    <h6 class="mb-3">Runner-up ${i}</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Runner-up Name</label>
+                            <input type="text" class="form-control runner-up-name" id="runnerUp${i}Name">
+                            <div class="invalid-feedback">Please enter the runner-up's name.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Runner-up Apartment</label>
+                            <input type="text" class="form-control runner-up-apartment" id="runnerUp${i}Apartment" placeholder="Tower X - Y (e.g., Tower 1 - 101)">
+                            <div class="invalid-feedback">Please enter apartment in format "Tower X - Y".</div>
+                        </div>
+                    </div>
+                `;
+                runnerUpsSection.appendChild(runnerUpDiv);
+            }
+            container.appendChild(runnerUpsSection);
+
+            // Apply autocomplete to the new fields
+            applyAutocompleteToWinnerFields();
+        }
+
+        function clearWinnerFields() {
+            document.getElementById('winnerFieldsContainer').innerHTML = '';
+            document.getElementById('tieQuestion').style.display = 'none';
+        }
+
+        function loadAutocompleteData() {
+            // Load names
+            fetch(`${CONFIG.BACKEND_URL}?type=registrationData&property=name`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        allNames = data.data;
+                        namesLoaded = true;
+                        checkAndApplyAutocomplete();
+                    }
+                })
+                .catch(error => console.error('Error loading names:', error));
+
+            // Load apartments
+            fetch(`${CONFIG.BACKEND_URL}?type=registrationData&property=apartment`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        allApartments = data.data;
+                        apartmentsLoaded = true;
+                        checkAndApplyAutocomplete();
+                    }
+                })
+                .catch(error => console.error('Error loading apartments:', error));
+        }
+
+        function checkAndApplyAutocomplete() {
+            // Only apply autocomplete when both datasets are loaded
+            if (namesLoaded && apartmentsLoaded) {
+                applyAutocompleteToWinnerFields();
+            }
+        }
+
+        function applyAutocompleteToWinnerFields() {
+            // Apply autocomplete to winner name fields (only if data is available)
+            if (allNames && allNames.length > 0) {
+                $('.winner-name').autocomplete({
+                    source: allNames,
+                    minLength: 1
+                });
+            }
+
+            // Apply autocomplete to winner apartment fields (only if data is available)
+            if (allApartments && allApartments.length > 0) {
+                $('.winner-apartment').autocomplete({
+                    source: allApartments,
+                    minLength: 1
+                });
+            }
+
+            // Apply autocomplete to runner-up name fields (only if data is available)
+            if (allNames && allNames.length > 0) {
+                $('.runner-up-name').autocomplete({
+                    source: allNames,
+                    minLength: 1
+                });
+            }
+
+            // Apply autocomplete to runner-up apartment fields (only if data is available)
+            if (allApartments && allApartments.length > 0) {
+                $('.runner-up-apartment').autocomplete({
+                    source: allApartments,
+                    minLength: 1
+                });
+            }
+        }
+
+        function validateApartmentFormat(apartment) {
+            // Check if apartment follows format "Tower X - Y" where X is tower, Y is flat number
+            // Allow optional space between "Tower" and the number
+            const towerFlatRegex = /^Tower\s*\d+\s*-\s*\d+$/i;
+            return towerFlatRegex.test(apartment.trim());
+        }
+
+        function handleWinnerSubmit(e) {
+            e.preventDefault();
+
+            const form = e.target;
+
+            // Custom validation for required fields and partial entries
+            let isValid = true;
+            let errorMessage = '';
+
+            // Check required competition fields
+            const competitionCategory = document.getElementById('competitionCategory');
+            const competitionName = document.getElementById('competitionName');
+            const ageGroup = document.getElementById('ageGroup');
+
+            if (!competitionCategory.value) {
+                competitionCategory.classList.add('is-invalid');
+                isValid = false;
+                errorMessage = 'Please select a competition category.';
+            } else {
+                competitionCategory.classList.remove('is-invalid');
+            }
+
+            if (!competitionName.value) {
+                competitionName.classList.add('is-invalid');
+                isValid = false;
+                if (!errorMessage) errorMessage = 'Please select a competition name.';
+            } else {
+                competitionName.classList.remove('is-invalid');
+            }
+
+            if (!ageGroup.value) {
+                ageGroup.classList.add('is-invalid');
+                isValid = false;
+                if (!errorMessage) errorMessage = 'Please select an age group.';
+            } else {
+                ageGroup.classList.remove('is-invalid');
+            }
+
+            // Validate winner and runner-up entries (partial entries allowed)
+            const winnerEntries = document.querySelectorAll('.winner-entry');
+            const runnerUpEntries = document.querySelectorAll('.runner-up-entry');
+
+            // Check winners
+            winnerEntries.forEach((entry, index) => {
+                const winnerNum = index + 1;
+                const nameField = entry.querySelector(`#winner${winnerNum}Name`);
+                const apartmentField = entry.querySelector(`#winner${winnerNum}Apartment`);
+
+                const nameValue = nameField.value.trim();
+                const apartmentValue = apartmentField.value.trim();
+
+                // If name is provided, apartment must also be provided
+                if (nameValue && !apartmentValue) {
+                    apartmentField.classList.add('is-invalid');
+                    isValid = false;
+                    if (!errorMessage) errorMessage = `Please provide apartment for Winner ${winnerNum}.`;
+                } else if (!nameValue && apartmentValue) {
+                    nameField.classList.add('is-invalid');
+                    isValid = false;
+                    if (!errorMessage) errorMessage = `Please provide name for Winner ${winnerNum}.`;
+                } else {
+                    nameField.classList.remove('is-invalid');
+                    apartmentField.classList.remove('is-invalid');
+                }
+            });
+
+            // Check runner-ups
+            runnerUpEntries.forEach((entry, index) => {
+                const runnerUpNum = index + 1;
+                const nameField = entry.querySelector(`#runnerUp${runnerUpNum}Name`);
+                const apartmentField = entry.querySelector(`#runnerUp${runnerUpNum}Apartment`);
+
+                const nameValue = nameField.value.trim();
+                const apartmentValue = apartmentField.value.trim();
+
+                // If name is provided, apartment must also be provided
+                if (nameValue && !apartmentValue) {
+                    apartmentField.classList.add('is-invalid');
+                    isValid = false;
+                    if (!errorMessage) errorMessage = `Please provide apartment for Runner-up ${runnerUpNum}.`;
+                } else if (!nameValue && apartmentValue) {
+                    nameField.classList.add('is-invalid');
+                    isValid = false;
+                    if (!errorMessage) errorMessage = `Please provide name for Runner-up ${runnerUpNum}.`;
+                } else {
+                    nameField.classList.remove('is-invalid');
+                    apartmentField.classList.remove('is-invalid');
+                }
+            });
+
+            // Ensure at least one winner or runner-up entry has data
+            let hasAtLeastOneEntry = false;
+            winnerEntries.forEach((entry, index) => {
+                const winnerNum = index + 1;
+                const nameField = entry.querySelector(`#winner${winnerNum}Name`);
+                const apartmentField = entry.querySelector(`#winner${winnerNum}Apartment`);
+                const nameValue = nameField.value.trim();
+                const apartmentValue = apartmentField.value.trim();
+
+                if (nameValue && apartmentValue) {
+                    hasAtLeastOneEntry = true;
+                }
+            });
+
+            runnerUpEntries.forEach((entry, index) => {
+                const runnerUpNum = index + 1;
+                const nameField = entry.querySelector(`#runnerUp${runnerUpNum}Name`);
+                const apartmentField = entry.querySelector(`#runnerUp${runnerUpNum}Apartment`);
+                const nameValue = nameField.value.trim();
+                const apartmentValue = apartmentField.value.trim();
+
+                if (nameValue && apartmentValue) {
+                    hasAtLeastOneEntry = true;
+                }
+            });
+
+            if (!hasAtLeastOneEntry) {
+                isValid = false;
+                errorMessage = 'Please enter at least one winner or runner-up with both name and apartment.';
+            }
+
+            if (!isValid) {
+                form.classList.add('was-validated');
+                if (errorMessage) {
+                    showAlertModal(errorMessage);
+                }
+                return;
+            }
+
+            // Check if volunteer is authenticated
+            const volunteerEmail = localStorage.getItem('volunteerEmail');
+            if (!volunteerEmail) {
+                showAlertModal('You must be authenticated as a volunteer to submit winner entries. Please access this form through the Admin tab.');
+                return;
+            }
+
+            // Validate apartment format for all filled apartment fields
+            const allApartmentFields = document.querySelectorAll('.winner-apartment, .runner-up-apartment');
+            let invalidApartments = [];
+
+            allApartmentFields.forEach(field => {
+                const value = field.value.trim();
+                if (value && !validateApartmentFormat(value)) {
+                    invalidApartments.push(field);
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (invalidApartments.length > 0) {
+                showAlertModal('Please ensure all apartment entries follow the format "Tower X - Y" (e.g., "Tower 1 - 101").');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitWinnerBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                // Get competition data to check if gender-separated
+                const category = document.getElementById('competitionCategory').value;
+                const competitionName = document.getElementById('competitionName').value;
+                const categoryData = competitionsData.find(cat => cat.category === category);
+                const competition = categoryData.competitions.find(comp => comp.name === competitionName);
+
+                // Collect form data
+                const volunteerEmail = localStorage.getItem('volunteerEmail');
+                const formData = {
+                    formType: 'winner',
+                    competitionCategory: category,
+                    competitionName: competitionName,
+                    ageGroup: document.getElementById('ageGroup').value,
+                    hadTie: document.querySelector('input[name="hadTie"]:checked').value === 'true',
+                    genderSeparated: competition ? competition.genderSeparated || false : false,
+                    submittedBy: volunteerEmail || 'Unknown',
+                    winners: [],
+                    runnerUps: []
+                };
+
+                // Collect winner data
+                const winnerEntries = document.querySelectorAll('.winner-entry');
+                winnerEntries.forEach((entry, index) => {
+                    const winnerNum = index + 1;
+                    const nameField = entry.querySelector(`#winner${winnerNum}Name`);
+                    const apartmentField = entry.querySelector(`#winner${winnerNum}Apartment`);
+
+                    if (nameField && apartmentField) {
+                        formData.winners.push({
+                            position: winnerNum,
+                            name: nameField.value.trim().toUpperCase(),
+                            apartment: apartmentField.value.trim().toUpperCase()
+                        });
+                    }
+                });
+
+                // Collect runner-up data
+                const runnerUpEntries = document.querySelectorAll('.runner-up-entry');
+                runnerUpEntries.forEach((entry, index) => {
+                    const runnerUpNum = index + 1;
+                    const nameField = entry.querySelector(`#runnerUp${runnerUpNum}Name`);
+                    const apartmentField = entry.querySelector(`#runnerUp${runnerUpNum}Apartment`);
+
+                    if (nameField && apartmentField) {
+                        formData.runnerUps.push({
+                            position: runnerUpNum,
+                            name: nameField.value.trim().toUpperCase(),
+                            apartment: apartmentField.value.trim().toUpperCase()
+                        });
+                    }
+                });
+
+                // Submit to backend
+                fetch(CONFIG.BACKEND_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    redirect: 'follow',
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showAlertModal('Winner entry submitted successfully!');
+                            form.reset();
+                            clearWinnerFields();
+                            document.getElementById('competitionName').disabled = true;
+                            document.getElementById('ageGroup').disabled = true;
+                            document.getElementById('tieQuestion').style.display = 'none';
+                        } else {
+                            showAlertModal('Failed to submit winner entry: ' + (data.error || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Submission error:', error);
+                        showAlertModal('An error occurred while submitting. Please try again.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+
+            } catch (error) {
+                console.error('Form processing error:', error);
+                showAlertModal('An error occurred while processing the form. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+    </script>
 </body>
 
 </html>
