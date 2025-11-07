@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Check for access code in URL synchronously first
     const urlParams = new URLSearchParams(window.location.search);
     const accessCodeFromUrl = urlParams.get('access_code');
+    const sectionFromUrl = urlParams.get('section');
     if (accessCodeFromUrl) {
         // Temporarily assume valid and enable registration
         hasValidAccessCode = true;
@@ -47,6 +48,32 @@ document.addEventListener("DOMContentLoaded", function () {
     // Set default section
     if (REGISTRATION_CLOSED && !hasValidAccessCode) {
         switchSection('dashboard');
+    }
+
+    // Check for section parameter in URL
+    if (sectionFromUrl) {
+        if (sectionFromUrl === 'admin') {
+            // Check if volunteer email is already stored in localStorage
+            const storedEmail = localStorage.getItem('volunteerEmail');
+            if (storedEmail) {
+                // If email exists, go directly to admin section
+                switchSection("admin");
+                // Show all panels for volunteers (assuming stored email is authorized)
+                setTimeout(() => {
+                    const reimbursementPanel = document.getElementById('reimbursement-panel');
+                    const winnerPanel = document.getElementById('winner-panel');
+                    if (reimbursementPanel) reimbursementPanel.style.display = 'block';
+                    if (winnerPanel) winnerPanel.style.display = 'block';
+                }, 100);
+            } else {
+                // If no email stored, show the email modal for authentication
+                setTimeout(() => {
+                    showEmailModal();
+                }, 100);
+            }
+        } else {
+            switchSection(sectionFromUrl);
+        }
     }
 
     // Initialize competitions display with no selection
@@ -100,7 +127,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (navAdmin) {
         navAdmin.addEventListener("click", function () {
-            showEmailModal();
+            // Check if volunteer email is already stored in localStorage
+            const storedEmail = localStorage.getItem('volunteerEmail');
+            if (storedEmail) {
+                // If email exists, go directly to admin section
+                switchSection("admin");
+                // Show all panels for volunteers (assuming stored email is authorized)
+                const reimbursementPanel = document.getElementById('reimbursement-panel');
+                const winnerPanel = document.getElementById('winner-panel');
+                if (reimbursementPanel) reimbursementPanel.style.display = 'block';
+                if (winnerPanel) winnerPanel.style.display = 'block';
+            } else {
+                // If no email stored, show the email modal for authentication
+                showEmailModal();
+            }
         });
     }
 

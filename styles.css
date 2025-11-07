@@ -304,6 +304,26 @@
     text-align: center;
 }
 
+.back-to-admin {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    z-index: 99;
+    background: transparent;
+    border: none;
+    color: #033c3b;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.back-to-admin:hover {
+    color: #0a5a58;
+}
+
 .mobile-header h1 {
     margin: 0;
     font-size: 1.5rem;
