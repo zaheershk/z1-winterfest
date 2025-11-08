@@ -26,7 +26,7 @@
             <section id="content-section" class="mobile-section active">
                 <div class="container py-3">
                     <div class="section-header">
-                        <h2>Winner Entry Form</h2>
+                        <h2>Winner Entry</h2>
                         <p class="text-muted">Enter competition winners and runner-ups</p>
                     </div>
 
@@ -379,7 +379,11 @@
 
         function loadAutocompleteData() {
             // Load names
-            fetch(`${CONFIG.BACKEND_URL}?type=registrationData&property=name`)
+            fetch(`${CONFIG.BACKEND_URL}?type=registrationData&property=name`, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache'
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -391,7 +395,11 @@
                 .catch(error => console.error('Error loading names:', error));
 
             // Load apartments
-            fetch(`${CONFIG.BACKEND_URL}?type=registrationData&property=apartment`)
+            fetch(`${CONFIG.BACKEND_URL}?type=registrationData&property=apartment`, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache'
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {

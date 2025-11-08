@@ -1,6 +1,18 @@
 // ---- CODE FOR UI BACKEND ----
 const registrationWorkbookId = '1k6k68Upe41ct_hwa-1VQbnCN6rtFiPZXSal_uPYMOfg';
+
+// Sheet names
 const formDataSheetName = 'FormData';
+const competitionDataSheetName = 'CompetitionData';
+const paymentDataSheetName = 'PaymentData';
+const foodStallDataSheetName = 'FoodStallData';
+const ageOutlierDataSheetName = 'AgeOutlierData';
+const reimbursementsSheetName = 'Expenses';
+const winnerEntriesSheetName = 'WinnerEntries';
+
+// Google Drive folder IDs
+const registrationPaymentProofsFolderId = '1epCI3H_dnfvsORby2YAt5fZfvRKrQVh9';
+const expenseAttachmentsFolderId = '1up5fQYQSvPShfkyKDgLq-lfc7FUUX0F1';
 
 // Hardcoded list of volunteer email addresses
 const VOLUNTEER_EMAILS = [
@@ -104,13 +116,13 @@ function doPost(e) {
       }
     }
 
-    // Check if this is a form submission (refund, reimbursement, winner)
+    // Check if this is a form submission (refund, expense, winner)
     if (requestData.formType) {
       switch (requestData.formType) {
         case 'refund':
           return submitRefund(requestData);
-        case 'reimbursement':
-          return submitReimbursement(requestData);
+        case 'expense':
+          return submitExpense(requestData);
         case 'winner':
           return submitWinner(requestData);
         default:
@@ -316,8 +328,7 @@ function uploadImageToDrive(base64Image, mimeType, registrationId) {
     const blob = Utilities.newBlob(decodedBytes, mimeType, `payment_proof_${registrationId}.${extension}`);
 
     // Upload to Google Drive (create file in a specific folder)
-    const folderId = '1epCI3H_dnfvsORby2YAt5fZfvRKrQVh9';
-    const folder = DriveApp.getFolderById(folderId);
+    const folder = DriveApp.getFolderById(registrationPaymentProofsFolderId);
     const file = folder.createFile(blob);
 
     // Set file permissions to anyone with link can view
@@ -614,7 +625,7 @@ function parseFoodStallsJson(jsonString) {
 function processCompetitionData() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const formDataSheet = spreadsheet.getSheetByName(formDataSheetName);
-  const competitionSheet = spreadsheet.getSheetByName('CompetitionData');
+  const competitionSheet = spreadsheet.getSheetByName(competitionDataSheetName);
 
   if (!formDataSheet || !competitionSheet) {
     throw new Error('Required sheets not found');
@@ -750,7 +761,7 @@ function processCompetitionData() {
 function processPaymentData() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const formDataSheet = spreadsheet.getSheetByName(formDataSheetName);
-  const paymentSheet = spreadsheet.getSheetByName('PaymentData');
+  const paymentSheet = spreadsheet.getSheetByName(paymentDataSheetName);
 
   if (!formDataSheet || !paymentSheet) {
     throw new Error('Required sheets not found');
@@ -821,7 +832,7 @@ function processPaymentData() {
 function processFoodStallData() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const formDataSheet = spreadsheet.getSheetByName(formDataSheetName);
-  const foodStallSheet = spreadsheet.getSheetByName('FoodStallData');
+  const foodStallSheet = spreadsheet.getSheetByName(foodStallDataSheetName);
 
   if (!formDataSheet || !foodStallSheet) {
     throw new Error('Required sheets not found');
@@ -927,17 +938,17 @@ function loadDataToSheets() {
     Logger.log('Starting data load process...');
 
     // Clear and load CompetitionData
-    clearSheetData('CompetitionData');
+    clearSheetData(competitionDataSheetName);
     processCompetitionData();
     Logger.log('CompetitionData loaded successfully');
 
     // Clear and load PaymentData
-    clearSheetData('PaymentData');
+    clearSheetData(paymentDataSheetName);
     processPaymentData();
     Logger.log('PaymentData loaded successfully');
 
     // Clear and load FoodStallData
-    clearSheetData('FoodStallData');
+    clearSheetData(foodStallDataSheetName);
     processFoodStallData();
     Logger.log('FoodStallData loaded successfully');
 
@@ -956,7 +967,7 @@ function identifyAgeOutliers() {
     Logger.log('Starting age outlier detection process...');
 
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    const competitionSheet = spreadsheet.getSheetByName('CompetitionData');
+    const competitionSheet = spreadsheet.getSheetByName(competitionDataSheetName);
 
     if (!competitionSheet) {
       throw new Error('CompetitionData sheet not found');
@@ -1036,10 +1047,10 @@ function identifyAgeOutliers() {
     Logger.log(`Found ${outliers.length} age outliers`);
 
     // Prepare AgeOutlierData sheet
-    let outlierSheet = spreadsheet.getSheetByName('AgeOutlierData');
+    let outlierSheet = spreadsheet.getSheetByName(ageOutlierDataSheetName);
     if (!outlierSheet) {
       Logger.log('Creating AgeOutlierData sheet');
-      outlierSheet = spreadsheet.insertSheet('AgeOutlierData');
+      outlierSheet = spreadsheet.insertSheet(ageOutlierDataSheetName);
     } else {
       // Clear existing data rows (excluding header)
       const lastRow = outlierSheet.getLastRow();
@@ -1258,7 +1269,7 @@ function verifyPayments() {
     // Logger.log('Starting payment verification process...');
 
     const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    const paymentSheet = spreadsheet.getSheetByName('PaymentData');
+    const paymentSheet = spreadsheet.getSheetByName(paymentDataSheetName);
 
     if (!paymentSheet) {
       throw new Error('PaymentData sheet not found');
@@ -1472,18 +1483,125 @@ function submitRefund(data) {
   }
 }
 
-function submitReimbursement(data) {
+function submitExpense(data) {
   try {
-    Logger.log('Reimbursement submission received: ' + JSON.stringify(data));
-    // TODO: Implement reimbursement processing logic
+    Logger.log('Expense submission received: ' + JSON.stringify(data));
+
+    // Generate unique expense ID
+    const expenseId = 'EXP-' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000);
+
+    // Validate required fields
+    if (!data.volunteerName || data.volunteerName.trim() === '') {
+      return errorResponse('Missing required field: volunteerName');
+    }
+    if (!data.expenseFor || data.expenseFor.trim() === '') {
+      return errorResponse('Missing required field: expenseFor');
+    }
+    if (!data.description || data.description.trim() === '') {
+      return errorResponse('Missing required field: description');
+    }
+    if (!data.expenseAmount && data.expenseAmount !== 0) {
+      return errorResponse('Missing required field: expenseAmount');
+    }
+
+    // Validate expense amount
+    const amount = parseFloat(data.expenseAmount);
+    if (isNaN(amount) || amount <= 0) {
+      return errorResponse('Invalid expense amount');
+    }
+
+    // Get or create expense sheet
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    let expenseSheet = ss.getSheetByName(reimbursementsSheetName);
+
+    if (!expenseSheet) {
+      expenseSheet = ss.insertSheet(reimbursementsSheetName);
+
+      // Add headers
+      const headers = [
+        'Expense ID',
+        'Volunteer Name',
+        'Expense Amount',
+        'Expense For',
+        'Description',
+        'Submitted By',
+        'Submitted Date',
+        'Status',
+        'Attachment-1',
+        'Attachment-2',
+        'Attachment-3',
+        'Attachment-4',
+        'Attachment-5'
+      ];
+      expenseSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    }
+
+    // Upload files to Google Drive
+    const attachmentLinks = [];
+
+    if (expenseAttachmentsFolderId && data.attachments && Array.isArray(data.attachments)) {
+      try {
+        const folder = DriveApp.getFolderById(expenseAttachmentsFolderId);
+
+        // Process up to 5 attachments
+        for (let i = 0; i < 5; i++) {
+          const attachment = data.attachments[i];
+          if (attachment && attachment.content && attachment.filename) {
+            const blob = Utilities.newBlob(Utilities.base64Decode(attachment.content), attachment.contentType, attachment.filename);
+
+            // Create unique filename with expense ID
+            const uniqueFilename = `${expenseId}_${i + 1}_${attachment.filename}`;
+            const uploadedFile = folder.createFile(blob.setName(uniqueFilename));
+
+            // Make file viewable by anyone with link
+            uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+            attachmentLinks.push(uploadedFile.getUrl());
+          } else {
+            attachmentLinks.push('');
+          }
+        }
+      } catch (driveError) {
+        Logger.log('Drive upload error: ' + driveError.toString());
+        // Continue without attachments if Drive fails
+        for (let i = 0; i < 5; i++) {
+          attachmentLinks.push('');
+        }
+      }
+    } else {
+      // No drive folder configured or no attachments
+      for (let i = 0; i < 5; i++) {
+        attachmentLinks.push('');
+      }
+    }
+
+    // Prepare row data
+    const rowData = [
+      expenseId,
+      data.volunteerName.trim(),
+      amount,
+      data.expenseFor,
+      data.description.trim(),
+      data.submittedBy || 'Unknown',
+      new Date().toISOString(),
+      'Pending',
+      ...attachmentLinks
+    ];
+
+    // Append to sheet
+    expenseSheet.appendRow(rowData);
+
+    Logger.log('Expense request submitted successfully: ' + expenseId);
+
     return dataResponse({
       status: 'success',
-      message: 'Reimbursement request submitted successfully (placeholder)',
-      requestId: 'REIMB-' + new Date().getTime()
+      message: 'Expense request submitted successfully',
+      expenseId: expenseId
     });
+
   } catch (error) {
-    Logger.log('Error in submitReimbursement: ' + error.toString());
-    return errorResponse('Failed to submit reimbursement request');
+    Logger.log('Error in submitExpense: ' + error.toString());
+    return errorResponse('Failed to submit expense request: ' + error.toString());
   }
 }
 
@@ -1494,11 +1612,11 @@ function submitWinner(data) {
     // We'll need a separate sheet for winner entries
     // For now, let's use the existing formDataSheetName but we should create a separate sheet
     const ss = SpreadsheetApp.openById(registrationWorkbookId);
-    let winnerSheet = ss.getSheetByName('WinnerEntries');
+    let winnerSheet = ss.getSheetByName(winnerEntriesSheetName);
 
     // Create the sheet if it doesn't exist
     if (!winnerSheet) {
-      winnerSheet = ss.insertSheet('WinnerEntries');
+      winnerSheet = ss.insertSheet(winnerEntriesSheetName);
 
       // Add headers - separate sections for winners and runner-ups
       const headers = [

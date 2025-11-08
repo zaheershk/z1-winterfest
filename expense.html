@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Z1 Winterfest 2025</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="mobile-container">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <div class="brand">
+                <h1>Z1 Winterfest 2025</h1>
+            </div>
+        </header>
+
+        <!-- Mobile Main -->
+        <main class="mobile-main">
+            <a href="index.html?section=admin" class="back-to-admin">[BACK]</a>
+            <section id="content-section" class="mobile-section active">
+                <div class="container py-3">
+                    <div class="section-header">
+                        <h2>Expense Reimbursement</h2>
+                        <p class="text-muted">Submit expense reimbursement requests</p>
+                    </div>
+
+                    <form id="expenseForm" class="needs-validation" novalidate>
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="volunteerName" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="volunteerName" required>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+
+                        <!-- Expense Amount -->
+                        <div class="mb-3">
+                            <label for="expenseAmount" class="form-label">Expense Amount (₹) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="expenseAmount" step="0.01" min="0" value="0" required>
+                            <div class="invalid-feedback">Please enter a valid expense amount.</div>
+                        </div>
+
+                        <!-- Expense For -->
+                        <div class="mb-3">
+                            <label for="expenseFor" class="form-label">Expense For <span class="text-danger">*</span></label>
+                            <select class="form-select" id="expenseFor" required>
+                                <option value="">Select Competition/Event</option>
+                            </select>
+                            <div class="invalid-feedback">Please select what the expense is for.</div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="expenseDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="expenseDescription" rows="4" required placeholder="Please provide details about the expense..."></textarea>
+                            <div class="invalid-feedback">Please provide a description of the expense.</div>
+                        </div>
+
+                        <!-- File Attachments -->
+                        <div class="mb-3">
+                            <label for="receiptFiles" class="form-label">Receipt/Payment Proof <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="receiptFiles" multiple accept=".pdf,.jpg,.jpeg,.png" required>
+                            <div class="form-text">Upload receipts or payment proofs (PDF, JPG, JPEG, PNG). Maximum 5 files allowed.</div>
+                            <div class="invalid-feedback">Please upload at least one receipt or payment proof file.</div>
+                            <div id="filePreview" class="mt-2"></div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-start">
+                            <button type="submit" class="green-btn btn-lg" id="submitExpenseBtn" style="width: 200px; padding: 8px 16px;">
+                                <i class="fas fa-paper-plane"></i> Submit Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="alertModal" class="alert-modal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-header">
+                <h3 id="alertModalTitle">Access Denied</h3>
+                <span class="alert-modal-close" onclick="hideAlertModal()">&times;</span>
+            </div>
+            <div class="alert-modal-body">
+                <p id="alertModalMessage">You are not authorized to access this form. Only volunteers can submit expense reimbursements.</p>
+            </div>
+            <div class="alert-modal-footer">
+                <button id="alertModalOkBtn" class="alert-modal-btn" onclick="hideAlertModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script src="competitions.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Load competitions for expense dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            populateExpenseForDropdown();
+            setupFileValidation();
+        });
+
+        function populateExpenseForDropdown() {
+            const expenseForSelect = document.getElementById('expenseFor');
+            if (!expenseForSelect) return;
+
+            // Extract all competition names from competitionsData
+            const competitionNames = [];
+            competitionsData.forEach(category => {
+                category.competitions.forEach(competition => {
+                    competitionNames.push(competition.name);
+                });
+            });
+
+            // Sort alphabetically and remove duplicates
+            const uniqueNames = [...new Set(competitionNames)].sort();
+
+            // Add "Other" option at the beginning
+            expenseForSelect.innerHTML = '<option value="">Select Competition/Event</option>';
+            expenseForSelect.innerHTML += '<option value="Other">Other (General Expense)</option>';
+
+            // Add all competition names
+            uniqueNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                expenseForSelect.appendChild(option);
+            });
+        }
+
+        function setupFileValidation() {
+            const fileInput = document.getElementById('receiptFiles');
+            const filePreview = document.getElementById('filePreview');
+
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                filePreview.innerHTML = '';
+
+                if (files.length > 5) {
+                    showAlertModal('Maximum 5 files allowed. Please select fewer files.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Validate file types
+                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+
+                if (invalidFiles.length > 0) {
+                    showAlertModal('Only PDF, JPG, JPEG, and PNG files are allowed.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Show file preview
+                files.forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-preview-item d-flex align-items-center mb-2 p-2 border rounded';
+                    fileItem.innerHTML = `
+                        <i class="fas fa-${file.type.startsWith('image/') ? 'image' : 'file-pdf'} me-2"></i>
+                        <span class="flex-grow-1">${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    filePreview.appendChild(fileItem);
+                });
+            });
+        }
+
+        function removeFile(index) {
+            const fileInput = document.getElementById('receiptFiles');
+            const files = Array.from(fileInput.files);
+            files.splice(index, 1);
+
+            // Create new FileList with remaining files
+            const dt = new DataTransfer();
+            files.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+
+            // Trigger change event to update preview
+            fileInput.dispatchEvent(new Event('change'));
+        }
+
+        // Form submission handler
+        document.getElementById('expenseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Additional validation for files
+            const fileInput = document.getElementById('receiptFiles');
+            if (fileInput.files.length === 0) {
+                showAlertModal('Please upload at least one receipt or payment proof file.');
+                fileInput.focus();
+                return;
+            }
+
+            if (fileInput.files.length > 5) {
+                showAlertModal('Maximum 5 files allowed.');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitExpenseBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            try {
+                // Convert files to base64
+                const filePromises = Array.from(fileInput.files).map(async (file, index) => {
+                    const base64 = await fileToBase64(file);
+                    return {
+                        filename: file.name,
+                        content: base64,
+                        contentType: file.type,
+                        fieldName: `attachment${index + 1}`
+                    };
+                });
+
+                const attachments = await Promise.all(filePromises);
+
+                // Prepare form data
+                const volunteerEmail = localStorage.getItem('volunteerEmail');
+                const formData = {
+                    formType: 'expense',
+                    volunteerName: document.getElementById('volunteerName').value.trim(),
+                    expenseAmount: parseFloat(document.getElementById('expenseAmount').value),
+                    expenseFor: document.getElementById('expenseFor').value,
+                    description: document.getElementById('expenseDescription').value.trim(),
+                    submittedBy: volunteerEmail || 'Unknown',
+                    attachments: attachments
+                };
+
+                // Submit to backend
+                const response = await fetch(CONFIG.BACKEND_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    redirect: 'follow',
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showAlertModal('Expense request submitted successfully!');
+                    this.reset();
+                    document.getElementById('filePreview').innerHTML = '';
+                } else {
+                    showAlertModal('Failed to submit expense request: ' + (data.error || 'Unknown error'));
+                }
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                showAlertModal('An error occurred while submitting. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+    </script>
+</body>
+
+</html>

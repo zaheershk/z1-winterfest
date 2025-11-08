@@ -19,33 +19,251 @@ let currentCheckoutStep = 1; // 1: Summary, 2: Acknowledgement, 3: Payment
 
 const foodStallCheckboxSelector = "#date-10nov, #date-16nov, #date-17nov, #date-23nov, #date-24nov, #date-30nov, #date-1dec, #date-7dec, #date-8dec";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on index.html (has dashboard nav)
     const isIndexPage = document.getElementById('nav-dashboard') !== null;
-    if (!isIndexPage) {
-        // On other pages (reimbursement, winner, refund), skip index-specific logic
-        return;
+    
+    if (isIndexPage) {
+        // Clear cart data on page refresh
+        localStorage.removeItem('registrationCart');
+        registrationCart = [];
+
+        // Load autocomplete data for names and apartments (available to all users)
+        loadDataAndApplyAutocomplete();
+
+        // Check for access code in URL synchronously first
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessCodeFromUrl = urlParams.get('access_code');
+        const sectionFromUrl = urlParams.get('section');
+
+        // Handle access code validation and section initialization
+        if (accessCodeFromUrl) {
+            // Validate access code first, then handle sections
+            validateAccessCodeAndInitialize(accessCodeFromUrl, sectionFromUrl);
+        } else {
+            // No access code, proceed with normal initialization
+            initializeSections(sectionFromUrl);
+        }
+
+        // Initialize competitions display with no selection
+        updateCompetitionsDisplay(null);
+
+        // Navigation event listeners
+        const navInformation = document.getElementById("nav-information");
+        const navRegistration = document.getElementById("nav-registration");
+        const navCheckout = document.getElementById("nav-checkout");
+        const navDashboard = document.getElementById("nav-dashboard");
+        const navAdmin = document.getElementById("nav-admin");
+
+        if (navInformation) {
+            navInformation.addEventListener("click", function () {
+                switchSection("information");
+            });
+        }
+
+        if (navRegistration) {
+            navRegistration.addEventListener("click", function () {
+                switchSection("registration");
+            });
+        }
+
+        if (navCheckout) {
+            navCheckout.addEventListener("click", function () {
+                switchSection("checkout");
+            });
+        }
+
+        if (navDashboard) {
+            navDashboard.addEventListener("click", function () {
+                switchSection("dashboard");
+            });
+        }
+
+        if (navAdmin) {
+            navAdmin.addEventListener("click", function () {
+                switchSection("admin");
+            });
+        }
+
+        // Disable registration and checkout navigation when registration is closed
+        // (but allow if valid access code is present)
+        if (REGISTRATION_CLOSED && !hasValidAccessCode) {
+            const navRegistration = document.getElementById('nav-registration');
+            const navCheckout = document.getElementById('nav-checkout');
+            const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+            const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
+
+            if (navRegistration) {
+                navRegistration.style.opacity = '0.5';
+                navRegistration.style.pointerEvents = 'none';
+                navRegistration.title = 'Registration is closed';
+            }
+
+            if (navCheckout) {
+                navCheckout.style.opacity = '0.5';
+                navCheckout.style.pointerEvents = 'none';
+                navCheckout.title = 'Registration is closed';
+            }
+
+            if (registerParticipantBtn) {
+                registerParticipantBtn.style.opacity = '0.5';
+                registerParticipantBtn.style.pointerEvents = 'none';
+                registerParticipantBtn.title = 'Registration is closed';
+            }
+
+            if (registerParticipantBtnCheckout) {
+                registerParticipantBtnCheckout.style.opacity = '0.5';
+                registerParticipantBtnCheckout.style.pointerEvents = 'none';
+                registerParticipantBtnCheckout.title = 'Registration is closed';
+            }
+
+            // Show registration closed banner
+            const registrationBanner = document.querySelector('.registration-closed-banner');
+            if (registrationBanner) {
+                registrationBanner.style.display = 'block';
+            }
+        } else {
+            // Hide banner when registration is open or valid access code is present
+            const registrationBanner = document.querySelector('.registration-closed-banner');
+            if (registrationBanner) {
+                registrationBanner.style.display = 'none';
+            }
+
+            // Show special access message if using access code
+            if (hasValidAccessCode) {
+                showSpecialAccessMessage();
+            }
+        }
+
+        // Information tab - Register Participant button
+        const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+        if (registerParticipantBtn) {
+            registerParticipantBtn.addEventListener('click', function () {
+                if (REGISTRATION_CLOSED && !hasValidAccessCode) {
+                    showRegistrationClosedMessage();
+                    return;
+                }
+                switchSection('registration');
+                resetRegistrationForm();
+                showParticipantSection();
+            });
+        }
+
+        // Checkout tab - Register Participant button
+        const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');  
+        if (registerParticipantBtnCheckout) {
+            registerParticipantBtnCheckout.addEventListener('click', function () {
+                if (REGISTRATION_CLOSED && !hasValidAccessCode) {
+                    showRegistrationClosedMessage();
+                    return;
+                }
+                switchSection('registration');
+                resetRegistrationForm();
+                showParticipantSection();
+            });
+        }
+
+        // Registration flow event listeners
+        // Note: Registration type event listeners are attached in handleContinue when the section is shown    
+        document.querySelectorAll('input[name="addAnother"]').forEach(radio => {
+            radio.addEventListener('change', handleAddAnotherChange);
+        });
+
+        // Food stall question event listeners
+        document.querySelectorAll('input[name="foodStallInterest"]').forEach(radio => {
+            radio.addEventListener('change', handleFoodStallInterestChange);
+        });
+
+        const continueBtn = document.getElementById('continueBtn');
+        if (continueBtn) continueBtn.addEventListener('click', handleContinue);
+
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) backBtn.addEventListener('click', handleBack);
+
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        // Removed event listener since we moved logic to radio button change
+        // if (addToCartBtn) addToCartBtn.addEventListener('click', handleAddToCart);
+
+        // Checkout navigation event listeners
+        const checkoutNextBtn = document.getElementById('checkoutNextBtn');
+        if (checkoutNextBtn) checkoutNextBtn.addEventListener('click', handleCheckoutNext);
+
+        const checkoutBackBtn = document.getElementById('checkoutBackBtn');
+        if (checkoutBackBtn) checkoutBackBtn.addEventListener('click', handleCheckoutBack);
+
+        const paymentBackBtn = document.getElementById('paymentBackBtn');
+        if (paymentBackBtn) paymentBackBtn.addEventListener('click', handleCheckoutBack);
+
+        // Next Step button (appears after filling registration details)
+        const nextStepBtn = document.getElementById('nextStepBtn');
+        if (nextStepBtn) nextStepBtn.addEventListener('click', handleNextStep);
+
+        // Checkout event listeners
+        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+        if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', handleFinalSubmit);
     }
+});// Handle access code validation and then section initialization
+function validateAccessCodeAndInitialize(accessCode, sectionFromUrl) {
+    $.getJSON(CONFIG.BACKEND_URL + '?validate_access_code=' + encodeURIComponent(accessCode), function(response) {
+        if (response.valid) {
+            hasValidAccessCode = true;
+            window.accessCode = accessCode;
+            REGISTRATION_CLOSED = false; // Override for this session
+            console.log('Valid access code detected:', accessCode, '- Registration reopened for this session');
 
-    // Clear cart data on page refresh
-    localStorage.removeItem('registrationCart');
-    registrationCart = [];
+            // Re-enable the UI since registration is now open
+            const navRegistration = document.getElementById('nav-registration');
+            const navCheckout = document.getElementById('nav-checkout');
+            const registerParticipantBtn = document.getElementById('registerParticipantBtn');
+            const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
 
-    // Check for access code in URL synchronously first
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessCodeFromUrl = urlParams.get('access_code');
-    const sectionFromUrl = urlParams.get('section');
-    if (accessCodeFromUrl) {
-        // Temporarily assume valid and enable registration
-        hasValidAccessCode = true;
-        accessCode = accessCodeFromUrl;
-        REGISTRATION_CLOSED = false;
-    }
+            if (navRegistration) {
+                navRegistration.style.opacity = '1';
+                navRegistration.style.pointerEvents = 'auto';
+                navRegistration.title = '';
+            }
 
-    // Check for access code in URL (async validation)
-    checkAccessCode();
+            if (navCheckout) {
+                navCheckout.style.opacity = '1';
+                navCheckout.style.pointerEvents = 'auto';
+                navCheckout.title = '';
+            }
 
-    // Set default section
+            if (registerParticipantBtn) {
+                registerParticipantBtn.style.opacity = '1';
+                registerParticipantBtn.style.pointerEvents = 'auto';
+                registerParticipantBtn.title = '';
+            }
+
+            if (registerParticipantBtnCheckout) {
+                registerParticipantBtnCheckout.style.opacity = '1';
+                registerParticipantBtnCheckout.style.pointerEvents = 'auto';
+                registerParticipantBtnCheckout.title = '';
+            }
+
+            // Hide registration closed banner
+            const registrationBanner = document.querySelector('.registration-closed-banner');
+            if (registrationBanner) {
+                registrationBanner.style.display = 'none';
+            }
+
+            showSpecialAccessMessage();
+
+            // Now handle section parameter
+            initializeSections(sectionFromUrl);
+        } else {
+            // Invalid access code - set default section to dashboard
+            switchSection('dashboard');
+        }
+    }).fail(function() {
+        // Error validating - set default section to dashboard
+        switchSection('dashboard');
+    });
+}
+
+// Handle section initialization (called after access code validation if needed)
+function initializeSections(sectionFromUrl) {
+    // Set default section if registration is closed and no valid access code
     if (REGISTRATION_CLOSED && !hasValidAccessCode) {
         switchSection('dashboard');
     }
@@ -60,9 +278,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 switchSection("admin");
                 // Show all panels for volunteers (assuming stored email is authorized)
                 setTimeout(() => {
-                    const reimbursementPanel = document.getElementById('reimbursement-panel');
+                    const expensePanel = document.getElementById('expense-panel');
                     const winnerPanel = document.getElementById('winner-panel');
-                    if (reimbursementPanel) reimbursementPanel.style.display = 'block';
+                    if (expensePanel) expensePanel.style.display = 'block';
                     if (winnerPanel) winnerPanel.style.display = 'block';
                 }, 100);
             } else {
@@ -75,241 +293,8 @@ document.addEventListener("DOMContentLoaded", function () {
             switchSection(sectionFromUrl);
         }
     }
+}
 
-    // Initialize competitions display with no selection
-    updateCompetitionsDisplay(null);
-
-    // Navigation event listeners
-    const navInformation = document.getElementById("nav-information");
-    const navRegistration = document.getElementById("nav-registration");
-    const navCheckout = document.getElementById("nav-checkout");
-    const navDashboard = document.getElementById("nav-dashboard");
-    const navAdmin = document.getElementById("nav-admin");
-
-    if (navInformation) {
-        navInformation.addEventListener("click", function () {
-            switchSection("information");
-        });
-    }
-
-    if (navRegistration) {
-        navRegistration.addEventListener("click", function () {
-            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
-                showRegistrationClosedMessage();
-                return;
-            }
-            switchSection("registration");
-            // If clicking registration tab directly, show participant section if not already shown
-            const participantSection = document.getElementById('participantSection');
-            const actionButtonsSection = document.getElementById('actionButtonsSection');
-            if (participantSection && participantSection.style.display === 'none') {
-                resetRegistrationForm();
-                showParticipantSection();
-            }
-        });
-    }
-
-    if (navCheckout) {
-        navCheckout.addEventListener("click", function () {
-            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
-                showRegistrationClosedMessage();
-                return;
-            }
-            switchSection("checkout");
-        });
-    }
-
-    if (navDashboard) {
-        navDashboard.addEventListener("click", function () {
-            switchSection("dashboard");
-        });
-    }
-
-    if (navAdmin) {
-        navAdmin.addEventListener("click", function () {
-            // Check if volunteer email is already stored in localStorage
-            const storedEmail = localStorage.getItem('volunteerEmail');
-            if (storedEmail) {
-                // If email exists, go directly to admin section
-                switchSection("admin");
-                // Show all panels for volunteers (assuming stored email is authorized)
-                const reimbursementPanel = document.getElementById('reimbursement-panel');
-                const winnerPanel = document.getElementById('winner-panel');
-                if (reimbursementPanel) reimbursementPanel.style.display = 'block';
-                if (winnerPanel) winnerPanel.style.display = 'block';
-            } else {
-                // If no email stored, show the email modal for authentication
-                showEmailModal();
-            }
-        });
-    }
-
-    // Initially hide volunteer-only admin panels
-    const reimbursementPanel = document.getElementById('reimbursement-panel');
-    const winnerPanel = document.getElementById('winner-panel');
-    if (reimbursementPanel) reimbursementPanel.style.display = 'none';
-    if (winnerPanel) winnerPanel.style.display = 'none';
-
-    // Information tab - Register Participant button
-    const registerParticipantBtn = document.getElementById('registerParticipantBtn');
-    if (registerParticipantBtn) {
-        registerParticipantBtn.addEventListener('click', function () {
-            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
-                showRegistrationClosedMessage();
-                return;
-            }
-            switchSection('registration');
-            resetRegistrationForm();
-            showParticipantSection();
-        });
-    }
-
-    // Checkout tab - Register Participant button
-    const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
-    if (registerParticipantBtnCheckout) {
-        registerParticipantBtnCheckout.addEventListener('click', function () {
-            if (REGISTRATION_CLOSED && !hasValidAccessCode) {
-                showRegistrationClosedMessage();
-                return;
-            }
-
-            // Set tower and flat from existing cart data before resetting
-            if (registrationCart.length > 0) {
-                const firstParticipant = registrationCart[0];
-                const towerField = document.getElementById('tower');
-                const flatField = document.getElementById('flat');
-                if (towerField) towerField.value = firstParticipant.tower;
-                if (flatField) flatField.value = firstParticipant.flat;
-            }
-            
-            // Reset registration sections visibility (similar to resetRegistrationForm but keep tower/flat disabled)
-            const participantSection = document.getElementById('participantSection');
-            const actionButtonsSection = document.getElementById('actionButtonsSection');
-            const registrationTypeSection = document.getElementById('registrationTypeSection');
-            const competitionsSection = document.getElementById('competitionsSection');
-            const foodstallSection = document.getElementById('foodstallSection');
-            const nextStepSection = document.getElementById('nextStepSection');
-            const addAnotherSection = document.getElementById('addAnotherSection');
-            const foodStallQuestionSection = document.getElementById('foodStallQuestionSection');
-
-            if (participantSection) participantSection.style.display = 'block';
-            if (actionButtonsSection) actionButtonsSection.style.display = 'block';
-            if (registrationTypeSection) registrationTypeSection.style.display = 'none';
-            if (competitionsSection) competitionsSection.style.display = 'none';
-            if (foodstallSection) foodstallSection.style.display = 'none';
-            if (nextStepSection) nextStepSection.style.display = 'none';
-            if (addAnotherSection) addAnotherSection.style.display = 'none';
-            if (foodStallQuestionSection) foodStallQuestionSection.style.display = 'none';
-
-            // Reset button states
-            const continueBtn = document.getElementById('continueBtn');
-            const backBtn = document.getElementById('backBtn');
-            const addToCartBtn = document.getElementById('addToCartBtn');
-            if (continueBtn) continueBtn.style.display = 'inline-block';
-            if (backBtn) backBtn.style.display = 'none';
-            if (addToCartBtn) addToCartBtn.style.display = 'none';
-
-            // Reset flow state
-            currentRegistrationType = null;
-            updateCompetitionsDisplay(null);
-
-            switchSection('registration');
-            resetParticipantSpecificFields();
-            showParticipantSection();
-        });
-    }
-
-    // Registration flow event listeners
-    // Note: Registration type event listeners are attached in handleContinue when the section is shown
-    document.querySelectorAll('input[name="addAnother"]').forEach(radio => {
-        radio.addEventListener('change', handleAddAnotherChange);
-    });
-
-    // Food stall question event listeners
-    document.querySelectorAll('input[name="foodStallInterest"]').forEach(radio => {
-        radio.addEventListener('change', handleFoodStallInterestChange);
-    });
-
-    const continueBtn = document.getElementById('continueBtn');
-    if (continueBtn) continueBtn.addEventListener('click', handleContinue);
-
-    const backBtn = document.getElementById('backBtn');
-    if (backBtn) backBtn.addEventListener('click', handleBack);
-
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    // Removed event listener since we moved logic to radio button change
-    // if (addToCartBtn) addToCartBtn.addEventListener('click', handleAddToCart);
-
-    // Checkout navigation event listeners
-    const checkoutNextBtn = document.getElementById('checkoutNextBtn');
-    if (checkoutNextBtn) checkoutNextBtn.addEventListener('click', handleCheckoutNext);
-
-    const checkoutBackBtn = document.getElementById('checkoutBackBtn');
-    if (checkoutBackBtn) checkoutBackBtn.addEventListener('click', handleCheckoutBack);
-
-    const paymentBackBtn = document.getElementById('paymentBackBtn');
-    if (paymentBackBtn) paymentBackBtn.addEventListener('click', handleCheckoutBack);
-
-    // Next Step button (appears after filling registration details)
-    const nextStepBtn = document.getElementById('nextStepBtn');
-    if (nextStepBtn) nextStepBtn.addEventListener('click', handleNextStep);
-
-    // Checkout event listeners
-    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
-    if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', handleFinalSubmit);
-
-    // Disable registration and checkout navigation when registration is closed
-    // (but allow if valid access code is present)
-    if (REGISTRATION_CLOSED && !hasValidAccessCode) {
-        const navRegistration = document.getElementById('nav-registration');
-        const navCheckout = document.getElementById('nav-checkout');
-        const registerParticipantBtn = document.getElementById('registerParticipantBtn');
-        const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
-
-        if (navRegistration) {
-            navRegistration.style.opacity = '0.5';
-            navRegistration.style.pointerEvents = 'none';
-            navRegistration.title = 'Registration is closed';
-        }
-
-        if (navCheckout) {
-            navCheckout.style.opacity = '0.5';
-            navCheckout.style.pointerEvents = 'none';
-            navCheckout.title = 'Registration is closed';
-        }
-
-        if (registerParticipantBtn) {
-            registerParticipantBtn.style.opacity = '0.5';
-            registerParticipantBtn.style.pointerEvents = 'none';
-            registerParticipantBtn.title = 'Registration is closed';
-        }
-
-        if (registerParticipantBtnCheckout) {
-            registerParticipantBtnCheckout.style.opacity = '0.5';
-            registerParticipantBtnCheckout.style.pointerEvents = 'none';
-            registerParticipantBtnCheckout.title = 'Registration is closed';
-        }
-
-        // Show registration closed banner
-        const registrationBanner = document.querySelector('.registration-closed-banner');
-        if (registrationBanner) {
-            registrationBanner.style.display = 'block';
-        }
-    } else {
-        // Hide banner when registration is open or valid access code is present
-        const registrationBanner = document.querySelector('.registration-closed-banner');
-        if (registrationBanner) {
-            registrationBanner.style.display = 'none';
-        }
-
-        // Show special access message if using access code
-        if (hasValidAccessCode) {
-            showSpecialAccessMessage();
-        }
-    }
-});
-
-// Navigation function
 function switchSection(sectionName) {
     // Prevent switching to registration or checkout sections when registration is closed
     // (unless valid access code is present)
@@ -496,7 +481,9 @@ function handleAgeGroupChange(selectedAgeGroup) {
             currentRegistrationType = 'competition';
         }
     }
-}function loadDataAndApplyAutocomplete() {
+}
+
+function loadDataAndApplyAutocomplete() {
     let allNames = localStorage.getItem('allNames');
     let allApartments = localStorage.getItem('allApartments');
 
@@ -1709,7 +1696,11 @@ async function initializeDashboard() {
 
 async function loadApartmentsForDashboard() {
     try {
-        const response = await fetch(`${CONFIG.BACKEND_URL}?apartments=true`);
+        const response = await fetch(`${CONFIG.BACKEND_URL}?apartments=true`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        });
         const result = await response.json();
 
         if (result.status === 'success') {
@@ -1722,6 +1713,8 @@ async function loadApartmentsForDashboard() {
         }
     } catch (error) {
         console.error('Error loading apartments:', error);
+        // Show user-friendly error message
+        showAlertModal('Unable to load apartment data for autocomplete. You can still search manually using the search fields.');
         // Fallback: don't break the dashboard if apartments can't be loaded
         dashboardApartments = [];
         setupApartmentAutocomplete();
@@ -1800,7 +1793,11 @@ async function performDashboardSearch() {
         if (towerFlat) params.append('towerFlat', towerFlat);
         if (name) params.append('name', name);
 
-        const response = await fetch(`${CONFIG.BACKEND_URL}?${params.toString()}`);
+        const response = await fetch(`${CONFIG.BACKEND_URL}?${params.toString()}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        });
         const result = await response.json();
 
         if (result.status === 'success') {
@@ -2218,12 +2215,10 @@ function saveEditCompetitions() {
 }
 
 // Add event listener for save button
-document.addEventListener('DOMContentLoaded', function() {
-    const saveEditBtn = document.getElementById('saveEditBtn');
-    if (saveEditBtn) {
-        saveEditBtn.addEventListener('click', saveEditCompetitions);
-    }
-});
+const saveEditBtn = document.getElementById('saveEditBtn');
+if (saveEditBtn) {
+    saveEditBtn.addEventListener('click', saveEditCompetitions);
+}
 
 // Function to show registration closed message
 function showRegistrationClosedMessage() {
@@ -2283,7 +2278,7 @@ function showRegistrationClosedMessage() {
 // Function to check for access code in URL and validate it
 function checkAccessCode() {
     const urlParams = new URLSearchParams(window.location.search);
-    const accessCode = urlParams.get('access_code');
+    let accessCode = urlParams.get('access_code');
 
     if (!accessCode) {
         return; // No access code in URL
@@ -2598,11 +2593,11 @@ async function checkVolunteerByEmail() {
             
             if (data.authorized) {
                 // Show all panels for volunteers
-                document.getElementById('reimbursement-panel').style.display = 'block';
+                document.getElementById('expense-panel').style.display = 'block';
                 document.getElementById('winner-panel').style.display = 'block';
             } else {
                 // Hide volunteer-only panels for non-volunteers
-                document.getElementById('reimbursement-panel').style.display = 'none';
+                document.getElementById('expense-panel').style.display = 'none';
                 document.getElementById('winner-panel').style.display = 'none';
             }
         }, 1500);
@@ -2633,11 +2628,13 @@ async function checkVolunteerByEmail() {
         setTimeout(() => {
             hideEmailModal();
             switchSection("admin");
-            document.getElementById('reimbursement-panel').style.display = 'none';
+            document.getElementById('expense-panel').style.display = 'none';
             document.getElementById('winner-panel').style.display = 'none';
         }, 1500);
     }
-}// Alert modal functions
+}
+
+// Alert modal functions
 function showAlertModal(message, title = 'Notification') {
     const modal = document.getElementById('alertModal');
     const titleEl = document.getElementById('alertModalTitle');

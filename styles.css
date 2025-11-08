@@ -306,8 +306,7 @@
 
 .back-to-admin {
     position: absolute;
-    top: 80px;
-    right: 20px;
+    right: 10px;
     z-index: 99;
     background: transparent;
     border: none;
