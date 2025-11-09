@@ -1614,7 +1614,7 @@ function submitWinner(data) {
     const ss = SpreadsheetApp.openById(registrationWorkbookId);
     let winnerSheet = ss.getSheetByName(winnerEntriesSheetName);
 
-    // Create the sheet if it doesn't exist
+    // Create the sheet if it doesn't exist, or update headers if they don't match
     if (!winnerSheet) {
       winnerSheet = ss.insertSheet(winnerEntriesSheetName);
 
@@ -1624,6 +1624,7 @@ function submitWinner(data) {
         'Competition Category',
         'Competition Name',
         'Age Group',
+        'Gender',
         'Had Tie',
         'Submission Date',
         'Submitted By'
@@ -1643,6 +1644,40 @@ function submitWinner(data) {
 
       winnerSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       winnerSheet.setFrozenRows(1); // Freeze header row
+    } else {
+      // Check if existing headers need to be updated (for backward compatibility)
+      const currentHeaders = winnerSheet.getRange(1, 1, 1, winnerSheet.getLastColumn()).getValues()[0];
+      const expectedHeaderCount = 8 + (10 * 2) + (10 * 2); // 8 base + 20 winner + 20 runner-up columns
+
+      if (currentHeaders.length !== expectedHeaderCount) {
+        // Update headers to match new structure
+        const headers = [
+          'Submission ID',
+          'Competition Category',
+          'Competition Name',
+          'Age Group',
+          'Gender',
+          'Had Tie',
+          'Submission Date',
+          'Submitted By'
+        ];
+
+        // Add winner columns (up to 10 winners to be safe)
+        for (let i = 1; i <= 10; i++) {
+          headers.push(`Winner ${i} Name`);
+          headers.push(`Winner ${i} Apartment`);
+        }
+
+        // Add runner-up columns (up to 10 runner-ups to be safe)
+        for (let i = 1; i <= 10; i++) {
+          headers.push(`Runner-up ${i} Name`);
+          headers.push(`Runner-up ${i} Apartment`);
+        }
+
+        // Clear existing headers and set new ones
+        winnerSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+        winnerSheet.setFrozenRows(1); // Freeze header row
+      }
     }
 
     // Generate submission ID
@@ -1654,6 +1689,7 @@ function submitWinner(data) {
       data.competitionCategory || '',
       data.competitionName || '',
       data.ageGroup || '',
+      data.gender || '',
       data.hadTie ? 'Yes' : 'No',
       new Date().toISOString(),
       data.submittedBy || Session.getActiveUser().getEmail() || 'Unknown'

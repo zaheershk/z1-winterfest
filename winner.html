@@ -61,6 +61,19 @@
                             <div class="invalid-feedback">Please select an age group.</div>
                         </div>
 
+                        <!-- Gender -->
+                        <div class="mb-3">
+                            <label for="competitionGender" class="form-label">Gender <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="competitionGender" required disabled>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Mixed">Mixed</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a gender.</div>
+                        </div>
+
                         <!-- Winner Fields Container -->
                         <div id="winnerFieldsContainer">
                             <!-- Winner fields will be dynamically added here -->
@@ -184,11 +197,13 @@
             document.getElementById('competitionCategory').addEventListener('change', handleCategoryChange);
             document.getElementById('competitionName').addEventListener('change', handleCompetitionChange);
             document.getElementById('ageGroup').addEventListener('change', handleAgeGroupChange);
+            document.getElementById('competitionGender').addEventListener('change', handleGenderChange);
             document.getElementById('winnerForm').addEventListener('submit', handleWinnerSubmit);
 
             // Initially disable dependent dropdowns
             document.getElementById('competitionName').disabled = true;
             document.getElementById('ageGroup').disabled = true;
+            document.getElementById('competitionGender').disabled = true;
         }
 
         function populateCategories() {
@@ -284,14 +299,14 @@
             const ageGroup = this.value;
 
             if (category && competitionName && ageGroup) {
+                // Enable gender field
+                document.getElementById('competitionGender').disabled = false;
+
                 // Find the competition data to get numberOfWinners
                 const categoryData = competitionsData.find(cat => cat.category === category);
                 const competition = categoryData.competitions.find(comp => comp.name === competitionName);
 
                 if (competition) {
-                    generateWinnerFields(competition.numberOfWinners);
-                    document.getElementById('tieQuestion').style.display = 'block';
-
                     // Show gender notice for gender-separated competitions
                     if (competition.genderSeparated) {
                         document.getElementById('genderNotice').style.display = 'block';
@@ -300,9 +315,33 @@
                     }
                 }
             } else {
+                // Disable gender field if age group is not selected
+                document.getElementById('competitionGender').disabled = true;
+                document.getElementById('competitionGender').value = '';
                 clearWinnerFields();
                 document.getElementById('tieQuestion').style.display = 'none';
                 document.getElementById('genderNotice').style.display = 'none';
+            }
+        }
+
+        function handleGenderChange() {
+            const category = document.getElementById('competitionCategory').value;
+            const competitionName = document.getElementById('competitionName').value;
+            const ageGroup = document.getElementById('ageGroup').value;
+            const gender = this.value;
+
+            if (category && competitionName && ageGroup && gender) {
+                // Find the competition data to get numberOfWinners
+                const categoryData = competitionsData.find(cat => cat.category === category);
+                const competition = categoryData.competitions.find(comp => comp.name === competitionName);
+
+                if (competition) {
+                    generateWinnerFields(competition.numberOfWinners);
+                    document.getElementById('tieQuestion').style.display = 'block';
+                }
+            } else {
+                clearWinnerFields();
+                document.getElementById('tieQuestion').style.display = 'none';
             }
         }
 
@@ -330,8 +369,8 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Winner Apartment</label>
-                            <input type="text" class="form-control winner-apartment" id="winner${i}Apartment" placeholder="Tower X - Y (e.g., Tower 1 - 101)">
-                            <div class="invalid-feedback">Please enter apartment in format "Tower X - Y".</div>
+                            <input type="text" class="form-control winner-apartment" id="winner${i}Apartment" placeholder="Tower X - Y">
+                            <div class="invalid-feedback">Please enter apartment in format "Tower X - Y"</div>
                         </div>
                     </div>
                 `;
@@ -359,8 +398,8 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Runner-up Apartment</label>
-                            <input type="text" class="form-control runner-up-apartment" id="runnerUp${i}Apartment" placeholder="Tower X - Y (e.g., Tower 1 - 101)">
-                            <div class="invalid-feedback">Please enter apartment in format "Tower X - Y".</div>
+                            <input type="text" class="form-control runner-up-apartment" id="runnerUp${i}Apartment" placeholder="Tower X - Y">
+                            <div class="invalid-feedback">Please enter apartment in format "Tower X - Y"</div>
                         </div>
                     </div>
                 `;
@@ -453,9 +492,9 @@
         }
 
         function validateApartmentFormat(apartment) {
-            // Check if apartment follows format "Tower X - Y" where X is tower, Y is flat number
-            // Allow optional space between "Tower" and the number
-            const towerFlatRegex = /^Tower\s*\d+\s*-\s*\d+$/i;
+            // Check if apartment follows format "Tower X - Z" where X is tower (letter or number), Z is flat number (1-6 digits)
+            // Allow flexible spacing around the dash
+            const towerFlatRegex = /^Tower\s*[A-Za-z0-9]\s*-\s*\d{1,6}$/i;
             return towerFlatRegex.test(apartment.trim());
         }
 
@@ -495,6 +534,15 @@
                 if (!errorMessage) errorMessage = 'Please select an age group.';
             } else {
                 ageGroup.classList.remove('is-invalid');
+            }
+
+            const competitionGender = document.getElementById('competitionGender');
+            if (!competitionGender.value) {
+                competitionGender.classList.add('is-invalid');
+                isValid = false;
+                if (!errorMessage) errorMessage = 'Please select a gender.';
+            } else {
+                competitionGender.classList.remove('is-invalid');
             }
 
             // Validate winner and runner-up entries (partial entries allowed)
@@ -577,7 +625,7 @@
 
             if (!hasAtLeastOneEntry) {
                 isValid = false;
-                errorMessage = 'Please enter at least one winner or runner-up with both name and apartment.';
+                errorMessage = 'Please enter at least one winner or runner-up with name, apartment, and gender.';
             }
 
             if (!isValid) {
@@ -610,7 +658,7 @@
             });
 
             if (invalidApartments.length > 0) {
-                showAlertModal('Please ensure all apartment entries follow the format "Tower X - Y" (e.g., "Tower 1 - 101").');
+                showAlertModal('Please ensure all apartment entries follow the format "Tower X - Y"');
                 return;
             }
 
@@ -633,7 +681,8 @@
                     formType: 'winner',
                     competitionCategory: category,
                     competitionName: competitionName,
-                    ageGroup: document.getElementById('ageGroup').value,
+                    ageGroup: String(document.getElementById('ageGroup').value),
+                    gender: document.getElementById('competitionGender').value,
                     hadTie: document.querySelector('input[name="hadTie"]:checked').value === 'true',
                     genderSeparated: competition ? competition.genderSeparated || false : false,
                     submittedBy: volunteerEmail || 'Unknown',
