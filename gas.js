@@ -1688,7 +1688,7 @@ function submitWinner(data) {
       submissionId,
       data.competitionCategory || '',
       data.competitionName || '',
-      data.ageGroup || '',
+      data.ageGroup ? "'" + data.ageGroup : '',
       data.gender || '',
       data.hadTie ? 'Yes' : 'No',
       new Date().toISOString(),
