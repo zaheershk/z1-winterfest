@@ -63,10 +63,9 @@
 
                         <!-- File Attachments -->
                         <div class="mb-3">
-                            <label for="receiptFiles" class="form-label">Receipt/Payment Proof <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" id="receiptFiles" multiple accept=".pdf,.jpg,.jpeg,.png" required>
-                            <div class="form-text">Upload receipts or payment proofs (PDF, JPG, JPEG, PNG). Maximum 5 files allowed.</div>
-                            <div class="invalid-feedback">Please upload at least one receipt or payment proof file.</div>
+                            <label for="receiptFiles" class="form-label">Receipt/Payment Proof</label>
+                            <input type="file" class="form-control" id="receiptFiles" multiple accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="form-text">Optional: Upload receipts or payment proofs (PDF, JPG, JPEG, PNG). Maximum 5 files allowed.</div>
                             <div id="filePreview" class="mt-2"></div>
                         </div>
 
@@ -203,14 +202,8 @@
                 return;
             }
 
-            // Additional validation for files
+            // Additional validation for files (optional)
             const fileInput = document.getElementById('receiptFiles');
-            if (fileInput.files.length === 0) {
-                showAlertModal('Please upload at least one receipt or payment proof file.');
-                fileInput.focus();
-                return;
-            }
-
             if (fileInput.files.length > 5) {
                 showAlertModal('Maximum 5 files allowed.');
                 return;
