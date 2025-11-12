@@ -543,69 +543,142 @@
 
             <section id="dashboard-section" class="mobile-section">
                 <div class="container py-3">
-                    <div class="section-header">
-                        <h2>Search Registrations</h2>
+                    <!-- Modern Toggle Switch -->
+                    <div class="dashboard-toggle-container mb-4">
+                        <div class="dashboard-toggle">
+                            <input type="checkbox" id="dashboardToggle" class="dashboard-toggle-input">
+                            <label for="dashboardToggle" class="dashboard-toggle-label">
+                                <span class="dashboard-toggle-option dashboard-toggle-winners active">
+                                    <i class="fas fa-trophy"></i>
+                                    <span class="toggle-text">Winners</span>
+                                </span>
+                                <span class="dashboard-toggle-option dashboard-toggle-search">
+                                    <i class="fas fa-search"></i>
+                                    <span class="toggle-text">Search</span>
+                                </span>
+                                <span class="dashboard-toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
 
-                    <!-- Search Form -->
-                    <section class="mb-3">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-5">
-                                <label for="dashboardApartment" class="form-label"
-                                    style="font-weight: bold;">Apartment</label>
-                                <input type="text" class="form-control" id="dashboardApartment"
-                                    placeholder="Start typing apartment (Tower - Flat)">
+                    <!-- Toggle Content -->
+                    <div class="dashboard-content">
+                        <!-- Winner Dashboard Content -->
+                        <div id="winners-content" class="dashboard-panel active">
+                            <div class="section-header mb-4">
+                                <h2>Winner Dashboard</h2>
+                                <p class="text-muted">Celebrating our Winterfest champions!</p>
                             </div>
-                            <div class="col-md-5">
-                                <label for="dashboardName" class="form-label" style="font-weight: bold;">Name</label>
-                                <input type="text" class="form-control" id="dashboardName"
-                                    placeholder="Enter name (minimum 5 characters)">
-                            </div>
-                            <div class="col-md-2">
-                                <button type="button"
-                                    class="modern-btn w-100 d-flex align-items-center justify-content-center"
-                                    id="dashboardSearchBtn" style="height: 38px;">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </section>
 
-                    <!-- Search Results -->
-                    <section class="mb-3" id="dashboardResultsSection" style="display: none;">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div id="dashboardFlatDisplay" style="display: none;">
-                                <strong style="color: #2e8b57; text-decoration: underline;">
-                                    <span id="dashboardFlatNumberDisplay"></span>
-                                </strong>
+                            <!-- Winner Dashboard Content -->
+                            <div id="winnerDashboardContent">
+                                <!-- Filter Controls -->
+                                <div id="winnerFilters" class="winner-filters mb-4" style="display: none;">
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-4">
+                                            <label for="filterCategory" class="form-label fw-bold">Competition Category</label>
+                                            <select class="form-select" id="filterCategory">
+                                                <option value="">All Categories</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="filterCompetition" class="form-label fw-bold">Competition Name</label>
+                                            <select class="form-select" id="filterCompetition" disabled>
+                                                <option value="">All Competitions</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="filterAgeGroup" class="form-label fw-bold">Age Group</label>
+                                            <select class="form-select" id="filterAgeGroup" disabled>
+                                                <option value="">All Age Groups</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <button type="button" class="green-btn btn-sm" id="clearFilters">
+                                            <i class="fas fa-times"></i> Clear Filters
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="text-center py-5" id="winnerLoadingState" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading winners...</span>
+                                    </div>
+                                    <p class="mt-3">Loading winner information...</p>
+                                </div>
+
+                                <div id="winnerDashboardContainer" style="display: none;">
+                                    <!-- Winners will be populated here -->
+                                </div>
                             </div>
-                            <button class="green-btn" id="dashboardRegisterBtn" style="display: none;">
-                                <i class="fas fa-user-plus"></i> Register
-                            </button>
                         </div>
-                        <div id="dashboardResults" class="table-responsive">
-                            <table class="table table-striped" id="dashboardTable">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Age Group</th>
-                                        <th>Details</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashboardTableBody">
-                                    <tr>
-                                        <td colspan="4" class="text-muted">No results found. Try adjusting your search
-                                            criteria.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+
+                        <!-- Search Content -->
+                        <div id="search-content" class="dashboard-panel">
+                            <div class="section-header mb-4">
+                                <h2>Search Registrations</h2>
+                            </div>
+
+                            <!-- Search Form -->
+                            <div class="mb-3">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-5">
+                                        <label for="dashboardApartment" class="form-label"
+                                            style="font-weight: bold;">Apartment</label>
+                                        <input type="text" class="form-control" id="dashboardApartment"
+                                            placeholder="Start typing apartment (Tower - Flat)">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="dashboardName" class="form-label" style="font-weight: bold;">Name</label>
+                                        <input type="text" class="form-control" id="dashboardName"
+                                            placeholder="Enter name (minimum 5 characters)">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button"
+                                            class="modern-btn w-100 d-flex align-items-center justify-content-center"
+                                            id="dashboardSearchBtn" style="height: 38px;">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Search Results -->
+                            <div id="dashboardResultsSection" style="display: none;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div id="dashboardFlatDisplay" style="display: none;">
+                                        <strong style="color: #2e8b57; text-decoration: underline;">
+                                            <span id="dashboardFlatNumberDisplay"></span>
+                                        </strong>
+                                    </div>
+                                    <button class="green-btn" id="dashboardRegisterBtn" style="display: none;">
+                                        <i class="fas fa-user-plus"></i> Register
+                                    </button>
+                                </div>
+                                <div id="dashboardResults" class="table-responsive">
+                                    <table class="table table-striped" id="dashboardTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Age Group</th>
+                                                <th>Details</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dashboardTableBody">
+                                            <tr>
+                                                <td colspan="4" class="text-muted">No results found. Try adjusting your search
+                                                criteria.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    </section>
+                    </div>
                 </div>
-            </section>
-
-            <section id="admin-section" class="mobile-section">
+            </section>            <section id="admin-section" class="mobile-section">
                 <div class="container py-3">
                     <div class="section-header">
                         <h2>Admin</h2>

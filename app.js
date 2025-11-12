@@ -350,6 +350,13 @@ function switchSection(sectionName) {
 
     // Special handling for dashboard section
     if (sectionName === 'dashboard') {
+        // Show loading state immediately when switching to dashboard
+        const loadingState = document.getElementById('winnerLoadingState');
+        const container = document.getElementById('winnerDashboardContainer');
+        if (loadingState && container) {
+            loadingState.style.display = 'block';
+            container.style.display = 'none';
+        }
         initializeDashboard();
     }
 }
@@ -1692,6 +1699,9 @@ async function initializeDashboard() {
 
     // Clear any previous search results
     clearDashboardResults();
+
+    // Load winner dashboard
+    loadWinnerDashboard();
 }
 
 async function loadApartmentsForDashboard() {
@@ -1721,6 +1731,323 @@ async function loadApartmentsForDashboard() {
     }
 }
 
+async function loadWinnerDashboard() {
+    const loadingState = document.getElementById('winnerLoadingState');
+    const container = document.getElementById('winnerDashboardContainer');
+
+    try {
+        // Show loading state
+        loadingState.style.display = 'block';
+        container.style.display = 'none';
+
+        // Fetch winner data
+        const response = await fetch(CONFIG.BACKEND_URL, {
+            method: 'POST',
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "text/plain",
+            },
+            redirect: "follow",
+            body: JSON.stringify({
+                formType: 'getWinners'
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            renderWinnerDashboard(result.winners);
+        } else {
+            throw new Error(result.message || 'Failed to load winner data');
+        }
+
+    } catch (error) {
+        console.error('Error loading winner dashboard:', error);
+        container.innerHTML = `
+            <div class="alert alert-warning text-center">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h5>Unable to Load Winner Information</h5>
+                <p>Please try refreshing the page. If the problem persists, contact support.</p>
+            </div>
+        `;
+    } finally {
+        // Hide loading state
+        loadingState.style.display = 'none';
+        container.style.display = 'block';
+    }
+}
+
+function renderWinnerDashboard(winners) {
+    const container = document.getElementById('winnerDashboardContainer');
+    const filtersContainer = document.getElementById('winnerFilters');
+
+    if (!winners || winners.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Winner Information Available</h4>
+                <p class="text-muted">Winner information will appear here once competitions are completed.</p>
+            </div>
+        `;
+        filtersContainer.style.display = 'none';
+        return;
+    }
+
+    // Show filters and populate dropdowns
+    filtersContainer.style.display = 'block';
+    populateFilterDropdowns(winners);
+
+    // Sort winners by category alphabetically, then by competition name alphabetically, then by age group (custom order)
+    winners.sort((a, b) => {
+        // First sort by category
+        const categoryCompare = a.category.localeCompare(b.category);
+        if (categoryCompare !== 0) {
+            return categoryCompare;
+        }
+        
+        // Then sort by competition name within the same category
+        const nameCompare = a.name.localeCompare(b.name);
+        if (nameCompare !== 0) {
+            return nameCompare;
+        }
+        
+        // Finally sort by age group using custom order within the same category and competition
+        return getAgeGroupSortIndex(a.ageGroup) - getAgeGroupSortIndex(b.ageGroup);
+    });
+
+    let html = '<div class="winner-dashboard-grid">';
+
+    winners.forEach((competition, index) => {
+        const animationDelay = (index * 0.1) + 's';
+
+        html += `
+            <div class="competition-card animate-fade-in" 
+                 style="animation-delay: ${animationDelay}"
+                 data-category="${competition.category}"
+                 data-competition="${competition.name}"
+                 data-agegroup="${competition.ageGroup}">
+                <div class="competition-header">
+                    <div class="competition-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="competition-info">
+                        <h5 class="competition-name">${competition.name}</h5>
+                        <div class="competition-meta">
+                            <span class="badge bg-primary">${competition.category}</span>
+                            <span class="badge bg-warning text-dark">${competition.ageGroup}</span>
+                            <span class="badge bg-info">${competition.gender}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="winners-section">
+                    ${competition.winners.length > 0 ? `
+                        <h6 class="section-title">
+                            <i class="fas fa-medal text-warning"></i> Winners
+                        </h6>
+                        <div class="winners-list">
+                            ${competition.winners.map((winner, idx) => `
+                                <div class="winner-item position-${idx + 1}">
+                                    <div class="winner-details">
+                                        <div class="winner-name">${winner.name}</div>
+                                        <div class="winner-apartment">${winner.apartment}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${competition.runnerUps.length > 0 ? `
+                        <h6 class="section-title runners-up-title">
+                            <i class="fas fa-award text-success"></i> Runners-up
+                        </h6>
+                        <div class="runners-list">
+                            ${competition.runnerUps.map((runner, idx) => `
+                                <div class="runner-item">
+                                    <div class="runner-details">
+                                        <div class="runner-name">${runner.name}</div>
+                                        <div class="runner-apartment">${runner.apartment}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // Setup filter event listeners
+    setupWinnerFilters();
+}
+
+function populateFilterDropdowns(winners) {
+    // Get unique categories
+    const categories = [...new Set(winners.map(w => w.category))].sort();
+
+    const categorySelect = document.getElementById('filterCategory');
+    categorySelect.innerHTML = '<option value="">All Categories</option>';
+    categories.forEach(category => {
+        categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+    });
+
+    // Initially disable competition and age group dropdowns
+    document.getElementById('filterCompetition').disabled = true;
+    document.getElementById('filterAgeGroup').disabled = true;
+}
+
+// Custom sort function for age groups
+function sortAgeGroups(ageGroups) {
+    const primaryOrder = ["3-5", "6-9", "10-13", "14-17", "18-35", "36-55", "56+"];
+    const variationOrder = {
+        "Under 10": 0.5,    // Between 3-5 and 6-9
+        "10-17": 2.5,       // Between 10-13 and 14-17
+        "Under 18": 3.5,    // Between 14-17 and 18-35
+        "18 & above": 4.5,  // Between 18-35 and 36-55
+        "56 & above": 6.5   // After 56+
+    };
+
+    return ageGroups.sort((a, b) => {
+        // Get sort index for each age group
+        const getSortIndex = (ageGroup) => {
+            if (primaryOrder.includes(ageGroup)) {
+                return primaryOrder.indexOf(ageGroup);
+            } else if (variationOrder.hasOwnProperty(ageGroup)) {
+                return variationOrder[ageGroup];
+            } else {
+                // For any other age groups, sort alphabetically at the end
+                return 100 + ageGroup.localeCompare(ageGroup);
+            }
+        };
+
+        const indexA = getSortIndex(a);
+        const indexB = getSortIndex(b);
+
+        return indexA - indexB;
+    });
+}
+
+// Helper function to get sort index for a single age group
+function getAgeGroupSortIndex(ageGroup) {
+    const primaryOrder = ["3-5", "6-9", "10-13", "14-17", "18-35", "36-55", "56+"];
+    const variationOrder = {
+        "Under 10": 0.5,    // Between 3-5 and 6-9
+        "10-17": 2.5,       // Between 10-13 and 14-17
+        "Under 18": 3.5,    // Between 14-17 and 18-35
+        "18 & above": 4.5,  // Between 18-35 and 36-55
+        "56 & above": 6.5   // After 56+
+    };
+
+    if (primaryOrder.includes(ageGroup)) {
+        return primaryOrder.indexOf(ageGroup);
+    } else if (variationOrder.hasOwnProperty(ageGroup)) {
+        return variationOrder[ageGroup];
+    } else {
+        // For any other age groups, sort alphabetically at the end
+        return 100 + ageGroup.localeCompare(ageGroup);
+    }
+}
+
+function setupWinnerFilters() {
+    const categorySelect = document.getElementById('filterCategory');
+    const competitionSelect = document.getElementById('filterCompetition');
+    const ageGroupSelect = document.getElementById('filterAgeGroup');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+
+    // Store original winners data
+    const allWinners = Array.from(document.querySelectorAll('.competition-card'));
+
+    categorySelect.addEventListener('change', function() {
+        const selectedCategory = this.value;
+
+        if (selectedCategory) {
+            // Filter competitions by selected category
+            const categoryWinners = allWinners.filter(card =>
+                card.dataset.category === selectedCategory
+            );
+
+            const competitions = [...new Set(categoryWinners.map(card => card.dataset.competition))].sort();
+
+            competitionSelect.innerHTML = '<option value="">All Competitions</option>';
+            competitions.forEach(competition => {
+                competitionSelect.innerHTML += `<option value="${competition}">${competition}</option>`;
+            });
+
+            competitionSelect.disabled = false;
+            ageGroupSelect.disabled = true;
+            ageGroupSelect.innerHTML = '<option value="">All Age Groups</option>';
+        } else {
+            // Reset all dropdowns
+            competitionSelect.innerHTML = '<option value="">All Competitions</option>';
+            competitionSelect.disabled = true;
+            ageGroupSelect.innerHTML = '<option value="">All Age Groups</option>';
+            ageGroupSelect.disabled = true;
+        }
+
+        applyFilters();
+    });
+
+    competitionSelect.addEventListener('change', function() {
+        const selectedCategory = categorySelect.value;
+        const selectedCompetition = this.value;
+
+        if (selectedCompetition) {
+            // Filter age groups by selected category and competition
+            const filteredWinners = allWinners.filter(card =>
+                (!selectedCategory || card.dataset.category === selectedCategory) &&
+                card.dataset.competition === selectedCompetition
+            );
+
+            const ageGroups = sortAgeGroups([...new Set(filteredWinners.map(card => card.dataset.agegroup))]);
+
+            ageGroupSelect.innerHTML = '<option value="">All Age Groups</option>';
+            ageGroups.forEach(ageGroup => {
+                ageGroupSelect.innerHTML += `<option value="${ageGroup}">${ageGroup}</option>`;
+            });
+
+            ageGroupSelect.disabled = false;
+        } else {
+            ageGroupSelect.innerHTML = '<option value="">All Age Groups</option>';
+            ageGroupSelect.disabled = true;
+        }
+
+        applyFilters();
+    });
+
+    ageGroupSelect.addEventListener('change', applyFilters);
+
+    clearFiltersBtn.addEventListener('click', function() {
+        categorySelect.value = '';
+        competitionSelect.value = '';
+        competitionSelect.disabled = true;
+        ageGroupSelect.value = '';
+        ageGroupSelect.disabled = true;
+        applyFilters();
+    });
+
+    function applyFilters() {
+        const selectedCategory = categorySelect.value;
+        const selectedCompetition = competitionSelect.value;
+        const selectedAgeGroup = ageGroupSelect.value;
+
+        allWinners.forEach(card => {
+            const matchesCategory = !selectedCategory || card.dataset.category === selectedCategory;
+            const matchesCompetition = !selectedCompetition || card.dataset.competition === selectedCompetition;
+            const matchesAgeGroup = !selectedAgeGroup || card.dataset.agegroup === selectedAgeGroup;
+
+            if (matchesCategory && matchesCompetition && matchesAgeGroup) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+}
+
 function setupApartmentAutocomplete() {
     const apartmentInput = document.getElementById('dashboardApartment');
 
@@ -1740,6 +2067,31 @@ function setupDashboardEventListeners() {
     const registerBtn = document.getElementById('dashboardRegisterBtn');
     const nameInput = document.getElementById('dashboardName');
     const apartmentInput = document.getElementById('dashboardApartment');
+    const toggleInput = document.getElementById('dashboardToggle');
+
+    // Setup toggle functionality
+    if (toggleInput) {
+        toggleInput.addEventListener('change', function() {
+            const winnersContent = document.getElementById('winners-content');
+            const searchContent = document.getElementById('search-content');
+            const winnersOption = document.querySelector('.dashboard-toggle-winners');
+            const searchOption = document.querySelector('.dashboard-toggle-search');
+
+            if (this.checked) {
+                // Show search content
+                winnersContent.classList.remove('active');
+                searchContent.classList.add('active');
+                winnersOption.classList.remove('active');
+                searchOption.classList.add('active');
+            } else {
+                // Show winners content
+                searchContent.classList.remove('active');
+                winnersContent.classList.add('active');
+                searchOption.classList.remove('active');
+                winnersOption.classList.add('active');
+            }
+        });
+    }
 
     if (searchBtn) {
         searchBtn.addEventListener('click', performDashboardSearch);

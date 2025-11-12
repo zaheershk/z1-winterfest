@@ -9,6 +9,7 @@ const foodStallDataSheetName = 'FoodStallData';
 const ageOutlierDataSheetName = 'AgeOutlierData';
 const reimbursementsSheetName = 'Expenses';
 const winnerEntriesSheetName = 'WinnerEntries';
+const winnerUnregisteredSheetName = 'WinnerUnregistered';
 
 // Google Drive folder IDs
 const registrationPaymentProofsFolderId = '1epCI3H_dnfvsORby2YAt5fZfvRKrQVh9';
@@ -125,6 +126,8 @@ function doPost(e) {
           return submitExpense(requestData);
         case 'winner':
           return submitWinner(requestData);
+        case 'getWinners':
+          return getWinnersData();
         default:
           return errorResponse('Unknown form type: ' + requestData.formType);
       }
@@ -1736,6 +1739,119 @@ function submitWinner(data) {
   } catch (error) {
     Logger.log('Error in submitWinner: ' + error.toString());
     return errorResponse('Failed to submit winner entry: ' + error.toString());
+  }
+}
+
+function getWinnersData() {
+  try {
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+
+    // Get WinnerEntries sheet
+    const winnerSheet = ss.getSheetByName(winnerEntriesSheetName);
+    if (!winnerSheet) {
+      return dataResponse({
+        status: 'success',
+        winners: []
+      });
+    }
+
+    // Get WinnerUnregistered sheet for defaulters
+    const defaulterSheet = ss.getSheetByName(winnerUnregisteredSheetName);
+    const defaulters = new Set();
+
+    if (defaulterSheet) {
+      const defaulterData = defaulterSheet.getDataRange().getValues();
+      // Skip header row
+      for (let i = 1; i < defaulterData.length; i++) {
+        const row = defaulterData[i];
+        if (row[1] && row[2]) { // Name and Apartment
+          const key = `${row[1].toString().trim().toLowerCase()}_${row[2].toString().trim().toLowerCase()}`;
+          defaulters.add(key);
+        }
+      }
+    }
+
+    // Get winner data
+    const winnerData = winnerSheet.getDataRange().getValues();
+    const winners = [];
+
+    // Skip header row
+    for (let i = 1; i < winnerData.length; i++) {
+      const row = winnerData[i];
+
+      // Extract competition data
+      const competition = {
+        submissionId: row[0] || '',
+        category: row[1] || '',
+        name: row[2] || '',
+        ageGroup: row[3] || '',
+        gender: row[4] || '',
+        hadTie: row[5] || '',
+        submissionDate: row[6] || '',
+        submittedBy: row[7] || '',
+        winners: [],
+        runnerUps: []
+      };
+
+      // Extract winners (columns 8-27: Winner 1-10 Name and Apartment)
+      for (let j = 0; j < 10; j++) {
+        const nameIndex = 8 + (j * 2);
+        const apartmentIndex = 9 + (j * 2);
+
+        const name = row[nameIndex] ? row[nameIndex].toString().trim() : '';
+        const apartment = row[apartmentIndex] ? row[apartmentIndex].toString().trim() : '';
+
+        if (name && apartment) {
+          // Check if this person is a defaulter
+          const key = `${name.toLowerCase()}_${apartment.toLowerCase()}`;
+          if (!defaulters.has(key)) {
+            competition.winners.push({
+              name: name,
+              apartment: apartment,
+              position: j + 1
+            });
+          }
+        }
+      }
+
+      // Extract runner-ups (columns 28-47: Runner-up 1-10 Name and Apartment)
+      for (let j = 0; j < 10; j++) {
+        const nameIndex = 28 + (j * 2);
+        const apartmentIndex = 29 + (j * 2);
+
+        const name = row[nameIndex] ? row[nameIndex].toString().trim() : '';
+        const apartment = row[apartmentIndex] ? row[apartmentIndex].toString().trim() : '';
+
+        if (name && apartment) {
+          // Check if this person is a defaulter
+          const key = `${name.toLowerCase()}_${apartment.toLowerCase()}`;
+          if (!defaulters.has(key)) {
+            competition.runnerUps.push({
+              name: name,
+              apartment: apartment,
+              position: j + 1
+            });
+          }
+        }
+      }
+
+      // Only include competitions that have winners or runner-ups
+      if (competition.winners.length > 0 || competition.runnerUps.length > 0) {
+        winners.push(competition);
+      }
+    }
+
+    // Sort by submission date (most recent first)
+    winners.sort((a, b) => new Date(b.submissionDate) - new Date(a.submissionDate));
+
+    return dataResponse({
+      status: 'success',
+      winners: winners
+    });
+
+  } catch (error) {
+    Logger.log('Error in getWinnersData: ' + error.toString());
+    return errorResponse('Failed to fetch winner data: ' + error.toString());
   }
 }
 
