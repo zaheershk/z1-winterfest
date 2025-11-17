@@ -276,8 +276,8 @@
                 const competition = categoryData.competitions.find(comp => comp.name === competitionName);
 
                 if (competition) {
-                    // Use displayAgeGroups if teamBased is true, otherwise use ageGroups
-                    const ageGroups = competition.teamBased ? competition.displayAgeGroups.split(', ') : competition.ageGroups;
+                    // Use displayAgeGroups if it has a valid value, otherwise use ageGroups
+                    const ageGroups = competition.displayAgeGroups ? competition.displayAgeGroups.split(', ') : competition.ageGroups;
 
                     ageGroups.forEach(ageGroup => {
                         const option = document.createElement('option');
