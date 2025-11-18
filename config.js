@@ -1,4 +1,4 @@
 // Application configuration constants
 const CONFIG = {
-    BACKEND_URL: "https://script.google.com/macros/s/AKfycbziMtEX8Odn4T53W07kNIq3hC7QUP5acIQLKYExgFqwfM7wkPwuRJSVNl66RwKS-eTX/exec"
+    BACKEND_URL: "https://script.google.com/macros/s/AKfycby6Up1T9DTcZO0KG0vY4leRJsH2BMZvFGR-VJ9oMtAwQjlpvbjqxh_Sw4eNzx0xP8g/exec"
 };
