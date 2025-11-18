@@ -1755,18 +1755,19 @@ function getWinnersData() {
       });
     }
 
-    // Get WinnerUnregistered sheet for defaulters
-    const defaulterSheet = ss.getSheetByName(winnerUnregisteredSheetName);
-    const defaulters = new Set();
+    // Get WinnerUnregistered sheet for invalid entries
+    const unregisteredSheet = ss.getSheetByName(winnerUnregisteredSheetName);
+    const invalidNames = new Set();
 
-    if (defaulterSheet) {
-      const defaulterData = defaulterSheet.getDataRange().getValues();
+    if (unregisteredSheet) {
+      const unregisteredData = unregisteredSheet.getDataRange().getValues();
       // Skip header row
-      for (let i = 1; i < defaulterData.length; i++) {
-        const row = defaulterData[i];
-        if (row[1] && row[2]) { // Name and Apartment
-          const key = `${row[1].toString().trim().toLowerCase()}_${row[2].toString().trim().toLowerCase()}`;
-          defaulters.add(key);
+      for (let i = 1; i < unregisteredData.length; i++) {
+        const row = unregisteredData[i];
+        // Name_WinnerEntries is in column 7 (index 6)
+        if (row[6]) {
+          const name = row[6].toString().trim().toLowerCase();
+          invalidNames.add(name);
         }
       }
     }
@@ -1802,9 +1803,8 @@ function getWinnersData() {
         const apartment = row[apartmentIndex] ? row[apartmentIndex].toString().trim() : '';
 
         if (name && apartment) {
-          // Check if this person is a defaulter
-          const key = `${name.toLowerCase()}_${apartment.toLowerCase()}`;
-          if (!defaulters.has(key)) {
+          // Check if this person is in the invalid names list
+          if (!invalidNames.has(name.toLowerCase())) {
             competition.winners.push({
               name: name,
               apartment: apartment,
@@ -1823,9 +1823,8 @@ function getWinnersData() {
         const apartment = row[apartmentIndex] ? row[apartmentIndex].toString().trim() : '';
 
         if (name && apartment) {
-          // Check if this person is a defaulter
-          const key = `${name.toLowerCase()}_${apartment.toLowerCase()}`;
-          if (!defaulters.has(key)) {
+          // Check if this person is in the invalid names list
+          if (!invalidNames.has(name.toLowerCase())) {
             competition.runnerUps.push({
               name: name,
               apartment: apartment,
@@ -1852,6 +1851,367 @@ function getWinnersData() {
   } catch (error) {
     Logger.log('Error in getWinnersData: ' + error.toString());
     return errorResponse('Failed to fetch winner data: ' + error.toString());
+  }
+}
+
+function validateWinnerRegistrations() {
+  try {
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+
+    // Get FormData sheet for validation
+    const formDataSheet = ss.getSheetByName(formDataSheetName);
+    if (!formDataSheet) {
+      return errorResponse('FormData sheet not found');
+    }
+
+    // Get WinnerEntries sheet
+    const winnerSheet = ss.getSheetByName(winnerEntriesSheetName);
+    if (!winnerSheet) {
+      return errorResponse('WinnerEntries sheet not found');
+    }
+
+    // Get WinnerUnregistered sheet (create if doesn't exist)
+    let unregisteredSheet = ss.getSheetByName(winnerUnregisteredSheetName);
+    if (!unregisteredSheet) {
+      unregisteredSheet = ss.insertSheet(winnerUnregisteredSheetName);
+      // Add headers: Age Group, Name, Apartment, Reason
+      const headers = ['Age Group', 'Name', 'Apartment', 'Reason'];
+      unregisteredSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      unregisteredSheet.setFrozenRows(1);
+    } else {
+      // Clear existing data (keep headers)
+      const lastRow = unregisteredSheet.getLastRow();
+      if (lastRow > 1) {
+        unregisteredSheet.getRange(2, 1, lastRow - 1, 10).clearContent();
+      }
+    }
+
+    // Load FormData into lookup structures for the new validation logic
+    const formData = formDataSheet.getDataRange().getValues();
+    const registeredParticipants = new Map();
+    const apartmentSet = new Set(); // All normalized apartments from FormData
+    const apartmentToNames = new Map(); // Apartment -> Set of registered names
+    const allNames = new Set(); // All registered names
+
+    // Get FormData headers to find correct column indices
+    const formDataHeaders = formData[0];
+    const formDataNameIndex = formDataHeaders.indexOf('Name');
+    const formDataTowerIndex = formDataHeaders.indexOf('Tower');
+    const formDataFlatIndex = formDataHeaders.indexOf('Flat');
+    const formDataAgeGroupIndex = formDataHeaders.indexOf('Age Group');
+
+    // Skip header row
+    for (let i = 1; i < formData.length; i++) {
+      const row = formData[i];
+      if (row[formDataNameIndex] && row[formDataTowerIndex] && row[formDataFlatIndex]) {
+        const name = row[formDataNameIndex].toString().trim().toUpperCase();
+        const tower = row[formDataTowerIndex].toString().trim().toUpperCase();
+        let flat = row[formDataFlatIndex].toString().trim().toUpperCase();
+
+        // Pad flat number to 3 digits (only for 1 or 2 digit flats)
+        const flatNum = parseInt(flat);
+        if (!isNaN(flatNum) && flatNum >= 0 && flatNum <= 999) {
+          flat = flatNum.toString().padStart(3, '0');
+        }
+
+        const apartment = `${tower}-${flat}`;
+
+        // Normalize apartment format the same way as winner validation
+        const normalizedApartment = apartment
+          .toUpperCase()
+          .replace(/\s*-\s*/g, '-')  // Replace " - " with "-"
+          .replace(/\s+/g, '')       // Remove remaining spaces
+          .replace(/-+/g, '-');      // Normalize multiple dashes to single dash
+
+        // Add to apartment set
+        apartmentSet.add(normalizedApartment);
+
+        // Add to apartment-to-names mapping
+        if (!apartmentToNames.has(normalizedApartment)) {
+          apartmentToNames.set(normalizedApartment, new Set());
+        }
+        apartmentToNames.get(normalizedApartment).add(name);
+
+        // Add to all names set
+        allNames.add(name);
+
+        // Create lookup key for backward compatibility
+        const key = `${name}_${normalizedApartment}`;
+        registeredParticipants.set(key, {
+          name: row[formDataNameIndex].toString().trim(),
+          apartment: apartment, // Keep original apartment for display
+          normalizedApartment: normalizedApartment, // Store normalized version
+          ageGroup: row[formDataAgeGroupIndex] ? row[formDataAgeGroupIndex].toString().trim() : '' // Age Group column
+        });
+      }
+    }
+    Logger.log(`Loaded ${registeredParticipants.size} registered participants from FormData`);
+
+    // Load WinnerEntries data
+    const winnerData = winnerSheet.getDataRange().getValues();
+    const invalidEntries = [];
+    const processedEntries = new Set(); // Track processed entries to avoid duplicates
+
+    Logger.log('Validating winner entries...');
+    // Skip header row
+    for (let i = 1; i < winnerData.length; i++) {
+      const row = winnerData[i];
+      const ageGroup = row[3] || ''; // Age Group column
+      const competitionName = row[2] || ''; // Competition Name for logging
+
+      // Check winners (columns 8-27: Winner 1-10 Name and Apartment)
+      for (let j = 0; j < 10; j++) {
+        const nameIndex = 8 + (j * 2);
+        const apartmentIndex = 9 + (j * 2);
+
+        const winnerName = row[nameIndex] ? row[nameIndex].toString().trim() : '';
+        const winnerApartment = row[apartmentIndex] ? row[apartmentIndex].toString().trim() : '';
+
+        if (winnerName && winnerApartment) {
+          // First, pad flat numbers in the winner apartment string
+          let paddedWinnerApartment = winnerApartment;
+          // Extract flat number and pad it (assuming format like "TOWER X - YYY" or "TOWERX-YYY")
+          const flatMatch = winnerApartment.match(/-(\d+)$/);
+          if (flatMatch) {
+            const flatNum = parseInt(flatMatch[1]);
+            if (!isNaN(flatNum) && flatNum >= 0 && flatNum <= 999) {
+              const paddedFlat = flatNum.toString().padStart(3, '0');
+              paddedWinnerApartment = winnerApartment.replace(/-(\d+)$/, `-${paddedFlat}`);
+            }
+          }
+
+          // Normalize apartment format more robustly
+          const normalizedApartment = paddedWinnerApartment
+            .toUpperCase()
+            .replace(/\s*-\s*/g, '-')  // Replace " - " with "-"
+            .replace(/\s+/g, '')       // Remove remaining spaces
+            .replace(/-+/g, '-');      // Normalize multiple dashes to single dash
+
+          // Check if apartment exists in FormData
+          if (apartmentSet.has(normalizedApartment)) {
+            // Apartment exists - check name validation
+            const winnerNameUpper = winnerName.toUpperCase();
+
+            if (!allNames.has(winnerNameUpper)) {
+              // Name not found in FormData at all - VALID
+              // Reason: "At least one registration from apartment is present."
+              // This is valid because someone from the apartment is registered
+            } else {
+              // Name exists in FormData - check if it's registered to this apartment
+              const namesForApartment = apartmentToNames.get(normalizedApartment);
+              if (!namesForApartment.has(winnerNameUpper)) {
+                // Name exists but not for this apartment - INVALID (Name Mismatch)
+                // Find closest match by name for debugging
+                let closestMatch = null;
+                for (let [key, participant] of registeredParticipants) {
+                  if (participant.name.toUpperCase() === winnerNameUpper) {
+                    closestMatch = participant;
+                    break;
+                  }
+                }
+
+                // Create unique key to prevent duplicates
+                const entryKey = `${winnerName.toUpperCase()}_${winnerApartment.toUpperCase()}_${ageGroup}`;
+                if (!processedEntries.has(entryKey)) {
+                  processedEntries.add(entryKey);
+                  invalidEntries.push({
+                    formDataAgeGroup: closestMatch ? `'${closestMatch.ageGroup}` : '',
+                    formDataName: closestMatch ? closestMatch.name : '',
+                    formDataTower: closestMatch ? closestMatch.apartment.split('-')[0] : '',
+                    formDataFlat: closestMatch ? closestMatch.apartment.split('-')[1] : '',
+                    formDataApartment: closestMatch ? `${closestMatch.apartment.split('-')[0]} - ${closestMatch.apartment.split('-')[1]}` : '',
+                    winnerAgeGroup: `'${ageGroup}`,
+                    winnerName: winnerName,
+                    winnerApartment: winnerApartment,
+                    isValid: 'INVALID',
+                    reason: 'Name Mismatch'
+                  });
+                }
+              }
+              // If name matches apartment, it's valid (no action needed)
+            }
+          } else {
+            // Apartment not found in FormData - INVALID
+            // Find closest match by name for debugging
+            let closestMatch = null;
+            for (let [key, participant] of registeredParticipants) {
+              if (participant.name.toUpperCase() === winnerName.toUpperCase()) {
+                closestMatch = participant;
+                break;
+              }
+            }
+
+            // Create unique key to prevent duplicates
+            const entryKey = `${winnerName.toUpperCase()}_${winnerApartment.toUpperCase()}_${ageGroup}`;
+            if (!processedEntries.has(entryKey)) {
+              processedEntries.add(entryKey);
+              invalidEntries.push({
+                formDataAgeGroup: closestMatch ? `'${closestMatch.ageGroup}` : '',
+                formDataName: closestMatch ? closestMatch.name : '',
+                formDataTower: closestMatch ? closestMatch.apartment.split('-')[0] : '',
+                formDataFlat: closestMatch ? closestMatch.apartment.split('-')[1] : '',
+                formDataApartment: closestMatch ? `${closestMatch.apartment.split('-')[0]} - ${closestMatch.apartment.split('-')[1]}` : '',
+                winnerAgeGroup: `'${ageGroup}`,
+                winnerName: winnerName,
+                winnerApartment: winnerApartment,
+                isValid: 'INVALID',
+                reason: 'No registration found from apartment.'
+              });
+            }
+          }
+        }
+      }
+
+      // Check runner-ups (columns 28-47: Runner-up 1-10 Name and Apartment)
+      for (let j = 0; j < 10; j++) {
+        const nameIndex = 28 + (j * 2);
+        const apartmentIndex = 29 + (j * 2);
+
+        const runnerName = row[nameIndex] ? row[nameIndex].toString().trim() : '';
+        const runnerApartment = row[apartmentIndex] ? row[apartmentIndex].toString().trim() : '';
+
+        if (runnerName && runnerApartment) {
+          // First, pad flat numbers in the runner apartment string
+          let paddedRunnerApartment = runnerApartment;
+          // Extract flat number and pad it (assuming format like "TOWER X - YYY" or "TOWERX-YYY")
+          const flatMatch = runnerApartment.match(/-(\d+)$/);
+          if (flatMatch) {
+            const flatNum = parseInt(flatMatch[1]);
+            if (!isNaN(flatNum) && flatNum >= 0 && flatNum <= 999) {
+              const paddedFlat = flatNum.toString().padStart(3, '0');
+              paddedRunnerApartment = runnerApartment.replace(/-(\d+)$/, `-${paddedFlat}`);
+            }
+          }
+
+          // Normalize apartment format more robustly
+          const normalizedApartment = paddedRunnerApartment
+            .toUpperCase()
+            .replace(/\s*-\s*/g, '-')  // Replace " - " with "-"
+            .replace(/\s+/g, '')       // Remove remaining spaces
+            .replace(/-+/g, '-');      // Normalize multiple dashes to single dash
+
+          // Check if apartment exists in FormData
+          if (apartmentSet.has(normalizedApartment)) {
+            // Apartment exists - check name validation
+            const runnerNameUpper = runnerName.toUpperCase();
+
+            if (!allNames.has(runnerNameUpper)) {
+              // Name not found in FormData at all - VALID
+              // Reason: "At least one registration from apartment is present."
+              // This is valid because someone from the apartment is registered
+            } else {
+              // Name exists in FormData - check if it's registered to this apartment
+              const namesForApartment = apartmentToNames.get(normalizedApartment);
+              if (!namesForApartment.has(runnerNameUpper)) {
+                // Name exists but not for this apartment - INVALID (Name Mismatch)
+                // Find closest match by name for debugging
+                let closestMatch = null;
+                for (let [key, participant] of registeredParticipants) {
+                  if (participant.name.toUpperCase() === runnerNameUpper) {
+                    closestMatch = participant;
+                    break;
+                  }
+                }
+
+                // Create unique key to prevent duplicates
+                const entryKey = `${runnerName.toUpperCase()}_${runnerApartment.toUpperCase()}_${ageGroup}`;
+                if (!processedEntries.has(entryKey)) {
+                  processedEntries.add(entryKey);
+                  invalidEntries.push({
+                    formDataAgeGroup: closestMatch ? `'${closestMatch.ageGroup}` : '',
+                    formDataName: closestMatch ? closestMatch.name : '',
+                    formDataTower: closestMatch ? closestMatch.apartment.split('-')[0] : '',
+                    formDataFlat: closestMatch ? closestMatch.apartment.split('-')[1] : '',
+                    formDataApartment: closestMatch ? `${closestMatch.apartment.split('-')[0]} - ${closestMatch.apartment.split('-')[1]}` : '',
+                    winnerAgeGroup: `'${ageGroup}`,
+                    winnerName: runnerName,
+                    winnerApartment: runnerApartment,
+                    isValid: 'INVALID',
+                    reason: 'Name Mismatch'
+                  });
+                }
+              }
+              // If name matches apartment, it's valid (no action needed)
+            }
+          } else {
+            // Apartment not found in FormData - INVALID
+            // Find closest match by name for debugging
+            let closestMatch = null;
+            for (let [key, participant] of registeredParticipants) {
+              if (participant.name.toUpperCase() === runnerName.toUpperCase()) {
+                closestMatch = participant;
+                break;
+              }
+            }
+
+            // Create unique key to prevent duplicates
+            const entryKey = `${runnerName.toUpperCase()}_${runnerApartment.toUpperCase()}_${ageGroup}`;
+            if (!processedEntries.has(entryKey)) {
+              processedEntries.add(entryKey);
+              invalidEntries.push({
+                formDataAgeGroup: closestMatch ? `'${closestMatch.ageGroup}` : '',
+                formDataName: closestMatch ? closestMatch.name : '',
+                formDataTower: closestMatch ? closestMatch.apartment.split('-')[0] : '',
+                formDataFlat: closestMatch ? closestMatch.apartment.split('-')[1] : '',
+                formDataApartment: closestMatch ? `${closestMatch.apartment.split('-')[0]} - ${closestMatch.apartment.split('-')[1]}` : '',
+                winnerAgeGroup: `'${ageGroup}`,
+                winnerName: runnerName,
+                winnerApartment: runnerApartment,
+                isValid: 'INVALID',
+                reason: 'No registration found from apartment.'
+              });
+            }
+          }
+        }
+      }
+    }
+
+    Logger.log(`Found ${invalidEntries.length} invalid entries total`);
+
+    // Add headers to WinnerUnregistered sheet
+    const headers = [
+      'Age Group_FormData',
+      'Name_FormData',
+      'Tower_FormData',
+      'Flat_FormData',
+      'Apartment_FormData',
+      'Age Group_WinnerEntries',
+      'Name_WinnerEntries',
+      'Apartment_WinnerEntries',
+      'IsValid?',
+      'Reason'
+    ];
+    unregisteredSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+
+    // Add invalid entries to WinnerUnregistered sheet
+    if (invalidEntries.length > 0) {
+      // Since we cleared the sheet, we can add all entries directly
+      const rowsToAppend = invalidEntries.map(entry => [
+        entry.formDataAgeGroup,
+        entry.formDataName,
+        entry.formDataTower,
+        entry.formDataFlat,
+        entry.formDataApartment,
+        entry.winnerAgeGroup,
+        entry.winnerName,
+        entry.winnerApartment,
+        entry.isValid,
+        entry.reason
+      ]);
+      unregisteredSheet.getRange(2, 1, invalidEntries.length, headers.length).setValues(rowsToAppend);
+
+      Logger.log(`Added ${invalidEntries.length} invalid winner entries to WinnerUnregistered sheet`);
+    }
+
+    return dataResponse({
+      status: 'success',
+      message: `Validation completed. Found ${invalidEntries.length} invalid entries.`,
+      invalidCount: invalidEntries.length
+    });
+
+  } catch (error) {
+    Logger.log('Error in validateWinnerRegistrations: ' + error.toString());
+    return errorResponse('Failed to validate winner registrations: ' + error.toString());
   }
 }
 
