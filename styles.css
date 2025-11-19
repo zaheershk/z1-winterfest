@@ -79,10 +79,10 @@
   left: 4px;
   width: calc(50% - 2px);
   height: calc(100% - 8px);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #033c3b 0%, #0a5a58 100%);
   border-radius: 46px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(3, 60, 59, 0.3);
   z-index: 1;
 }
 
