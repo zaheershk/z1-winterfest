@@ -3024,7 +3024,8 @@ async function loadFeedback() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            renderFeedback(result.feedback || []);
+            currentFeedbackData = result.feedback || [];
+            renderFeedback(currentFeedbackData);
         } else {
             // Handle specific error cases
             if (result.message && result.message.includes('Failed to retrieve feedback')) {
@@ -3078,7 +3079,7 @@ async function loadFeedback() {
     }
 }
 
-function renderFeedback(feedback) {
+function renderFeedback(feedback, filterType = null) {
     const container = document.getElementById('feedbackContainer');
 
     if (!container) {
@@ -3097,12 +3098,49 @@ function renderFeedback(feedback) {
         return;
     }
 
-    // Sort feedback by timestamp (newest first)
-    feedback.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    // Store feedback data globally for filtering
+    currentFeedbackData = feedback;
 
-    let html = '<div class="feedback-grid">';
+    // Filter feedback if a type is specified
+    let filteredFeedback = filterType ? feedback.filter(item => item.type === filterType) : feedback;
 
-    feedback.forEach((item, index) => {
+    // Calculate feedback counts by type (always use full feedback for counts)
+    const feedbackCounts = {};
+    feedback.forEach(item => {
+        feedbackCounts[item.type] = (feedbackCounts[item.type] || 0) + 1;
+    });
+
+    // Only show summary if we have data
+    let summaryHtml = '';
+    if (Object.keys(feedbackCounts).length > 0) {
+        summaryHtml = '<div class="feedback-summary">';
+        summaryHtml += '<div class="summary-stats">';
+
+        const feedbackTypes = [
+            { type: 'appreciation', iconClass: 'fa-solid fa-heart', color: '#28a745', label: 'Appreciations' },
+            { type: 'grievance', iconClass: 'fa-solid fa-triangle-exclamation', color: '#fd7e14', label: 'Grievances' },
+            { type: 'suggestion', iconClass: 'fa-solid fa-lightbulb', color: '#007bff', label: 'Suggestions' }
+        ];
+
+        feedbackTypes.forEach(({ type, iconClass, color, label }) => {
+            const count = feedbackCounts[type] || 0;
+            summaryHtml += `
+                <div class="summary-row" data-type="${type}" onclick="filterFeedback('${type}')">
+                    <div class="summary-icon" style="color: ${color}"><i class="${iconClass}"></i></div>
+                    <div class="summary-label">${label}</div>
+                    <div class="summary-count">${count}</div>
+                </div>
+            `;
+        });
+
+        summaryHtml += '</div>';
+        summaryHtml += '<button class="btn btn-outline-secondary btn-sm clear-filter-btn" onclick="clearFeedbackFilter()" style="display: none;">Clear Filter</button>';
+        summaryHtml += '</div>';
+    }
+
+    let html = summaryHtml + '<div class="feedback-grid">';
+
+    filteredFeedback.forEach((item, index) => {
         const animationDelay = (index * 0.1) + 's';
         const feedbackClass = `feedback-card-${item.type}`;
 
@@ -3111,8 +3149,12 @@ function renderFeedback(feedback) {
                  style="animation-delay: ${animationDelay}">
                 <div class="feedback-header">
                     <div class="feedback-meta">
-                        <span class="badge ${getFeedbackBadgeClass(item.type)}">${item.type.toUpperCase()}</span>
-                        <span class="badge bg-light text-dark">${formatDate(item.timestamp)}</span>
+                        <div class="feedback-type-badge">
+                            <span class="badge ${getFeedbackBadgeClass(item.type)}">${item.type.toUpperCase()}</span>
+                        </div>
+                        <div class="feedback-timestamp-badge">
+                            <span class="badge bg-light text-dark">${formatDate(item.timestamp)}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="feedback-details" data-type="${item.type}">
@@ -3126,6 +3168,60 @@ function renderFeedback(feedback) {
     container.innerHTML = html;
 }
 
+// Global variable to store current feedback data and filter state
+let currentFeedbackData = [];
+let currentFeedbackFilter = null;
+
+function filterFeedback(type) {
+    if (!currentFeedbackData || currentFeedbackData.length === 0) {
+        console.warn('No feedback data available for filtering');
+        return;
+    }
+
+    currentFeedbackFilter = type;
+    renderFeedback(currentFeedbackData, type);
+
+    // Update summary item styles (defensive DOM access)
+    const summaryItems = document.querySelectorAll('.summary-item');
+    if (summaryItems.length > 0) {
+        summaryItems.forEach(item => {
+            item.classList.remove('active');
+        });
+        const activeItem = document.querySelector(`.summary-item[data-type="${type}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
+    }
+
+    // Show clear filter button (defensive DOM access)
+    const clearBtn = document.querySelector('.clear-filter-btn');
+    if (clearBtn) {
+        clearBtn.style.display = 'block';
+    }
+}
+
+function clearFeedbackFilter() {
+    currentFeedbackFilter = null;
+    if (currentFeedbackData && currentFeedbackData.length > 0) {
+        renderFeedback(currentFeedbackData);
+    }
+
+    // Remove active class from all summary items (defensive DOM access)
+    const summaryItems = document.querySelectorAll('.summary-item');
+    if (summaryItems.length > 0) {
+        summaryItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    // Hide clear filter button (defensive DOM access)
+    const clearBtn = document.querySelector('.clear-filter-btn');
+    if (clearBtn) {
+        clearBtn.style.display = 'none';
+    }
+}
+
+// Modified loadFeedback to store data globally
 function getFeedbackIcon(type) {
     switch (type) {
         case 'grievance': return 'fa-exclamation-triangle';

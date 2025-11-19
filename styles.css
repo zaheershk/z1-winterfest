@@ -1421,6 +1421,89 @@
     }
 }
 
+/* Feedback Summary Styles */
+.feedback-summary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+}
+
+.summary-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.summary-stats {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 15px;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.summary-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row:hover {
+    background-color: #f8f9fa;
+}
+
+.summary-row.active {
+    background-color: #e3f2fd;
+}
+
+.summary-icon {
+    font-size: 1rem;
+    margin-right: 12px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.summary-label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.summary-count {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.clear-filter-btn {
+    display: block;
+    margin: 0 auto;
+    font-size: 0.85rem;
+}
+
 /* Feedback Styles */
 .feedback-container {
     min-height: 400px;
@@ -1466,8 +1549,9 @@
 
 .feedback-meta {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
 }
 
 .feedback-meta .badge {
@@ -1489,8 +1573,8 @@
 
 /* Overlay Icons for Feedback Types */
 .feedback-details[data-type="grievance"]::before {
-    content: "\f06a";
-    font-family: "Font Awesome 5 Free";
+    content: "\f071";
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
     bottom: 8px;
@@ -1504,7 +1588,7 @@
 
 .feedback-details[data-type="appreciation"]::before {
     content: "\f004";
-    font-family: "Font Awesome 5 Free";
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
     bottom: 8px;
@@ -1518,7 +1602,7 @@
 
 .feedback-details[data-type="suggestion"]::before {
     content: "\f0eb";
-    font-family: "Font Awesome 5 Free";
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
     bottom: 8px;
@@ -1532,7 +1616,7 @@
 
 .feedback-details[data-type="general"]::before {
     content: "\f075";
-    font-family: "Font Awesome 5 Free";
+    font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
     bottom: 8px;
@@ -1610,7 +1694,7 @@
     }
 
     .feedback-meta {
-        justify-content: center;
+        align-items: center;
     }
 
     .feedback-details {
