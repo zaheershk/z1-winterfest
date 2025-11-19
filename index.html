@@ -47,6 +47,10 @@
                     <i class="fas fa-chart-line"></i>
                     <span>Dashboard</span>
                 </button>
+                <button class="mobile-nav-btn" id="nav-feedback">
+                    <i class="fas fa-comments"></i>
+                    <span>Feedback</span>
+                </button>
                 <button class="mobile-nav-btn" id="nav-admin">
                     <i class="fas fa-question-circle"></i>
                     <span>Admin</span>
@@ -726,6 +730,31 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Feedback Section -->
+            <section id="feedback-section" class="mobile-section">
+                <div class="container py-3">
+                    <div class="section-header mb-4">
+                        <h2>Feedback</h2>
+                        <p class="text-muted">Share your thoughts, suggestions, and feedback about Winterfest 2025</p>
+                    </div>
+
+                    <!-- Feedback Cards Container -->
+                    <div id="feedbackContainer" class="feedback-container">
+                        <!-- Feedback cards will be loaded here -->
+                        <div class="text-center py-5" id="feedbackLoadingState">
+                            <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+                            <p class="text-muted">Loading feedback...</p>
+                        </div>
+                    </div>
+
+                    <!-- Floating Action Button -->
+                    <button id="feedbackFab" class="feedback-fab" title="Submit Feedback">
+                        <i class="fas fa-plus"></i>
+                        <span class="fab-text">Feedback</span>
+                    </button>
+                </div>
+            </section>
         </main>
     </div>
     <div id="loadingSpinner" class="loader" hidden></div>
@@ -789,6 +818,40 @@
                         <i class="fas fa-save"></i> Save
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="alert-modal" onclick="hideFeedbackModal()">
+        <div class="alert-modal-content" onclick="event.stopPropagation()">
+            <div class="alert-modal-header">
+                <h3>Submit Feedback</h3>
+                <span class="alert-modal-close" onclick="hideFeedbackModal()">&times;</span>
+            </div>
+            <div class="alert-modal-body">
+                <form id="feedbackForm">
+                    <div class="mb-3">
+                        <label for="feedbackType" class="form-label fw-bold">Feedback Type</label>
+                        <select class="form-select" id="feedbackType" required>
+                            <option value="">Select feedback type</option>
+                            <option value="grievance">Grievance</option>
+                            <option value="suggestion">Suggestion</option>
+                            <option value="appreciation">Appreciation</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackText" class="form-label fw-bold">Your Feedback</label>
+                        <textarea class="form-control" id="feedbackText" rows="4" 
+                            placeholder="Please share your feedback..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="alert-modal-footer">
+                <button type="button" class="alert-modal-btn" onclick="hideFeedbackModal()">Cancel</button>
+                <button type="button" class="green-btn" id="submitFeedbackBtn" onclick="submitFeedback()">
+                    <i class="fas fa-paper-plane"></i> Submit
+                </button>
             </div>
         </div>
     </div>

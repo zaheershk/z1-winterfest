@@ -128,6 +128,10 @@ function doPost(e) {
           return submitWinner(requestData);
         case 'getWinners':
           return getWinnersData();
+        case 'getFeedback':
+          return getFeedbackData();
+        case 'submitFeedback':
+          return submitFeedbackData(requestData);
         default:
           return errorResponse('Unknown form type: ' + requestData.formType);
       }
@@ -2212,6 +2216,113 @@ function validateWinnerRegistrations() {
   } catch (error) {
     Logger.log('Error in validateWinnerRegistrations: ' + error.toString());
     return errorResponse('Failed to validate winner registrations: ' + error.toString());
+  }
+}
+
+// Feedback functions
+function getFeedbackData() {
+  try {
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    const feedbackSheetName = 'Feedback';
+    
+    let feedbackSheet = ss.getSheetByName(feedbackSheetName);
+    if (!feedbackSheet) {
+      // Return empty array if sheet doesn't exist yet
+      return dataResponse({
+        status: 'success',
+        feedback: []
+      });
+    }
+
+    const data = feedbackSheet.getDataRange().getValues();
+    
+    if (data.length <= 1) {
+      // Only headers or empty
+      return dataResponse({
+        status: 'success',
+        feedback: []
+      });
+    }
+
+    // Convert to objects (skip header row)
+    const feedback = [];
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (row[0] && row[1] && row[2] && row[3]) { // Ensure required fields are present
+        feedback.push({
+          id: row[0], // Feedback ID
+          type: row[1], // Feedback Type
+          text: row[2], // Feedback Text
+          timestamp: row[3], // Timestamp
+          status: row[4] || 'New' // Status (default to 'New' if not set)
+        });
+      }
+    }
+
+    return dataResponse({
+      status: 'success',
+      feedback: feedback
+    });
+
+  } catch (error) {
+    Logger.log('Error in getFeedbackData: ' + error.toString());
+    return errorResponse('Failed to retrieve feedback: ' + error.toString());
+  }
+}
+
+function submitFeedbackData(requestData) {
+  try {
+    const { feedbackType, feedbackText, timestamp } = requestData;
+
+    if (!feedbackType || !feedbackText || !timestamp) {
+      return errorResponse('Missing required feedback data');
+    }
+
+    const ss = SpreadsheetApp.openById(registrationWorkbookId);
+    const feedbackSheetName = 'Feedback';
+    
+    let feedbackSheet = ss.getSheetByName(feedbackSheetName);
+    if (!feedbackSheet) {
+      // Create the sheet if it doesn't exist
+      feedbackSheet = ss.insertSheet(feedbackSheetName);
+      
+      // Add headers
+      const headers = [
+        'Feedback ID',
+        'Feedback Type',
+        'Feedback Text', 
+        'Timestamp',
+        'Status'
+      ];
+      feedbackSheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      
+      // Format header row
+      feedbackSheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#f8f9fa');
+    }
+
+    // Generate unique ID
+    const feedbackId = Utilities.getUuid();
+    
+    // Add the feedback entry
+    const newRow = [
+      feedbackId,
+      feedbackType,
+      feedbackText,
+      timestamp,
+      'New' // Default status
+    ];
+    
+    feedbackSheet.appendRow(newRow);
+
+    return dataResponse({
+      status: 'success',
+      message: 'Feedback submitted successfully',
+      feedbackId: feedbackId
+    });
+
+  } catch (error) {
+    Logger.log('Error in submitFeedbackData: ' + error.toString());
+    return errorResponse('Failed to submit feedback: ' + error.toString());
   }
 }
 

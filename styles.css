@@ -969,7 +969,9 @@
 
 .alert-modal-footer {
     padding: 15px 25px 25px;
-    text-align: center;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 .alert-modal-btn {
@@ -1416,5 +1418,249 @@
     .competition-meta .badge {
         font-size: 0.7rem;
         padding: 3px 6px;
+    }
+}
+
+/* Feedback Styles */
+.feedback-container {
+    min-height: 400px;
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.feedback-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.feedback-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.feedback-icon {
+    font-size: 2rem;
+    opacity: 0.9;
+}
+
+.feedback-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.feedback-meta .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+.feedback-details {
+    padding: 20px;
+    position: relative;
+}
+
+.feedback-content {
+    line-height: 1.6;
+    color: #495057;
+    white-space: pre-wrap;
+    position: relative;
+}
+
+/* Overlay Icons for Feedback Types */
+.feedback-details[data-type="grievance"]::before {
+    content: "\f06a";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 3;
+    color: #fd7e14;
+}
+
+.feedback-details[data-type="appreciation"]::before {
+    content: "\f004";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 3;
+    color: #28a745;
+}
+
+.feedback-details[data-type="suggestion"]::before {
+    content: "\f0eb";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 3;
+    color: #007bff;
+}
+
+.feedback-details[data-type="general"]::before {
+    content: "\f075";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 3;
+    color: #6c757d;
+}
+
+/* Floating Action Button */
+.feedback-fab {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    height: 56px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    min-width: 56px;
+}
+
+.feedback-fab .fab-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.feedback-fab:hover .fab-text {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.feedback-fab:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    padding: 0 20px;
+}
+
+.feedback-fab:active {
+    transform: scale(0.98);
+}
+
+/* Responsive Feedback */
+@media (max-width: 768px) {
+    .feedback-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .feedback-card {
+        margin: 0 10px;
+    }
+
+    .feedback-header {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .feedback-meta {
+        justify-content: center;
+    }
+
+    .feedback-details {
+        padding: 15px;
+    }
+
+    .feedback-content {
+        font-size: 0.9rem;
+    }
+
+    .feedback-fab {
+        bottom: 5rem;
+        right: 1.5rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .feedback-header {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .feedback-meta .badge {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+
+    .feedback-details {
+        padding: 12px;
+    }
+
+    .feedback-content {
+        font-size: 0.85rem;
+    }
+
+    .feedback-fab {
+        bottom: 4rem;
+        right: 1rem;
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+        border-radius: 50%;
+        padding: 0;
+        min-width: 48px;
+    }
+
+    .feedback-fab .fab-text {
+        display: none;
     }
 }

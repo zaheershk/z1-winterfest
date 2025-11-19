@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const navRegistration = document.getElementById("nav-registration");
         const navCheckout = document.getElementById("nav-checkout");
         const navDashboard = document.getElementById("nav-dashboard");
+        const navFeedback = document.getElementById("nav-feedback");
         const navAdmin = document.getElementById("nav-admin");
 
         if (navInformation) {
@@ -79,6 +80,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+        if (navFeedback) {
+            navFeedback.addEventListener("click", function () {
+                switchSection("feedback");
+            });
+        }
+
         if (navAdmin) {
             navAdmin.addEventListener("click", function () {
                 switchSection("admin");
@@ -94,15 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
 
             if (navRegistration) {
-                navRegistration.style.opacity = '0.5';
-                navRegistration.style.pointerEvents = 'none';
-                navRegistration.title = 'Registration is closed';
+                navRegistration.style.display = 'none';
             }
 
             if (navCheckout) {
-                navCheckout.style.opacity = '0.5';
-                navCheckout.style.pointerEvents = 'none';
-                navCheckout.title = 'Registration is closed';
+                navCheckout.style.display = 'none';
             }
 
             if (registerParticipantBtn) {
@@ -209,8 +212,6 @@ function validateAccessCodeAndInitialize(accessCode, sectionFromUrl) {
             hasValidAccessCode = true;
             window.accessCode = accessCode;
             REGISTRATION_CLOSED = false; // Override for this session
-            console.log('Valid access code detected:', accessCode, '- Registration reopened for this session');
-
             // Re-enable the UI since registration is now open
             const navRegistration = document.getElementById('nav-registration');
             const navCheckout = document.getElementById('nav-checkout');
@@ -218,15 +219,11 @@ function validateAccessCodeAndInitialize(accessCode, sectionFromUrl) {
             const registerParticipantBtnCheckout = document.getElementById('registerParticipantBtnCheckout');
 
             if (navRegistration) {
-                navRegistration.style.opacity = '1';
-                navRegistration.style.pointerEvents = 'auto';
-                navRegistration.title = '';
+                navRegistration.style.display = 'flex';
             }
 
             if (navCheckout) {
-                navCheckout.style.opacity = '1';
-                navCheckout.style.pointerEvents = 'auto';
-                navCheckout.title = '';
+                navCheckout.style.display = 'flex';
             }
 
             if (registerParticipantBtn) {
@@ -1828,9 +1825,6 @@ function renderWinnerDashboard(winners) {
                  data-competition="${competition.name}"
                  data-agegroup="${competition.ageGroup}">
                 <div class="competition-header">
-                    <div class="competition-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
                     <div class="competition-info">
                         <h5 class="competition-name">${competition.name}</h5>
                         <div class="competition-meta">
@@ -2983,6 +2977,305 @@ async function checkVolunteerByEmail() {
             document.getElementById('expense-panel').style.display = 'none';
             document.getElementById('winner-panel').style.display = 'none';
         }, 1500);
+    }
+}
+
+// Feedback functions
+function initializeFeedback() {
+    // Small delay to ensure DOM is ready after section switch
+    setTimeout(() => {
+        // Load feedback data
+        loadFeedback();
+
+        // Setup feedback FAB event listener
+        const feedbackFab = document.getElementById('feedbackFab');
+        if (feedbackFab) {
+            feedbackFab.addEventListener('click', showFeedbackModal);
+        }
+    }, 100);
+}
+
+async function loadFeedback() {
+    const loadingState = document.getElementById('feedbackLoadingState');
+    const container = document.getElementById('feedbackContainer');
+
+    try {
+        // Show loading state (defensive access)
+        if (loadingState) loadingState.style.display = 'block';
+
+        // Fetch feedback data
+        const response = await fetch(CONFIG.BACKEND_URL, {
+            method: 'POST',
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "text/plain",
+            },
+            redirect: "follow",
+            body: JSON.stringify({
+                formType: 'getFeedback'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            renderFeedback(result.feedback || []);
+        } else {
+            // Handle specific error cases
+            if (result.message && result.message.includes('Failed to retrieve feedback')) {
+                // This is likely a sheet access issue, show a user-friendly message
+                if (container) container.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle fa-2x mb-3 text-primary"></i>
+                        <h5>Feedback System Ready</h5>
+                        <p>No feedback has been submitted yet. Be the first to share your thoughts!</p>
+                    </div>
+                `;
+            } else {
+                throw new Error(result.message || 'Failed to load feedback');
+            }
+        }
+
+    } catch (error) {
+        console.error('Error loading feedback:', error);
+
+        // Check if it's a network error or parsing error
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            if (container) container.innerHTML = `
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-wifi fa-2x mb-3 text-warning"></i>
+                    <h5>Connection Issue</h5>
+                    <p>Unable to connect to the feedback service. Please check your internet connection and try again.</p>
+                </div>
+            `;
+        } else if (error.message.includes('HTTP error!')) {
+            if (container) container.innerHTML = `
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-server fa-2x mb-3 text-danger"></i>
+                    <h5>Server Error</h5>
+                    <p>The feedback service is temporarily unavailable. Please try again later.</p>
+                </div>
+            `;
+        } else {
+            if (container) container.innerHTML = `
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                    <h5>Unable to Load Feedback</h5>
+                    <p>Please try refreshing the page. If the problem persists, contact support.</p>
+                </div>
+            `;
+        }
+    } finally {
+        // Hide loading state
+        if (loadingState) {
+            loadingState.style.display = 'none';
+        }
+    }
+}
+
+function renderFeedback(feedback) {
+    const container = document.getElementById('feedbackContainer');
+
+    if (!container) {
+        console.error('Feedback container not found');
+        return;
+    }
+
+    if (!feedback || feedback.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Feedback Yet</h4>
+                <p class="text-muted">Be the first to share your feedback about Winterfest 2025!</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Sort feedback by timestamp (newest first)
+    feedback.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    let html = '<div class="feedback-grid">';
+
+    feedback.forEach((item, index) => {
+        const animationDelay = (index * 0.1) + 's';
+        const feedbackClass = `feedback-card-${item.type}`;
+
+        html += `
+            <div class="feedback-card ${item.type} animate-fade-in"
+                 style="animation-delay: ${animationDelay}">
+                <div class="feedback-header">
+                    <div class="feedback-meta">
+                        <span class="badge ${getFeedbackBadgeClass(item.type)}">${item.type.toUpperCase()}</span>
+                        <span class="badge bg-light text-dark">${formatDate(item.timestamp)}</span>
+                    </div>
+                </div>
+                <div class="feedback-details" data-type="${item.type}">
+                    <div class="feedback-content" style="${getFeedbackGradientStyle(item.type)}">${item.text}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function getFeedbackIcon(type) {
+    switch (type) {
+        case 'grievance': return 'fa-exclamation-triangle';
+        case 'suggestion': return 'fa-lightbulb';
+        case 'appreciation': return 'fa-heart';
+        default: return 'fa-comment';
+    }
+}
+
+function getFeedbackBadgeClass(type) {
+    switch (type) {
+        case 'grievance': return 'bg-warning text-dark'; // orange with dark text
+        case 'appreciation': return 'bg-success'; // green with light text (default)
+        case 'suggestion': return 'bg-primary'; // blue with light text (default)
+        default: return 'bg-secondary';
+    }
+}
+
+function getFeedbackGradientStyle(type) {
+    const basePadding = 'padding: 15px; position: relative;';
+    switch (type) {
+        case 'grievance':
+            return basePadding + ' background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);';
+        case 'appreciation':
+            return basePadding + ' background: linear-gradient(135deg, rgba(25, 135, 84, 0.1) 0%, rgba(25, 135, 84, 0.05) 100%);';
+        case 'suggestion':
+            return basePadding + ' background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);';
+        default:
+            return basePadding + ' background: linear-gradient(135deg, rgba(108, 117, 125, 0.1) 0%, rgba(108, 117, 125, 0.05) 100%);';
+    }
+}
+
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function showFeedbackModal() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        // Reset form
+        document.getElementById('feedbackForm').reset();
+    }
+}
+
+function hideFeedbackModal() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function submitFeedback() {
+    const feedbackType = document.getElementById('feedbackType').value;
+    const feedbackText = document.getElementById('feedbackText').value.trim();
+
+    if (!feedbackType || !feedbackText) {
+        showAlertModal('Please fill in all required fields.');
+        return;
+    }
+
+    // Show loading state
+    const submitBtn = document.getElementById('submitFeedbackBtn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    }
+
+    try {
+        const response = await fetch(CONFIG.BACKEND_URL, {
+            method: 'POST',
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "text/plain",
+            },
+            redirect: "follow",
+            body: JSON.stringify({
+                formType: 'submitFeedback',
+                feedbackType: feedbackType,
+                feedbackText: feedbackText,
+                timestamp: new Date().toISOString()
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            showAlertModal('Thank you for your feedback! It has been submitted successfully.');
+            hideFeedbackModal();
+            // Reload feedback to show the new entry
+            loadFeedback();
+        } else {
+            throw new Error(result.message || 'Failed to submit feedback');
+        }
+
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        showAlertModal('Failed to submit feedback. Please try again.');
+    } finally {
+        // Reset button state
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+        }
+    }
+}
+
+// Section switching function
+function switchSection(sectionName) {
+    // Hide all sections
+    const sections = document.querySelectorAll('.mobile-section');
+    sections.forEach(section => {
+        section.classList.remove('active');
+    });
+
+    // Remove active class from all nav buttons
+    const navButtons = document.querySelectorAll('.mobile-nav-btn');
+    navButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Show the target section
+    const targetSection = document.getElementById(sectionName + '-section');
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+
+    // Add active class to the corresponding nav button
+    const targetNavButton = document.getElementById('nav-' + sectionName);
+    if (targetNavButton) {
+        targetNavButton.classList.add('active');
+    }
+
+    // Handle section-specific initialization
+    if (sectionName === 'dashboard') {
+        initializeDashboard();
+    } else if (sectionName === 'feedback') {
+        initializeFeedback();
     }
 }
 
