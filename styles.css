@@ -1635,11 +1635,11 @@
     right: 2rem;
     height: 56px;
     border-radius: 28px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #033c3b 0%, #0a5a58 100%);
     border: none;
     color: white;
     font-size: 1.5rem;
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 20px rgba(3, 60, 59, 0.4);
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 1000;
