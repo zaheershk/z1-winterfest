@@ -1,6 +1,7 @@
 
-// Global flag to control registration status
+// Global flag to control functionality
 let REGISTRATION_CLOSED = true;
+let FEEDBACK_OPEN = false;
 
 // Global access code state
 let hasValidAccessCode = false;
@@ -136,6 +137,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (hasValidAccessCode) {
                 showSpecialAccessMessage();
             }
+        }
+
+        // Control feedback tab visibility based on FEEDBACK_OPEN flag
+        if (navFeedback) {
+            navFeedback.style.display = FEEDBACK_OPEN ? 'flex' : 'none';
         }
 
         // Information tab - Register Participant button
