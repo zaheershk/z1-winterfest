@@ -1912,12 +1912,6 @@ function validateWinnerRegistrations() {
         const tower = row[formDataTowerIndex].toString().trim().toUpperCase();
         let flat = row[formDataFlatIndex].toString().trim().toUpperCase();
 
-        // Pad flat number to 3 digits (only for 1 or 2 digit flats)
-        const flatNum = parseInt(flat);
-        if (!isNaN(flatNum) && flatNum >= 0 && flatNum <= 999) {
-          flat = flatNum.toString().padStart(3, '0');
-        }
-
         const apartment = `${tower}-${flat}`;
 
         // Normalize apartment format the same way as winner validation

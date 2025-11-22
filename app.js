@@ -1613,6 +1613,65 @@ function hideAlertModal() {
     }
 }
 
+function showTopPerformersModal() {
+    const modal = document.getElementById('topPerformersModal');
+    if (modal) {
+        // Load top performers data if not already loaded
+        if (!modal.dataset.loaded) {
+            loadTopPerformers();
+            modal.dataset.loaded = 'true';
+        }
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+
+        // Add click outside to close
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                hideTopPerformersModal();
+            }
+        });
+    }
+}
+
+function hideTopPerformersModal() {
+    const modal = document.getElementById('topPerformersModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function loadTopPerformers() {
+    // Show loading state
+    const container = document.getElementById('topPerformersContainer');
+    container.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading top performers...</span>
+            </div>
+            <p class="mt-2">Loading top performers...</p>
+        </div>
+    `;
+
+    // Use stored winner data instead of making a new fetch request
+    setTimeout(() => {
+        if (winnerData && winnerData.length > 0) {
+            // Calculate and render top performers
+            const topPerformers = calculateTopPerformers(winnerData);
+            renderTopPerformers(topPerformers);
+        } else {
+            // No winners data available
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Winner Information Available</h4>
+                    <p class="text-muted">Winner information will appear here once competitions are completed.</p>
+                </div>
+            `;
+        }
+    }, 500); // Small delay to show loading state
+}
+
 function showResetModal() {
     const modal = document.createElement('div');
     modal.id = 'resetModal';
@@ -1692,6 +1751,7 @@ function resetRegistrationFlow() {
 
 // Dashboard functionality
 let dashboardApartments = [];
+let winnerData = []; // Store winner data globally for modal reuse
 
 async function initializeDashboard() {
     // Load apartments for autocomplete
@@ -1781,7 +1841,169 @@ async function loadWinnerDashboard() {
     }
 }
 
+function calculateTopPerformers(winners) {
+    // Define age groups for top performers
+    const ageGroups = {
+        'Under 10': [],
+        '10-17': [],
+        '18+': []
+    };
+
+    // Points system: 2 points for winners, 1 point for runner-ups
+    const pointsMap = new Map();
+
+    winners.forEach(competition => {
+        const ageGroup = getTopPerformerAgeGroup(competition.ageGroup);
+
+        if (!ageGroup) return; // Skip if age group doesn't match our criteria
+
+        // Process winners (2 points each)
+        competition.winners.forEach(winner => {
+            const key = `${winner.name.trim().toLowerCase()}|${winner.apartment.trim().toLowerCase()}`;
+            if (!pointsMap.has(key)) {
+                pointsMap.set(key, {
+                    name: winner.name.trim(),
+                    apartment: winner.apartment.trim(),
+                    points: 0,
+                    ageGroup: ageGroup
+                });
+            }
+            pointsMap.get(key).points += 2;
+        });
+
+        // Process runner-ups (1 point each)
+        competition.runnerUps.forEach(runnerUp => {
+            const key = `${runnerUp.name.trim().toLowerCase()}|${runnerUp.apartment.trim().toLowerCase()}`;
+            if (!pointsMap.has(key)) {
+                pointsMap.set(key, {
+                    name: runnerUp.name.trim(),
+                    apartment: runnerUp.apartment.trim(),
+                    points: 0,
+                    ageGroup: ageGroup
+                });
+            }
+            pointsMap.get(key).points += 1;
+        });
+    });
+
+    // Group performers by age group and sort by points (descending)
+    Object.keys(ageGroups).forEach(ageGroup => {
+        const performers = Array.from(pointsMap.values())
+            .filter(performer => performer.ageGroup === ageGroup)
+            .sort((a, b) => b.points - a.points);
+
+        // Assign ranks, handling ties
+        let currentRank = 1;
+        let previousPoints = -1;
+
+        performers.forEach((performer, index) => {
+            if (performer.points !== previousPoints) {
+                currentRank++;
+                previousPoints = performer.points;
+            }
+            performer.rank = currentRank - 1; // Subtract 1 because we incremented at the start
+        });
+
+        // Take all performers with ranks 1, 2, or 3 (including ties)
+        ageGroups[ageGroup] = performers.filter(performer => performer.rank <= 3);
+    });
+
+    return ageGroups;
+}
+
+function getTopPerformerAgeGroup(ageGroup) {
+    if (!ageGroup) return null;
+
+    const age = ageGroup.toString().toLowerCase().trim();
+
+    // Map to our 3 categories based on existing age group formats
+    if (age.includes('3-5') || age.includes('6-9') || age.includes('under 10') || age.includes('below 10') || age === 'u10' || age === '<10') {
+        return 'Under 10';
+    }
+
+    if (age.includes('10-13') || age.includes('14-17') || age.includes('10-17') || age.includes('under 18')) {
+        return '10-17';
+    }
+
+    if (age.includes('18-35') || age.includes('36-55') || age.includes('56+') || age.includes('18 & above') || age.includes('56 & above') || age.includes('adult') || age === '18+') {
+        return '18+';
+    }
+
+    return null; // Not one of our target age groups
+}
+
+function renderTopPerformers(topPerformers) {
+    const container = document.getElementById('topPerformersContainer');
+
+    // Check if we have any performers to show
+    const hasPerformers = Object.values(topPerformers).some(group => group.length > 0);
+
+    if (!hasPerformers) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Winner Information Available</h4>
+                <p class="text-muted">Winner information will appear here once competitions are completed.</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+
+    Object.keys(topPerformers).forEach(ageGroup => {
+        const performers = topPerformers[ageGroup];
+
+        html += `
+            <div class="top-performers-column">
+                <div class="age-group-header">
+                    <h4>${ageGroup}</h4>
+                </div>
+                <div class="performers-table-container">
+        `;
+
+        if (performers.length === 0) {
+            html += `
+                <div class="no-performers">
+                    No performers yet
+                </div>
+            `;
+        } else {
+            html += `
+                <table class="performers-table">
+                    <tbody>
+            `;
+            performers.forEach(performer => {
+                html += `
+                    <tr class="performer-row rank-${performer.rank}">
+                        <td class="performer-rank-cell">${performer.rank}</td>
+                        <td class="performer-details-cell">
+                            <div class="performer-name">${performer.name}</div>
+                            <div class="performer-apartment">${performer.apartment}</div>
+                        </td>
+                        <td class="performer-points-cell">${performer.points}</td>
+                    </tr>
+                `;
+            });
+            html += `
+                    </tbody>
+                </table>
+            `;
+        }
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
 function renderWinnerDashboard(winners) {
+    // Store winner data globally for modal reuse
+    winnerData = winners || [];
+
     const container = document.getElementById('winnerDashboardContainer');
     const filtersContainer = document.getElementById('winnerFilters');
 
@@ -2068,6 +2290,7 @@ function setupDashboardEventListeners() {
     const nameInput = document.getElementById('dashboardName');
     const apartmentInput = document.getElementById('dashboardApartment');
     const toggleInput = document.getElementById('dashboardToggle');
+    const showTopPerformersBtn = document.getElementById('showTopPerformersBtn');
 
     // Setup toggle functionality
     if (toggleInput) {
@@ -2116,6 +2339,10 @@ function setupDashboardEventListeners() {
                 performDashboardSearch();
             }
         });
+    }
+
+    if (showTopPerformersBtn) {
+        showTopPerformersBtn.addEventListener('click', showTopPerformersModal);
     }
 }
 

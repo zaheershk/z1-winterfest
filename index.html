@@ -576,6 +576,14 @@
 
                             <!-- Winner Dashboard Content -->
                             <div id="winnerDashboardContent">
+                                <!-- Show Top Performers Button -->
+                                <div class="mb-4">
+                                    <button type="button" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2" id="showTopPerformersBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 3px 10px rgba(102, 126, 234, 0.25); font-size: 0.95rem;">
+                                        <i class="fas fa-trophy fa-sm"></i>
+                                        <span>Show Top Performers</span>
+                                    </button>
+                                </div>
+
                                 <!-- Filter Controls -->
                                 <div id="winnerFilters" class="winner-filters mb-4" style="display: none;">
                                     <div class="row g-3 align-items-end">
@@ -790,6 +798,25 @@
             <div class="alert-modal-footer">
                 <button id="emailSubmitBtn" class="alert-modal-btn" onclick="checkVolunteerByEmail()">Submit</button>
                 <button id="emailCancelBtn" class="alert-modal-btn" onclick="hideEmailModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performers Modal -->
+    <div id="topPerformersModal" class="alert-modal">
+        <div class="alert-modal-content">
+            <div class="alert-modal-header">
+                <h3><i class="fas fa-trophy"></i> Top Performers</h3>
+                <span class="alert-modal-close" onclick="hideTopPerformersModal()">&times;</span>
+            </div>
+            <div class="alert-modal-body">
+                <p class="text-muted mb-4">Top 3 rank participants across all competitions</p>
+                <div id="topPerformersContainer" class="top-performers-grid">
+                    <!-- Top performers will be populated here -->
+                </div>
+            </div>
+            <div class="alert-modal-footer">
+                <button class="alert-modal-btn" onclick="hideTopPerformersModal()">Close</button>
             </div>
         </div>
     </div>
