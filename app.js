@@ -2006,7 +2006,7 @@ function renderWinnerDashboard(winners) {
 
     const container = document.getElementById('winnerDashboardContainer');
     const filtersContainer = document.getElementById('winnerFilters');
-    const topPerformersBtnContainer = document.querySelector('#topPerformersBtnContainer');
+    const topPerformersBtnContainer = document.getElementById('topPerformersBtnContainer');
 
     if (!winners || winners.length === 0) {
         container.innerHTML = `
