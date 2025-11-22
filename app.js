@@ -2006,6 +2006,7 @@ function renderWinnerDashboard(winners) {
 
     const container = document.getElementById('winnerDashboardContainer');
     const filtersContainer = document.getElementById('winnerFilters');
+    const topPerformersBtnContainer = document.getElementById('topPerformersBtnContainer');
 
     if (!winners || winners.length === 0) {
         container.innerHTML = `
@@ -2016,11 +2017,13 @@ function renderWinnerDashboard(winners) {
             </div>
         `;
         filtersContainer.style.display = 'none';
+        topPerformersBtnContainer.style.display = 'none';
         return;
     }
 
-    // Show filters and populate dropdowns
+    // Show filters and top performers button
     filtersContainer.style.display = 'block';
+    topPerformersBtnContainer.style.display = 'block';
     populateFilterDropdowns(winners);
 
     // Sort winners by category alphabetically, then by competition name alphabetically, then by age group (custom order)
